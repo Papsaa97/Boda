@@ -1,0 +1,33 @@
+// lib/core/di/providers.dart
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
+
+import '../../features/activity/data/activity_hive_model.dart';
+import '../../features/activity/data/hive_local_data_source.dart';
+import '../../features/activity/data/activity_repository_impl.dart';
+import '../../features/activity/domain/activity_repository.dart';
+
+/// Provider pro Hive box s aktivitami.
+///
+/// V těle je jen placeholder – skutečný Box předáme v main.dart
+/// pomocí ProviderScope(overrides: ...).
+final activityBoxProvider = Provider<Box<ActivityHiveModel>>((ref) {
+  throw UnimplementedError(
+    'activityBoxProvider musí být override-nut v main.dart otevřeným Hive boxem.',
+  );
+});
+
+/// Provider pro lokální data source (Hive).
+final hiveLocalDataSourceProvider = Provider<HiveLocalDataSource>((ref) {
+  final box = ref.watch(activityBoxProvider);
+  return HiveLocalDataSource(box);
+});
+
+/// Provider pro ActivityRepository (Domain vrstva).
+///
+/// Presentation (controllery, UI) budou číst tento provider.
+final activityRepositoryProvider = Provider<ActivityRepository>((ref) {
+  final dataSource = ref.watch(hiveLocalDataSourceProvider);
+  return ActivityRepositoryImpl(dataSource);
+});
