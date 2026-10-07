@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Bóďa potřebuje fotoaparát, abys mohl vyfotit práci na zahradě do deníku.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Bóďa potřebuje přístup k fotkám, abys mohl přidat fotku k záznamu v deníku.</string>
 </dict>
 </plist>
