@@ -58,7 +58,7 @@ dependencies:
   turf: ^0.0.14
   geolocator: ^14.0.0
   purchases_flutter: ^10.15.1
-  sentry_flutter: ^8.14.2
+  sentry_flutter: ^9.30.1
   posthog_flutter: ^5.52.0
 
 dev_dependencies:
