@@ -82,7 +82,9 @@ void main() {
 
     final a1 = activities.firstWhere((a) => a.id == 'a1');
     expect(a1.title, 'Zálivka rajčat');
-    expect(a1.date, DateTime(2026, 5, 1, 8, 30));
+    // Fixtura vznikla v UTC; Hive ukládá okamžik, ne místní čas, proto
+    // srovnání v UTC, aby test prošel v libovolném časovém pásmu.
+    expect(a1.date.toUtc(), DateTime.utc(2026, 5, 1, 8, 30));
     expect(a1.notes, 'Ráno před sluncem');
     expect(a1.type, ActivityType.watering);
     expect(a1.zoneId, zones.first.id);
