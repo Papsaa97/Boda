@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../core/di/providers.dart';
 import '../../activity/domain/activity_entity.dart';
@@ -7,7 +6,7 @@ import '../../activity/presentation/controllers/activity_controller.dart';
 import '../domain/zone_entity.dart';
 import '../domain/zone_rules.dart';
 
-/// Seznam zón seřazený podle názvu.
+/// Všechny zóny včetně archivovaných, seřazené podle názvu.
 class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
   @override
   Future<List<ZoneEntity>> build() async {
@@ -17,11 +16,18 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
 
   List<ZoneEntity> get _current => state.value ?? const <ZoneEntity>[];
 
-  /// Přidá zónu. Vrací chybovou hlášku, když název neprojde kontrolou.
-  Future<String?> addZone(String name) async {
+  int get _activeCount => _current.where((z) => !z.archived).length;
+
+  /// Přidá zónu. Vrací důvod, když název neprojde kontrolou.
+  Future<ZoneNameError?> addZone(
+    String name, {
+    ZoneType type = ZoneType.other,
+  }) async {
     final error = validateZoneName(name, _current);
     if (error != null) return error;
-    await _save(ZoneEntity(id: const Uuid().v4(), name: name.trim()));
+    await _save(
+      ZoneEntity(id: ref.read(newIdProvider)(), name: name.trim(), type: type),
+    );
     return null;
   }
 
@@ -38,12 +44,30 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
     });
   }
 
-  /// Přejmenuje zónu. Vrací chybovou hlášku, když název neprojde kontrolou.
-  Future<String?> renameZone(String id, String name) async {
+  /// Změní název a druh zóny. Vrací důvod, když název neprojde kontrolou.
+  Future<ZoneNameError?> editZone(
+    String id, {
+    required String name,
+    required ZoneType type,
+  }) async {
     final error = validateZoneName(name, _current, exceptId: id);
     if (error != null) return error;
-    await _save(ZoneEntity(id: id, name: name.trim()));
+    final zone = _byId(id);
+    if (zone == null) return null;
+    await _save(zone.copyWith(name: name.trim(), type: type));
     return null;
+  }
+
+  /// Archivuje zónu nebo ji vrátí z archivu (FR-D3). Vrací false, když
+  /// by nezůstala žádná aktivní zóna.
+  Future<bool> setArchived(String id, bool archived) async {
+    final zone = _byId(id);
+    if (zone == null || zone.archived == archived) return true;
+    if (archived && !canArchiveZone(activeZoneCount: _activeCount)) {
+      return false;
+    }
+    await _save(zone.copyWith(archived: archived));
+    return true;
   }
 
   /// Smaže zónu, pokud to pravidla dovolí; jinak vrátí důvod a nic nemění.
@@ -54,7 +78,8 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
         await ref.read(activityControllerProvider.future);
     final blocker = zoneDeleteBlocker(
       zoneId: id,
-      zoneCount: _current.length,
+      activeZoneCount: _activeCount,
+      isArchived: _byId(id)?.archived ?? false,
       activityCount: activities.where((a) => a.zoneId == id).length,
     );
     if (blocker != null) return blocker;
@@ -64,6 +89,13 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
       await ref.read(zoneRepositoryProvider).deleteZone(id);
       return previous.where((z) => z.id != id).toList();
     });
+    return null;
+  }
+
+  ZoneEntity? _byId(String id) {
+    for (final z in _current) {
+      if (z.id == id) return z;
+    }
     return null;
   }
 
@@ -92,12 +124,25 @@ final zonesControllerProvider =
       ZonesController.new,
     );
 
-/// Název zóny podle id; pro neznámé id vrací „Neznámá zóna“.
-final zoneNameProvider = Provider.family<String, String>((ref, zoneId) {
-  final zones =
-      ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[];
-  for (final zone in zones) {
-    if (zone.id == zoneId) return zone.name;
-  }
-  return 'Neznámá zóna';
+/// Zóny, které se nabízejí pro nové záznamy a úkoly (bez archivovaných).
+final activeZonesProvider = Provider<List<ZoneEntity>>((ref) {
+  final zones = ref.watch(zonesControllerProvider).value ?? const [];
+  return [
+    for (final z in zones)
+      if (!z.archived) z,
+  ];
 });
+
+/// Zóna podle id, nebo null pro neznámé id.
+final zoneByIdProvider = Provider.family<ZoneEntity?, String>((ref, zoneId) {
+  final zones = ref.watch(zonesControllerProvider).value ?? const [];
+  for (final zone in zones) {
+    if (zone.id == zoneId) return zone;
+  }
+  return null;
+});
+
+/// Název zóny podle id; null pro neznámé id (UI ukáže „Neznámá zóna“).
+final zoneNameProvider = Provider.family<String?, String>(
+  (ref, zoneId) => ref.watch(zoneByIdProvider(zoneId))?.name,
+);

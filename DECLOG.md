@@ -175,3 +175,58 @@ Dopad: kdyby Papi chtěl jiné ID (např. podle vlastní domény), stačí ho zm
 **D36. Onboarding a světlý motiv už v 0.1 (předsunuto z 0.2, viz D18); onboarding má jeden krok „Co pěstuješ?“, jde přeskočit a úvodní obrazovka „Začít bez registrace“ odpadá (upřesňuje D19).**
 Proč: bez onboardingu nový uživatel dostal pět zón, které nemusí mít; podoba odpovídá spec 10.1 (bez úvodní obrazovky) a 10.4. Světlý motiv byl levný, protože paleta ve spec 10.2 je hotová.
 Dopad: lokalita a první záznam ze spec 10.4 zůstávají na 0.2. Výchozí motiv je „podle systému“.
+
+## 2026-10-08 – MVP 0.2 Spolehlivý deník
+
+Rozhodnutí, která padla při stavbě MVP 0.2. Rozsah je spec kap. 4 (MVP 0.2) a tabulky FR s fází 0.2.
+
+**D37. Převod dat z verze 0.1: zóny dostanou UUID a druh, záznamy odhadnutý typ.**
+Proč: verze 0.1 měla zóny s pevnými id `Z1`–`Z7` a záznamy bez typu. Server (1.0) potřebuje UUID a číselník `zone.type`.
+Dopad: `lib/core/storage/legacy_hive_import.dart` jednou při prvním spuštění 0.2 převede Hive do Driftu v jedné transakci (příznak `legacy_hive_import_at` v `app_settings`). `Z1` → zelenina, `Z2` → okrasná … podle pevné tabulky; typ záznamu se odhadne z názvu („Zálivka rajčat“ → `watering`), jinak `other`. Soubory Hive zůstávají na disku jako pojistka; když převod selže, aplikace se spustí a převod se zkusí znovu příště. Test čte box zapsaný verzí 0.1.
+
+**D38. Do číselníku `zone.type` přibyly bylinky (`herbs`).**
+Proč: onboarding 0.1 nabízí kartu Bylinky a bez vlastního druhu by dostala ikonu i budoucí rady „jiné“.
+Dopad: spec 8.3 doplněna.
+
+**D39. Fulltext v deníku se filtruje v paměti, ne přes FTS5 (upřesňuje D26).**
+Proč: deník jednoho zahradníka má stovky až nízké tisíce záznamů, filtr v paměti je pod milisekundu. Uživatel píše bez diakritiky („zalivka“), což FTS5 bez vlastního tokenizéru neumí; normalizace v Dartu ano.
+Dopad: `ActivityFilter` + `normalizeForSearch`. Přejít na FTS5, až to ukáže měření.
+
+**D40. Čas připomínky je samostatný sloupec `tasks.remind_at` (minuty od půlnoci).**
+Proč: `due` je den (spec 8.1). Úkol bez času se objeví jen v ranním přehledu, úkol s časem dostane i vlastní notifikaci.
+Dopad: v 1.0 přibude sloupec i v PostgreSQL (`remind_at smallint`); export ho nese jako `"HH:MM"`.
+
+**D41. Notifikace: nepřesné alarmy, plán na 14 dní, 30 minut ochrana před tichými hodinami.**
+Proč: přesné alarmy na Androidu 14 vyžadují zvláštní oprávnění a Google Play ho kalendářovým aplikacím nedává automaticky. Nepřesný alarm se může o pár minut zpozdit, proto připomínka v posledních 30 minutách před tichými hodinami přijde na začátku této půlhodiny, ne přes noc. Plán se přepočítá při každé změně úkolů a nastavení a při spuštění.
+Dopad: `ReminderPlanner` (unit test prochází všechny kombinace tichých hodin, „notifikace nikdy nepřijde v tichých hodinách“ z definice hotovo). O oprávnění k notifikacím se žádá až při uložení úkolu.
+
+**D42. Záloha: „nahradit vše“, jen v aplikaci pro Android a iOS, formát v `docs/FORMAT_EXPORTU.md`.**
+Proč: slučování dvou deníků bez synchronizace by vyžadovalo řešit konflikty; pro výměnu telefonu stačí nahradit vše (FR-E2). Web nemá souborový systém pro fotky.
+Dopad: import nejdřív zálohu zkontroluje (ZIP, `data.json`, odkazy na zóny, cesty fotek) a teprve pak v jedné transakci vymění data; při chybě zůstanou stará data. Fotky jsou v ZIP bez komprese (JPEG už komprimovaný je). Připomínka zálohy (FR-E3) je karta na „Co dnes?“ 30 dní po posledním exportu, jen když je co zálohovat. V 1.0 se import musí přepsat na měkké mazání kvůli synchronizaci.
+
+**D43. Nastavení jsou v tabulce `app_settings` (klíč → hodnota) a načítají se při startu.**
+Proč: motiv musí být známý před prvním snímkem. V 1.0 se stejné hodnoty synchronizují jako `profiles.settings`.
+Dopad: `DriftSettingsRepository`; neplatné hodnoty se nahradí výchozími.
+
+**D44. Tipy od Bódi zůstávají v kódu, ne v ARB.**
+Proč: jsou to obsahová data (sezónní rady podle měsíce), ne texty rozhraní; při překladu do slovenštiny se přesunou do obsahového souboru.
+Dopad: lint „žádné texty mimo lokalizaci“ se na `boda_tips.dart` nevztahuje.
+
+**D45. Onboarding 0.2 zůstává jednokrokový; lokalita až s tipy na míru (1.0), první záznam nabízí „Co dnes?“.**
+Proč: lokalita je v 0.2 nice-to-have a tipy zatím na lokalitě nezávisí. Hero karta „Co dnes?“ po onboardingu rovnou nabízí „Zapsat aktivitu“, samostatný krok by jen přidal klepnutí.
+Dopad: spec 10.4 kroky (2) a (3) se vrátí na pořad s Bóďou v 1.0.
+
+**D46. Statistika pro testery počítá „týdny s aspoň 2 záznamy“.**
+Proč: přesně to měří hypotéza H1 (≥ 60 % testerů zapisuje aspoň 2× týdně). Tester číslo opíše, aplikace nic neodesílá.
+Dopad: obrazovka Statistika v Nastavení: záznamy za 8 týdnů, nejaktivnější zóny a práce.
+
+**D47. Drift na webu přes WebAssembly; `web/sqlite3.wasm` a `web/drift_worker.js` jsou v repozitáři.**
+Proč: webová verze má fungovat dál (spec 7.1). Soubory jsou z vydání balíčků `sqlite3` 3.7.0 a `drift` 2.35.2.
+Dopad: při upgradu `drift` nebo `sqlite3` stáhnout odpovídající verze souborů.
+
+**D48. Mockito odstraněno, testy stojí na repozitářích v paměti a na Driftu v paměti (upřesňuje D32).**
+Proč: po odchodu z Hive Mockito nic nepoužívá; repozitáře v paměti jsou čitelnější a Drift v paměti testuje skutečné SQL.
+Dopad: `test/helpers/fakes.dart`, `test/helpers/database.dart`.
+
+**D49. Dart balíček se jmenuje `zahradnik_boda`.**
+Proč: přípona `_mvp01` by se táhla celým projektem. Android `namespace` a názvy desktopových runnerů zůstávají, uživatel je nevidí a `applicationId` je už `cz.zahradnikboda.app` (D35).

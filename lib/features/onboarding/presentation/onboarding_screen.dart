@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/di/providers.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../zones/domain/zone_entity.dart';
 import '../../zones/presentation/zone_icons.dart';
 import '../../zones/presentation/zones_controller.dart';
@@ -19,32 +21,37 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  final Set<String> _selected = {'Z1'};
+  final Set<ZoneType> _selected = {ZoneType.vegetable};
   bool _saving = false;
 
-  Future<void> _save(List<ZoneEntity> zones) async {
+  Future<void> _save(List<ZoneType> types) async {
+    final l = AppLocalizations.of(context);
+    final newId = ref.read(newIdProvider);
+    final zones = [
+      for (final type in types)
+        ZoneEntity(id: newId(), name: zoneTypeLabel(l, type), type: type),
+    ];
     setState(() => _saving = true);
     await ref.read(zonesControllerProvider.notifier).addZones(zones);
     if (!mounted) return;
     if (ref.read(zonesControllerProvider).hasError) {
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Zóny se nepodařilo uložit, zkus to znovu.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l.onboardingSaveFailed)));
     }
   }
 
-  void _toggle(String id) => setState(() {
-    if (!_selected.remove(id)) _selected.add(id);
+  void _toggle(ZoneType type) => setState(() {
+    if (!_selected.remove(type)) _selected.add(type);
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chosen = zoneCatalog.where((z) => _selected.contains(z.id)).toList();
+    final l = AppLocalizations.of(context);
+    final chosen = zoneCatalog.where(_selected.contains).toList();
 
     return Scaffold(
       // Hlavní tlačítko je vždy vidět, i když se karty nevejdou na displej.
@@ -54,7 +61,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           onPressed: chosen.isEmpty || _saving ? null : () => _save(chosen),
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           child: Text(
-            chosen.isEmpty ? 'Vyber aspoň jednu' : 'Jdeme na zahradu',
+            chosen.isEmpty ? l.onboardingPickAtLeastOne : l.onboardingFinish,
           ),
         ),
       ),
@@ -70,13 +77,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Zahradník Bóďa',
+                        l.appTitle,
                         style: theme.textTheme.titleMedium,
                       ),
                     ),
                     TextButton(
-                      onPressed: _saving ? null : () => _save(defaultZones),
-                      child: const Text('Přeskočit'),
+                      onPressed: _saving ? null : () => _save(defaultZoneTypes),
+                      child: Text(l.onboardingSkip),
                     ),
                   ],
                 ),
@@ -88,11 +95,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Co pěstuješ?', style: theme.textTheme.headlineMedium),
+                    Text(
+                      l.onboardingZonesTitle,
+                      style: theme.textTheme.headlineMedium,
+                    ),
                     const SizedBox(height: 8),
                     Text(
-                      'Vyber, co máš na zahradě. Z toho budou zóny, ke kterým '
-                      'budeš zapisovat práci. Upravit je můžeš kdykoli.',
+                      l.onboardingZonesBody,
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],
@@ -107,11 +116,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 crossAxisSpacing: 12,
                 childAspectRatio: 1.25,
                 children: [
-                  for (final zone in zoneCatalog)
+                  for (final type in zoneCatalog)
                     _CategoryCard(
-                      zone: zone,
-                      selected: _selected.contains(zone.id),
-                      onTap: () => _toggle(zone.id),
+                      type: type,
+                      selected: _selected.contains(type),
+                      onTap: () => _toggle(type),
                     ),
                 ],
               ),
@@ -125,12 +134,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
 class _CategoryCard extends StatelessWidget {
   const _CategoryCard({
-    required this.zone,
+    required this.type,
     required this.selected,
     required this.onTap,
   });
 
-  final ZoneEntity zone;
+  final ZoneType type;
   final bool selected;
   final VoidCallback onTap;
 
@@ -161,7 +170,7 @@ class _CategoryCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(zoneIcon(zone.id), size: 32, color: scheme.primary),
+                    Icon(zoneIcon(type), size: 32, color: scheme.primary),
                     const Spacer(),
                     if (selected)
                       Icon(Icons.check_circle, color: scheme.primary),
@@ -169,7 +178,7 @@ class _CategoryCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  zone.name,
+                  zoneTypeLabel(AppLocalizations.of(context), type),
                   style: Theme.of(context).textTheme.titleMedium,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

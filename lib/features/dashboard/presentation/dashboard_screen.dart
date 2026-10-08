@@ -1,23 +1,35 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/time/today.dart';
 import '../../../core/formatting/dates.dart';
+import '../../../core/time/calendar.dart';
+import '../../../core/time/today.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../activity/presentation/screens/activity_form_screen.dart';
 import '../../activity/presentation/widgets/activity_tile.dart';
+import '../../backup/presentation/backup_actions.dart';
+import '../../settings/presentation/settings_controller.dart';
+import '../../settings/presentation/settings_screen.dart';
+import '../../tasks/domain/task_entity.dart';
+import '../../tasks/presentation/screens/tasks_screen.dart';
+import '../../tasks/presentation/tasks_controller.dart';
+import '../../tasks/presentation/widgets/task_tile.dart';
 import '../../zones/domain/zone_entity.dart';
+import '../../zones/presentation/zone_icons.dart';
 import '../../zones/presentation/zones_controller.dart';
 import '../domain/boda_tips.dart';
 import '../domain/today_summary.dart';
-import '../../zones/presentation/zone_icons.dart';
 
 /// Souhrn „Co dnes?“ přepočítaný při každé změně deníku nebo zón.
 final todaySummaryProvider = Provider<AsyncValue<TodaySummary>>((ref) {
   final activities = ref.watch(activityControllerProvider);
   final zones = ref.watch(zonesControllerProvider);
   final now = ref.watch(todayProvider);
+  // Archivované zóny se do „zaslouží pozornost“ nepočítají.
+  final active = ref.watch(activeZonesProvider);
 
   // Po chybě zápisu nesou stavy chybu i poslední seznam; počítáme z něj.
   if (!activities.hasValue) {
@@ -32,11 +44,7 @@ final todaySummaryProvider = Provider<AsyncValue<TodaySummary>>((ref) {
   }
 
   return AsyncData(
-    buildTodaySummary(
-      activities: activities.value!,
-      zones: zones.value!,
-      now: now,
-    ),
+    buildTodaySummary(activities: activities.value!, zones: active, now: now),
   );
 });
 
@@ -46,24 +54,52 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final summaryAsync = ref.watch(todaySummaryProvider);
     final now = ref.watch(todayProvider);
     final dateLabel = DateFormat('EEEE d. MMMM', appLocale).format(now);
+    final todayTasks = _tasksForToday(ref.watch(tasksControllerProvider), now);
+    final settings = ref.watch(settingsControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Co dnes?')),
+      appBar: AppBar(
+        title: Text(l.dashboardTitle),
+        actions: [
+          IconButton(
+            tooltip: l.settingsTooltip,
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
+          ),
+        ],
+      ),
       body: summaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('Chyba: $error')),
+        error: (error, _) =>
+            Center(child: Text(l.commonErrorWithDetail('$error'))),
         data: (summary) => ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
           children: [
             Text(
-              _capitalize(dateLabel),
+              capitalize(dateLabel),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
             _HeroCard(summary: summary),
+            if (todayTasks.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _TasksCard(tasks: todayTasks),
+            ],
+            if (!kIsWeb &&
+                backupReminderDue(
+                  lastExportAt: settings.lastExportAt,
+                  activityCount: summary.totalCount,
+                  now: now,
+                )) ...[
+              const SizedBox(height: 12),
+              const _BackupCard(),
+            ],
             const SizedBox(height: 12),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +108,7 @@ class DashboardScreen extends ConsumerWidget {
                   child: _StatCard(
                     icon: Icons.event_available,
                     value: '${summary.lastWeekCount}',
-                    label: 'záznamů za 7 dní',
+                    label: l.dashboardLastWeek(summary.lastWeekCount),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -82,12 +118,13 @@ class DashboardScreen extends ConsumerWidget {
                     value: summary.lastActivity == null
                         ? '–'
                         : formatDaysAgo(
+                            l,
                             calendarDaysBetween(
                               summary.lastActivity!.date,
                               now,
                             ),
                           ),
-                    label: 'poslední záznam',
+                    label: l.dashboardLastEntry,
                   ),
                 ),
               ],
@@ -104,8 +141,102 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  static String _capitalize(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  /// Otevřené úkoly na dnešek a po termínu (spec 10.3: „+ dnešní úkoly“).
+  static List<TaskEntity> _tasksForToday(
+    AsyncValue<List<TaskEntity>> tasks,
+    DateTime now,
+  ) {
+    final today = dayOnly(now);
+    return [
+      for (final t in tasks.value ?? const <TaskEntity>[])
+        if (t.isOpen && !dayOnly(t.effectiveDate).isAfter(today)) t,
+    ];
+  }
+}
+
+/// Úkoly na dnešek (a po termínu).
+class _TasksCard extends StatelessWidget {
+  const _TasksCard({required this.tasks});
+
+  final List<TaskEntity> tasks;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                l.dashboardTodayTasks(tasks.length),
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            for (final task in tasks.take(5)) TaskTile(task: task),
+            if (tasks.length > 5)
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const TasksScreen()),
+                  ),
+                  child: Text(l.dashboardAllTasks),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Připomínka zálohy jednou za měsíc (FR-E3).
+class _BackupCard extends ConsumerWidget {
+  const _BackupCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.backup_outlined, color: theme.colorScheme.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l.backupReminderTitle,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(l.backupReminderBody),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton.tonalIcon(
+                onPressed: () => exportBackup(context, ref),
+                icon: const Icon(Icons.upload_file),
+                label: Text(l.backupReminderAction),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 /// Hero karta: co je dnes zapsané, nebo co by stálo za to udělat.
@@ -116,6 +247,7 @@ class _HeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
@@ -126,18 +258,19 @@ class _HeroCard extends StatelessWidget {
     final String headline;
     final String body;
     if (summary.today.isNotEmpty) {
-      headline = summary.today.length == 1
-          ? 'Dnes máš zapsaný 1 záznam'
-          : 'Dnes máš zapsané záznamy: ${summary.today.length}';
-      body = 'Dobrá práce. Zahrada ti to vrátí.';
+      headline = l.dashboardHeroToday(summary.today.length);
+      body = l.dashboardHeroTodayBody;
     } else if (suggestion != null) {
-      headline = 'Dnes zatím nic';
+      headline = l.dashboardHeroNothing;
       body = suggestion.daysSince == null
-          ? 'V zóně ${suggestion.zone.name} ještě nemáš žádný záznam. Co se tam teď děje?'
-          : 'Poslední záznam v zóně ${suggestion.zone.name} je ${formatDaysAgo(suggestion.daysSince!)}. Mrkni, jak se jí daří.';
+          ? l.dashboardHeroZoneEmpty(suggestion.zone.name)
+          : l.dashboardHeroZoneStale(
+              suggestion.zone.name,
+              formatDaysAgo(l, suggestion.daysSince!),
+            );
     } else {
-      headline = 'Dnes zatím nic';
-      body = 'Všechny zóny máš za poslední týden zapsané. Co dnes uděláš?';
+      headline = l.dashboardHeroNothing;
+      body = l.dashboardHeroAllFresh;
     }
 
     return Card(
@@ -176,7 +309,7 @@ class _HeroCard extends StatelessWidget {
                 ),
               ),
               icon: const Icon(Icons.edit_note),
-              label: const Text('Zapsat aktivitu'),
+              label: Text(l.dashboardLogActivity),
             ),
           ],
         ),
@@ -241,7 +374,10 @@ class _TipCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Tip od Bódi', style: theme.textTheme.titleMedium),
+                  Text(
+                    AppLocalizations.of(context).dashboardTip,
+                    style: theme.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 4),
                   Text(tip),
                 ],
@@ -262,6 +398,7 @@ class _AttentionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Card(
       child: Padding(
@@ -272,19 +409,19 @@ class _AttentionCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Zaslouží pozornost',
+                l.dashboardAttention,
                 style: theme.textTheme.titleMedium,
               ),
             ),
             for (final s in statuses)
               ListTile(
                 dense: true,
-                leading: Icon(zoneIcon(s.zone.id)),
+                leading: Icon(zoneIcon(s.zone.type)),
                 title: Text(s.zone.name),
                 subtitle: Text(
                   s.daysSince == null
-                      ? 'zatím bez záznamu'
-                      : 'naposledy ${formatDaysAgo(s.daysSince!)}',
+                      ? l.dashboardZoneNoEntry
+                      : l.dashboardZoneLast(formatDaysAgo(l, s.daysSince!)),
                 ),
                 trailing: const Icon(Icons.add),
                 onTap: () => _addForZone(context, s.zone),

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:zahradnik_boda_mvp01/core/time/today.dart';
+import 'package:zahradnik_boda/core/time/today.dart';
+import 'package:zahradnik_boda/features/activity/presentation/screens/timeline_screen.dart';
 
 import '../helpers/fakes.dart';
 
@@ -51,7 +52,16 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Deník'));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Řez jabloní'));
+      await tester.scrollUntilVisible(
+        find.text('Řez jabloní'),
+        300,
+        scrollable: find
+            .descendant(
+              of: find.byType(TimelineScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Řez jabloní'));
       await tester.pumpAndSettle();
@@ -156,9 +166,7 @@ void main() {
       find.widgetWithText(TextFormField, 'Poznámka (volitelné)'),
       '',
     );
-    await tester.ensureVisible(find.text('Uložit změny'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Uložit změny'));
+    await tester.tap(find.widgetWithText(TextButton, 'Uložit'));
     await tester.pumpAndSettle();
 
     expect(repo.items['a']!.notes, isNull);

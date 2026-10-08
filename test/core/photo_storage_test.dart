@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
-import 'package:zahradnik_boda_mvp01/core/photos/photo_storage.dart';
+import 'package:zahradnik_boda/core/photos/photo_storage.dart';
 
 void main() {
   late Directory dir;

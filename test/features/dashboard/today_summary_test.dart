@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zahradnik_boda_mvp01/features/dashboard/domain/boda_tips.dart';
-import 'package:zahradnik_boda_mvp01/features/dashboard/domain/today_summary.dart';
-import 'package:zahradnik_boda_mvp01/features/zones/domain/zone_entity.dart';
+import 'package:zahradnik_boda/features/dashboard/domain/boda_tips.dart';
+import 'package:zahradnik_boda/core/time/calendar.dart';
+import 'package:zahradnik_boda/features/dashboard/domain/today_summary.dart';
+import 'package:zahradnik_boda/features/zones/domain/zone_entity.dart';
 
 import '../../helpers/fakes.dart';
 

@@ -9,7 +9,8 @@ Ověřeno: `flutter analyze` bez nálezů, `flutter test` zelený, `flutter buil
 
 ## Platformy
 * **Android / iOS** – plná funkčnost včetně fotek. iOS má v `Info.plist` popisky oprávnění pro fotoaparát a galerii.
-* **Web** – deník, zóny a dashboard fungují (Hive ukládá do IndexedDB), fotky jsou vypnuté.
+* **Web** – deník, zóny, úkoly a dashboard fungují (Drift přes SQLite ve WebAssembly: `web/sqlite3.wasm` a `web/drift_worker.js`, data v OPFS nebo IndexedDB). Fotky, záloha a připomínky jsou vypnuté.
+* **Android** – připomínky potřebují `POST_NOTIFICATIONS` (Android 13+, aplikace se zeptá až při prvním úkolu s připomínkou) a core library desugaring v `android/app/build.gradle.kts`.
 
 ## CI
 GitHub Actions (`.github/workflows/ci.yml`) na každý push a PR spustí `flutter analyze` a `flutter test`.
@@ -20,7 +21,20 @@ GitHub Actions (`.github/workflows/ci.yml`) na každý push a PR spustí `flutte
 2. Android: Android Studio (SDK, emulátor) nebo fyzický telefon s ladicím režimem. Ověřit `flutter doctor`.
 3. iOS: vyžaduje Mac s Xcode a pro vydání Apple Developer Program (99 USD/rok). Do MVP 1.0 není potřeba, iOS build lze později řešit i přes cloudové CI (např. Codemagic).
 4. V kořeni repa: `flutter pub get`, pak `flutter run`.
-5. Po změně Hive modelů nebo mockovaných tříd: `dart run build_runner build --delete-conflicting-outputs`.
+5. Po změně tabulek Drift: `dart run build_runner build --delete-conflicting-outputs` a `dart run drift_dev make-migrations` (snímek schématu do `drift_schemas/`). Po změně textů v `lib/l10n/app_cs.arb`: `flutter gen-l10n`.
+
+## Podpis vydání (Android)
+
+Release build se podepíše klíčem z `android/key.properties`, pokud soubor existuje; jinak se použije ladicí klíč (stačí pro testovací APK z CI). Soubor i klíč **nikdy nepatří do gitu** (jsou v `.gitignore`):
+
+```
+storeFile=/cesta/k/upload-keystore.jks
+storePassword=…
+keyAlias=upload
+keyPassword=…
+```
+
+Klíč vytvoří Papi (`keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`) a uloží si ho bezpečně mimo repozitář; ztracený upload klíč jde v Google Play resetovat jen přes podporu.
 
 **Referenční zařízení pro výkon (NFR-4):** Android střední třídy se 4 GB RAM; konkrétní model doplnit, až bude k dispozici.
 
@@ -28,7 +42,7 @@ GitHub Actions (`.github/workflows/ci.yml`) na každý push a PR spustí `flutte
 
 | Platforma | Současná hodnota | Plán |
 | --- | --- | --- |
-| Dart balíček | `zahradnik_boda_mvp01` | `zahradnik_boda` (MVP 0.2) |
+| Dart balíček | `zahradnik_boda` (od MVP 0.2, DECLOG D49) | |
 | Android `applicationId` | `cz.zahradnikboda.app` (DECLOG D35) | změnit jde jen **před prvním nahráním na Google Play**, potom už ne |
 | iOS bundle ID | `cz.zahradnikboda.app` (DECLOG D35) | |
 

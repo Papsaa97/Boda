@@ -473,7 +473,7 @@ Stejné tabulky a sloupce jako v 8.1, bez `profiles`, `entitlements` a `garden_m
 | Číselník | Hodnoty |
 | --- | --- |
 | `activity.type` | `sowing` výsev, `planting` výsadba, `watering` zálivka, `fertilizing` hnojení, `spraying` postřik/ošetření, `pruning` řez, `harvest` sklizeň, `weeding` pletí, `mowing` sekání, `other` jiné |
-| `zone.type` | `vegetable` zelenina, `fruit` ovocný sad, `ornamental` okrasná, `lawn` trávník, `greenhouse` skleník/fóliovník, `pond` jezírko, `structure` stavba, `other` |
+| `zone.type` | `vegetable` zelenina, `herbs` bylinky (DECLOG D38), `fruit` ovocný sad, `ornamental` okrasná, `lawn` trávník, `greenhouse` skleník/fóliovník, `pond` jezírko, `structure` stavba, `other` |
 | `zone.soilTexture` | `sandy` písčitá, `loamy` hlinitá, `clay` jílovitá, `unknown` |
 | `zone.sunExposure` | `fullSun` plné slunce (6+ h), `partShade` polostín (3–6 h), `shade` stín (< 3 h) |
 | `zone.irrigation` | `none`, `manual` konev/hadice, `drip` kapková, `sprinkler` postřikovač |
@@ -482,7 +482,7 @@ Uložené hodnoty jsou anglické klíče, české popisky jsou v lokalizaci.
 
 ### 8.4 Formát exportu (0.2)
 
-`boda-export-YYYY-MM-DD.zip` → `data.json` (`formatVersion`, `exportedAt`, `appVersion`, `zones[]`, `activities[]`, `tasks[]`) + `photos/<photoId>.jpg`. Přesný popis vznikne v `docs/FORMAT_EXPORTU.md` spolu s implementací.
+`boda-export-YYYY-MM-DD.zip` → `data.json` (`formatVersion`, `exportedAt`, `appVersion`, `zones[]`, `activities[]`, `tasks[]`) + `photos/<photoId>.jpg`. Přesný popis je v [`docs/FORMAT_EXPORTU.md`](FORMAT_EXPORTU.md).
 
 ---
 

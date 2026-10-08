@@ -4,13 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zahradnik_boda_mvp01/app.dart';
-import 'package:zahradnik_boda_mvp01/core/di/providers.dart';
-import 'package:zahradnik_boda_mvp01/core/photos/photo_storage.dart';
-import 'package:zahradnik_boda_mvp01/features/activity/domain/activity_entity.dart';
-import 'package:zahradnik_boda_mvp01/features/activity/domain/activity_repository.dart';
-import 'package:zahradnik_boda_mvp01/features/zones/domain/zone_entity.dart';
-import 'package:zahradnik_boda_mvp01/features/zones/domain/zone_repository.dart';
+import 'package:zahradnik_boda/app.dart';
+import 'package:zahradnik_boda/core/di/providers.dart';
+import 'package:zahradnik_boda/core/photos/photo_storage.dart';
+import 'package:zahradnik_boda/features/activity/domain/activity_entity.dart';
+import 'package:zahradnik_boda/features/activity/domain/activity_repository.dart';
+import 'package:zahradnik_boda/features/activity/domain/activity_type.dart';
+import 'package:zahradnik_boda/features/settings/domain/app_settings.dart';
+import 'package:zahradnik_boda/features/settings/domain/settings_repository.dart';
+import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
+import 'package:zahradnik_boda/features/tasks/domain/task_repository.dart';
+import 'package:zahradnik_boda/features/zones/domain/zone_entity.dart';
+import 'package:zahradnik_boda/features/zones/domain/zone_repository.dart';
 
 class InMemoryActivityRepository implements ActivityRepository {
   InMemoryActivityRepository([List<ActivityEntity> initial = const []]) {
@@ -40,9 +45,18 @@ class InMemoryActivityRepository implements ActivityRepository {
   Future<void> deleteActivity(String id) async => items.remove(id);
 }
 
+/// Výchozí zóny v testech (krátká id kvůli čitelnosti).
+const testZones = [
+  ZoneEntity(id: 'Z1', name: 'Zelenina', type: ZoneType.vegetable),
+  ZoneEntity(id: 'Z2', name: 'Okrasná zahrada', type: ZoneType.ornamental),
+  ZoneEntity(id: 'Z3', name: 'Ovocný sad', type: ZoneType.fruit),
+  ZoneEntity(id: 'Z4', name: 'Trávník', type: ZoneType.lawn),
+  ZoneEntity(id: 'Z5', name: 'Skleník', type: ZoneType.greenhouse),
+];
+
 class InMemoryZoneRepository implements ZoneRepository {
   InMemoryZoneRepository([List<ZoneEntity>? initial]) {
-    for (final z in initial ?? defaultZones) {
+    for (final z in initial ?? testZones) {
       items[z.id] = z;
     }
   }
@@ -57,15 +71,37 @@ class InMemoryZoneRepository implements ZoneRepository {
 
   @override
   Future<void> deleteZone(String id) async => items.remove(id);
+}
 
-  @override
-  Future<void> seedDefaultsIfEmpty() async {
-    if (items.isEmpty) {
-      for (final z in defaultZones) {
-        items[z.id] = z;
-      }
+class InMemoryTaskRepository implements TaskRepository {
+  InMemoryTaskRepository([List<TaskEntity> initial = const []]) {
+    for (final t in initial) {
+      items[t.id] = t;
     }
   }
+
+  final Map<String, TaskEntity> items = {};
+
+  @override
+  Future<List<TaskEntity>> getAllTasks() async => items.values.toList();
+
+  @override
+  Future<void> saveTask(TaskEntity task) async => items[task.id] = task;
+
+  @override
+  Future<void> deleteTask(String id) async => items.remove(id);
+}
+
+class InMemorySettingsRepository implements SettingsRepository {
+  InMemorySettingsRepository([this.current = const AppSettings()]);
+
+  AppSettings current;
+
+  @override
+  AppSettings load() => current;
+
+  @override
+  Future<void> save(AppSettings settings) async => current = settings;
 }
 
 /// Pevné „teď“ pro testy: úterý 7. 10. 2026 10:00.
@@ -74,15 +110,30 @@ final testNow = DateTime(2026, 10, 7, 10, 0);
 ProviderContainer makeContainer({
   InMemoryActivityRepository? activities,
   InMemoryZoneRepository? zones,
+  InMemoryTaskRepository? tasks,
+  InMemorySettingsRepository? settings,
 }) {
   return ProviderContainer(
-    overrides: testOverrides(activities: activities, zones: zones),
+    overrides: testOverrides(
+      activities: activities,
+      zones: zones,
+      tasks: tasks,
+      settings: settings,
+    ),
   );
+}
+
+/// Id pro nové entity v testech: id-1, id-2, …
+String Function() sequentialIds() {
+  var n = 0;
+  return () => 'id-${++n}';
 }
 
 List<Override> testOverrides({
   InMemoryActivityRepository? activities,
   InMemoryZoneRepository? zones,
+  InMemoryTaskRepository? tasks,
+  InMemorySettingsRepository? settings,
   DateTime Function()? clock,
 }) {
   return [
@@ -90,6 +141,11 @@ List<Override> testOverrides({
       activities ?? InMemoryActivityRepository(),
     ),
     zoneRepositoryProvider.overrideWithValue(zones ?? InMemoryZoneRepository()),
+    taskRepositoryProvider.overrideWithValue(tasks ?? InMemoryTaskRepository()),
+    settingsRepositoryProvider.overrideWithValue(
+      settings ?? InMemorySettingsRepository(),
+    ),
+    newIdProvider.overrideWithValue(sequentialIds()),
     clockProvider.overrideWithValue(clock ?? () => testNow),
     photoStorageProvider.overrideWithValue(
       PhotoStorage('${Directory.systemTemp.path}/boda_test_photos'),
@@ -103,9 +159,11 @@ ActivityEntity activity(
   String zoneId = 'Z1',
   String? title,
   String? notes,
+  ActivityType type = ActivityType.other,
 }) {
   return ActivityEntity(
     id: id,
+    type: type,
     title: title ?? 'Aktivita $id',
     date: date,
     zoneId: zoneId,
