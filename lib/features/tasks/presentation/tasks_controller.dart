@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
+import '../../../core/time/calendar.dart';
 import '../../../core/telemetry/telemetry.dart';
 import '../../inventory/domain/stock_movement.dart';
 import '../../inventory/presentation/inventory_controller.dart';
@@ -99,6 +100,13 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
     final task = _find(id);
     if (task == null) return;
     await save(task.copyWith(snoozedUntil: () => snoozeTarget(option, _now)));
+  }
+
+  /// Odloží úkol na den [day] (zálivka po dešti, FR-W3).
+  Future<void> postponeTo(String id, DateTime day) async {
+    final task = _find(id);
+    if (task == null) return;
+    await save(task.copyWith(snoozedUntil: () => dayOnly(day)));
   }
 
   /// Propojí hotový úkol se záznamem v deníku (FR-U4).

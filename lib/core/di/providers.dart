@@ -27,6 +27,11 @@ import '../../features/settings/domain/settings_repository.dart';
 import '../../features/settings/presentation/settings_controller.dart';
 import '../../features/tasks/data/drift_task_repository.dart';
 import '../../features/tasks/domain/task_repository.dart';
+import '../../features/weather/data/drift_garden_site_repository.dart';
+import '../../features/weather/data/geolocator_device_location.dart';
+import '../../features/weather/data/supabase_weather_source.dart';
+import '../../features/weather/domain/garden_site.dart';
+import '../../features/weather/domain/weather.dart';
 import '../../features/zones/data/drift_zone_repository.dart';
 import '../../features/zones/domain/zone_repository.dart';
 import '../database/app_database.dart';
@@ -99,6 +104,14 @@ final planRepositoryProvider = Provider<PlanRepository>(
 
 final incidentRepositoryProvider = Provider<IncidentRepository>(
   (ref) => DriftIncidentRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+final gardenSiteRepositoryProvider = Provider<GardenSiteRepository>(
+  (ref) => DriftGardenSiteRepository(
     ref.watch(databaseProvider),
     ref.watch(gardenIdProvider),
     ref.watch(clockProvider),
@@ -210,6 +223,19 @@ final assistantBackendProvider = Provider<AssistantBackend>((ref) {
   }
   return SupabaseAssistantBackend(client);
 });
+
+/// Počasí (V2, Premium): bez backendu nedostupné.
+final weatherSourceProvider = Provider<WeatherSource>((ref) {
+  final client = ref.watch(supabaseClientProvider);
+  return client == null
+      ? const UnavailableWeatherSource()
+      : SupabaseWeatherSource(client);
+});
+
+/// Poloha telefonu pro „Použít polohu telefonu“.
+final deviceLocationProvider = Provider<DeviceLocation>(
+  (ref) => const GeolocatorDeviceLocation(),
+);
 
 /// Profil na serveru (souhlasy); null bez backendu.
 final profileRemoteProvider = Provider<ProfileRemote?>((ref) {

@@ -43,7 +43,9 @@ boda-export-2026-10-07.zip
     }
   ],
   "garden": {
-    "outline": [[-1, -1], [20.5, -1], [20.5, 10.25], [-1, 10.25]]
+    "outline": [[-1, -1], [20.5, -1], [20.5, 10.25], [-1, 10.25]],
+    "location": {"lat": 49.2, "lng": 16.61},
+    "altitudeM": 237
   },
   "activities": [
     {
@@ -132,6 +134,8 @@ boda-export-2026-10-07.zip
 | `incidents[]` | pole | Problémy na zahradě (od verze 4): `id`, `zoneId`, `label`, `source` (`user`, `model`), `candidates` (možné příčiny: `label`, `reason`), `planBio`, `planChem`, `status` (`open`, `resolved`), `photoIds` (fotky ve složce `photos/` jako u záznamů), `createdAt`. |
 | `movements[]` | pole | Pohyby na skladě (od verze 4): `id`, `itemId`, `qtyDelta` (v jednotce položky, záporná = odpis), `reason` (`purchase`, `task`, `manual`, `reversal`), `taskId`, `at`. Stav skladu je v `inventory[].stockQty`, pohyby jsou historie. |
 | `garden.outline` | pole bodů | Obrys pozemku ve stejných souřadnicích jako `polygon`; `null`, když plán není nakreslený (od verze 3). Podklad plánu (fotka nebo nákres) se nezálohuje, zůstává jen v telefonu. |
+| `garden.location` | objekt `{lat, lng}` | Poloha zahrady pro počasí, zaokrouhlená na 2 desetinná místa (~1 km); `null` nebo chybí, když není zadaná (od verze 4, nepovinné). Stažené počasí se nezálohuje. |
+| `garden.altitudeM` | celé číslo | Nadmořská výška v metrech pro kalendář prací; `null` nebo chybí, když není zadaná (od verze 4, nepovinné). |
 | `activities[].harvestQty`, `harvestUnit` | číslo, text | Sklizeň (`kg`, `g`, `ks`), od verze 2. |
 | `activities[].costCzk` | číslo | Náklady v Kč. |
 | `activities[].materials`, `tasks[].materials` | pole | Materiál ze skladu: `itemId`, `qty`, `unit` (`g`, `kg`, `ml`, `l`, `ks`, `pack`). |

@@ -2318,4 +2318,257 @@ class AppLocalizationsCs extends AppLocalizations {
   String incidentDeleteBody(String label) {
     return 'Smaže se karta „$label“ i její fotky. Úkoly kontrol zůstanou.';
   }
+
+  @override
+  String get weatherTitle => 'Počasí a kalendář prací';
+
+  @override
+  String get weatherCardSubtitle =>
+      'Zálivka podle deště, mráz a co je teď na řadě';
+
+  @override
+  String get weatherSiteTitle => 'Poloha zahrady';
+
+  @override
+  String get weatherSiteNotSet =>
+      'Poloha není zadaná. Bez ní nejde stáhnout počasí.';
+
+  @override
+  String weatherSiteSummary(String lat, String lng, String altitude) {
+    return '$lat, $lng · $altitude';
+  }
+
+  @override
+  String weatherAltitudeValue(String meters) {
+    return '$meters m n. m.';
+  }
+
+  @override
+  String weatherAltitudeFromWeather(String meters) {
+    return '$meters m n. m. (podle počasí)';
+  }
+
+  @override
+  String get weatherAltitudeUnknown => 'výška nezadaná';
+
+  @override
+  String get weatherSiteEdit => 'Upravit polohu';
+
+  @override
+  String get weatherSiteSet => 'Zadat polohu';
+
+  @override
+  String get weatherLocationIntro =>
+      'Poloha slouží jen pro počasí a kalendář prací. Ukládá se zaokrouhlená na zhruba 1 km.';
+
+  @override
+  String get weatherLatLabel => 'Zeměpisná šířka';
+
+  @override
+  String get weatherLatHint => 'např. 49,19';
+
+  @override
+  String get weatherLngLabel => 'Zeměpisná délka';
+
+  @override
+  String get weatherLngHint => 'např. 16,61';
+
+  @override
+  String get weatherAltitudeLabel => 'Nadmořská výška (m)';
+
+  @override
+  String get weatherAltitudeHelper =>
+      'Nepovinné. Když ji nezadáš, vezme se z počasí.';
+
+  @override
+  String get weatherUseDeviceLocation => 'Použít polohu telefonu';
+
+  @override
+  String get weatherClearLocation => 'Smazat polohu';
+
+  @override
+  String get weatherInvalidCoordinate => 'Zadej číslo, například 49,19';
+
+  @override
+  String get weatherImplausibleLocation =>
+      'Tahle poloha neleží v Česku. Nejsou šířka a délka prohozené?';
+
+  @override
+  String get weatherAltitudeInvalid => 'Zadej výšku v metrech (0 až 2000)';
+
+  @override
+  String get weatherLocationIncomplete =>
+      'Vyplň šířku i délku, nebo obojí nech prázdné.';
+
+  @override
+  String get weatherDeviceLocationDisabled => 'Poloha v telefonu je vypnutá.';
+
+  @override
+  String get weatherDeviceLocationDenied =>
+      'Aplikace nemá povolení k poloze. Zadej ji ručně.';
+
+  @override
+  String get weatherDeviceLocationFailed =>
+      'Polohu telefonu se nepodařilo zjistit.';
+
+  @override
+  String get weatherDeviceLocationUnsupported =>
+      'Tady polohu telefonu zjistit nejde. Zadej ji ručně.';
+
+  @override
+  String get weatherSectionForecast => 'Počasí';
+
+  @override
+  String get weatherUnavailable =>
+      'Počasí potřebuje připojení k serveru, které tahle verze aplikace nemá.';
+
+  @override
+  String get weatherNotSignedIn =>
+      'Pro počasí se přihlas v Nastavení, v části Účet.';
+
+  @override
+  String get weatherNotPremium =>
+      'Počasí a zálivka podle deště jsou v Premium. Kalendář prací je zdarma.';
+
+  @override
+  String get weatherShowPremium => 'Zobrazit Premium';
+
+  @override
+  String get weatherNoLocation => 'Zadej polohu zahrady a počasí se stáhne.';
+
+  @override
+  String get weatherOffline => 'Bez připojení. Zkusím to znovu později.';
+
+  @override
+  String get weatherProviderError => 'Počasí se teď nepodařilo stáhnout.';
+
+  @override
+  String get weatherRetry => 'Zkusit znovu';
+
+  @override
+  String weatherFetchedAt(String time) {
+    return 'Staženo $time';
+  }
+
+  @override
+  String weatherRainLast7(String mm) {
+    return 'Za posledních 7 dní napršelo $mm mm';
+  }
+
+  @override
+  String weatherDayRow(String precip, String tmin, String tmax) {
+    return '$precip mm · $tmin až $tmax °C';
+  }
+
+  @override
+  String weatherDayRowNoTemp(String precip) {
+    return '$precip mm';
+  }
+
+  @override
+  String get weatherSectionWatering => 'Zálivka';
+
+  @override
+  String get weatherWateringEmpty => 'Žádná zóna teď zálivku neřeší.';
+
+  @override
+  String weatherAdviceRained(String mm, String threshold) {
+    return 'Může počkat: napršelo $mm mm (práh $threshold mm)';
+  }
+
+  @override
+  String get weatherAdviceRainExpected => 'Může počkat: do zítřka má pršet';
+
+  @override
+  String weatherAdviceWater(String mm, String threshold) {
+    return 'Zalij podle potřeby: napršelo $mm z $threshold mm';
+  }
+
+  @override
+  String get weatherAdviceCovered =>
+      'Krytá zóna: déšť nedostane, zalij podle potřeby';
+
+  @override
+  String weatherPostponeButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Odložit $count zálivek',
+      few: 'Odložit $count zálivky',
+      one: 'Odložit 1 zálivku',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String weatherPostponed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count zálivek odloženo o den',
+      few: '$count zálivky odloženy o den',
+      one: 'Zálivka odložena o den',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get weatherAutoPostpone => 'Odkládat zálivku automaticky';
+
+  @override
+  String get weatherAutoPostponeSubtitle =>
+      'Jednou denně po stažení počasí, když napršelo nebo má pršet';
+
+  @override
+  String weatherFrostTitle(String temp, String day) {
+    return 'Mráz $temp °C $day';
+  }
+
+  @override
+  String weatherFrostZones(String zones) {
+    return 'Zakryj nebo ochraň: $zones';
+  }
+
+  @override
+  String get weatherSectionPhenology => 'Kalendář prací';
+
+  @override
+  String weatherPhenologyAltitude(String altitude) {
+    return 'Termíny jsou posunuté pro $altitude. Řiď se i tím, jak jaro skutečně běží.';
+  }
+
+  @override
+  String get weatherPhenologyNow => 'Teď je čas';
+
+  @override
+  String get weatherPhenologySoon => 'Brzy přijde';
+
+  @override
+  String get weatherPhenologyEmpty =>
+      'Teď ani v příštích třech týdnech podle kalendáře nic. Kalendář se řídí druhy zón, které na zahradě máš.';
+
+  @override
+  String weatherPhenologyRange(String from, String to) {
+    return '$from až $to';
+  }
+
+  @override
+  String get weatherPhenologyAddTask => 'Přidat jako úkol';
+
+  @override
+  String get weatherPhenologyTaskAdded => 'Úkol přidán';
+
+  @override
+  String weatherCardNow(String items) {
+    return 'Teď je čas: $items';
+  }
+
+  @override
+  String weatherCardRained(String mm) {
+    return 'Zálivka může počkat: napršelo $mm mm';
+  }
+
+  @override
+  String get weatherCardRainExpected =>
+      'Zálivka může počkat: do zítřka má pršet';
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../weather/presentation/weather_screen.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/time/calendar.dart';
 import '../../../core/time/today.dart';
@@ -97,6 +98,7 @@ class DashboardScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _TasksCard(tasks: todayTasks),
             ],
+            const WeatherCard(),
             if (!kIsWeb &&
                 backupReminderDue(
                   lastExportAt: settings.lastExportAt,

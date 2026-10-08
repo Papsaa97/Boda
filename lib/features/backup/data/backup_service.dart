@@ -17,6 +17,7 @@ import '../../inventory/data/drift_inventory_repository.dart';
 import '../../inventory/domain/shopping_item.dart';
 import '../../inventory/domain/stock_movement.dart';
 import '../../tasks/data/drift_task_repository.dart';
+import '../../weather/data/drift_garden_site_repository.dart';
 import '../../zones/data/drift_zone_repository.dart';
 import '../domain/backup_format.dart';
 
@@ -90,12 +91,18 @@ class BackupService {
       _gardenId,
       _clock,
     ).loadOutline();
+    final site = await DriftGardenSiteRepository(
+      _db,
+      _gardenId,
+      _clock,
+    ).loadSite();
     return BackupData(
       formatVersion: backupFormatVersion,
       exportedAt: _clock(),
       appVersion: appVersion,
       zones: zones,
       gardenOutline: outline,
+      site: site,
       // Fotky, jejichž soubor zmizel, se do zálohy nedají přibalit.
       activities: [
         for (final a in activities)
@@ -248,6 +255,11 @@ class BackupService {
         _gardenId,
         _clock,
       ).saveOutline(data.gardenOutline);
+      await DriftGardenSiteRepository(
+        _db,
+        _gardenId,
+        _clock,
+      ).saveSite(data.site);
       final inventory = DriftInventoryRepository(_db, _gardenId, _clock);
       for (final i in data.inventory) {
         await inventory.save(i);

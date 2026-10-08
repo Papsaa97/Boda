@@ -1393,5 +1393,211 @@
         "type": "String"
       }
     }
-  }
+  },
+  "weatherTitle": "Počasí a kalendář prací",
+  "weatherCardSubtitle": "Zálivka podle deště, mráz a co je teď na řadě",
+  "weatherSiteTitle": "Poloha zahrady",
+  "weatherSiteNotSet": "Poloha není zadaná. Bez ní nejde stáhnout počasí.",
+  "weatherSiteSummary": "{lat}, {lng} · {altitude}",
+  "@weatherSiteSummary": {
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      },
+      "lng": {
+        "type": "String"
+      },
+      "altitude": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherAltitudeValue": "{meters} m n. m.",
+  "@weatherAltitudeValue": {
+    "placeholders": {
+      "meters": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherAltitudeFromWeather": "{meters} m n. m. (podle počasí)",
+  "@weatherAltitudeFromWeather": {
+    "placeholders": {
+      "meters": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherAltitudeUnknown": "výška nezadaná",
+  "weatherSiteEdit": "Upravit polohu",
+  "weatherSiteSet": "Zadat polohu",
+  "weatherLocationIntro": "Poloha slouží jen pro počasí a kalendář prací. Ukládá se zaokrouhlená na zhruba 1 km.",
+  "weatherLatLabel": "Zeměpisná šířka",
+  "weatherLatHint": "např. 49,19",
+  "weatherLngLabel": "Zeměpisná délka",
+  "weatherLngHint": "např. 16,61",
+  "weatherAltitudeLabel": "Nadmořská výška (m)",
+  "weatherAltitudeHelper": "Nepovinné. Když ji nezadáš, vezme se z počasí.",
+  "weatherUseDeviceLocation": "Použít polohu telefonu",
+  "weatherClearLocation": "Smazat polohu",
+  "weatherInvalidCoordinate": "Zadej číslo, například 49,19",
+  "weatherImplausibleLocation": "Tahle poloha neleží v Česku. Nejsou šířka a délka prohozené?",
+  "weatherAltitudeInvalid": "Zadej výšku v metrech (0 až 2000)",
+  "weatherLocationIncomplete": "Vyplň šířku i délku, nebo obojí nech prázdné.",
+  "weatherDeviceLocationDisabled": "Poloha v telefonu je vypnutá.",
+  "weatherDeviceLocationDenied": "Aplikace nemá povolení k poloze. Zadej ji ručně.",
+  "weatherDeviceLocationFailed": "Polohu telefonu se nepodařilo zjistit.",
+  "weatherDeviceLocationUnsupported": "Tady polohu telefonu zjistit nejde. Zadej ji ručně.",
+  "weatherSectionForecast": "Počasí",
+  "weatherUnavailable": "Počasí potřebuje připojení k serveru, které tahle verze aplikace nemá.",
+  "weatherNotSignedIn": "Pro počasí se přihlas v Nastavení, v části Účet.",
+  "weatherNotPremium": "Počasí a zálivka podle deště jsou v Premium. Kalendář prací je zdarma.",
+  "weatherShowPremium": "Zobrazit Premium",
+  "weatherNoLocation": "Zadej polohu zahrady a počasí se stáhne.",
+  "weatherOffline": "Bez připojení. Zkusím to znovu později.",
+  "weatherProviderError": "Počasí se teď nepodařilo stáhnout.",
+  "weatherRetry": "Zkusit znovu",
+  "weatherFetchedAt": "Staženo {time}",
+  "@weatherFetchedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRainLast7": "Za posledních 7 dní napršelo {mm} mm",
+  "@weatherRainLast7": {
+    "placeholders": {
+      "mm": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherDayRow": "{precip} mm · {tmin} až {tmax} °C",
+  "@weatherDayRow": {
+    "placeholders": {
+      "precip": {
+        "type": "String"
+      },
+      "tmin": {
+        "type": "String"
+      },
+      "tmax": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherDayRowNoTemp": "{precip} mm",
+  "@weatherDayRowNoTemp": {
+    "placeholders": {
+      "precip": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherSectionWatering": "Zálivka",
+  "weatherWateringEmpty": "Žádná zóna teď zálivku neřeší.",
+  "weatherAdviceRained": "Může počkat: napršelo {mm} mm (práh {threshold} mm)",
+  "@weatherAdviceRained": {
+    "placeholders": {
+      "mm": {
+        "type": "String"
+      },
+      "threshold": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherAdviceRainExpected": "Může počkat: do zítřka má pršet",
+  "weatherAdviceWater": "Zalij podle potřeby: napršelo {mm} z {threshold} mm",
+  "@weatherAdviceWater": {
+    "placeholders": {
+      "mm": {
+        "type": "String"
+      },
+      "threshold": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherAdviceCovered": "Krytá zóna: déšť nedostane, zalij podle potřeby",
+  "weatherPostponeButton": "{count, plural, =1{Odložit 1 zálivku} few{Odložit {count} zálivky} other{Odložit {count} zálivek}}",
+  "@weatherPostponeButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weatherPostponed": "{count, plural, =1{Zálivka odložena o den} few{{count} zálivky odloženy o den} other{{count} zálivek odloženo o den}}",
+  "@weatherPostponed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weatherAutoPostpone": "Odkládat zálivku automaticky",
+  "weatherAutoPostponeSubtitle": "Jednou denně po stažení počasí, když napršelo nebo má pršet",
+  "weatherFrostTitle": "Mráz {temp} °C {day}",
+  "@weatherFrostTitle": {
+    "placeholders": {
+      "temp": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherFrostZones": "Zakryj nebo ochraň: {zones}",
+  "@weatherFrostZones": {
+    "placeholders": {
+      "zones": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherSectionPhenology": "Kalendář prací",
+  "weatherPhenologyAltitude": "Termíny jsou posunuté pro {altitude}. Řiď se i tím, jak jaro skutečně běží.",
+  "@weatherPhenologyAltitude": {
+    "placeholders": {
+      "altitude": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherPhenologyNow": "Teď je čas",
+  "weatherPhenologySoon": "Brzy přijde",
+  "weatherPhenologyEmpty": "Teď ani v příštích třech týdnech podle kalendáře nic. Kalendář se řídí druhy zón, které na zahradě máš.",
+  "weatherPhenologyRange": "{from} až {to}",
+  "@weatherPhenologyRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherPhenologyAddTask": "Přidat jako úkol",
+  "weatherPhenologyTaskAdded": "Úkol přidán",
+  "weatherCardNow": "Teď je čas: {items}",
+  "@weatherCardNow": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherCardRained": "Zálivka může počkat: napršelo {mm} mm",
+  "@weatherCardRained": {
+    "placeholders": {
+      "mm": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherCardRainExpected": "Zálivka může počkat: do zítřka má pršet"
 }

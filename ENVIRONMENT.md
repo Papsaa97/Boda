@@ -67,4 +67,6 @@ Backend je **Supabase** (DECLOG D24); kód serveru je v `supabase/`, projekty `d
 | Sentry a PostHog (EU) | pády, měření H1–H4 | `crashReporterProvider`, `analyticsSinkProvider` (DECLOG D75) |
 | Podpisový klíč Androidu, účet Google Play | vydání na Androidu | `android/key.properties` (mimo git) |
 | Apple Developer Program, Mac s Xcode | build a vydání pro iOS | `ios/` (bundle `cz.zahradnikboda.app`), `pod install` na Macu |
+| Poskytovatel počasí s licencí pro komerční aplikaci (např. placený tarif Open-Meteo) | počasí a zálivka (V2, Premium) | secrets `WEATHER_API_URL`, `WEATHER_API_KEY` (DECLOG D85) |
+| Firebase Cloud Messaging (jen push, bez dalších služeb Firebase) | upozornění na mráz i se zavřenou aplikací | zatím jen karta na dashboardu (DECLOG D85) |
 | ≥ 10 testerů, test na skutečných telefonech | ověření před vydáním | – |

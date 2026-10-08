@@ -25,6 +25,14 @@ class Gardens extends Table {
   /// v metrech; serverový sloupec `bounds`.
   TextColumn get bounds => text().nullable()();
 
+  /// Poloha zahrady pro počasí (V2, schéma 7), zaokrouhlená na 2 desetinná
+  /// místa (~1 km, spec 8.1).
+  RealColumn get locationLat => real().nullable()();
+  RealColumn get locationLng => real().nullable()();
+
+  /// Nadmořská výška v metrech (fenologický kalendář, FR-W5).
+  IntColumn get altitudeM => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -367,7 +375,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -463,6 +471,12 @@ class AppDatabase extends _$AppDatabase {
         ]) {
           await m.create(trigger);
         }
+      },
+      // V2: poloha a nadmořská výška zahrady (počasí, fenologie).
+      from6To7: (m, schema) async {
+        await m.addColumn(schema.gardens, schema.gardens.locationLat);
+        await m.addColumn(schema.gardens, schema.gardens.locationLng);
+        await m.addColumn(schema.gardens, schema.gardens.altitudeM);
       },
     ),
     beforeOpen: (details) async {
