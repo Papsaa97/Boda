@@ -107,7 +107,7 @@ Offline deník → Spolehlivý deník → validace H1    → Chytrý parťák   
 #### MVP 0.1 – Offline deník ✅ (implementováno v PR #1)
 
 **Cíl:** mít použitelný deník pro vlastní zahradu autora.
-**Rozsah:** záznam aktivity (název, datum a čas, zóna ze seznamu, fotka, poznámka); deník seřazený od nejnovějšího s detailem, úpravou a smazáním; správa seznamu zón; dashboard „Co dnes?“ počítaný z deníku; statický sezónní tip od Bódi. Bez účtu, bez internetu, bez AI, bez 2D plátna.
+**Rozsah:** záznam aktivity (název, datum a čas, zóna ze seznamu, fotka, poznámka); rychlé volby pro častý zápis (Zálivka, Pletí, naposledy použité); deník seřazený od nejnovějšího s detailem, úpravou, smazáním a filtrem podle zóny; správa seznamu zón; úvodní obrazovka „Začít bez registrace“ a výběr zón velkými kartami (onboarding); dashboard „Co dnes?“ počítaný z deníku; statický sezónní tip od Bódi. Bez účtu, bez internetu, bez AI, bez 2D plátna.
 **Definice hotovo:**
 - [x] Všechny funkce výše fungují na Androidu bez připojení k internetu.
 - [x] Fotka přežije restart aplikace i promazání cache (kopíruje se do složky aplikace).
@@ -120,15 +120,15 @@ Offline deník → Spolehlivý deník → validace H1    → Chytrý parťák   
 **Rozsah (must-have):**
 1. **Export a import dat** (ZIP: JSON + fotky) přes systémové sdílení. Bez toho tester při výměně nebo ztrátě telefonu přijde o celou sezónu. *(kap. 5.5)*
 2. **Typ činnosti** u záznamu (výsev, výsadba, zálivka, hnojení, postřik, řez, sklizeň, pletí, jiné) s ikonou a rychlým výběrem. Usnadní zápis a je to podklad pro pozdější rady i statistiky.
-3. **Rychlý zápis:** nový záznam na ≤ 3 klepnutí a do 15 sekund (předvyplněné datum, poslední zóna, typ činnosti jako velká tlačítka).
-4. **Filtrování deníku** podle zóny a typu činnosti, fulltext v názvu a poznámce.
+3. **Rychlý zápis:** nový záznam na ≤ 3 klepnutí a do 15 sekund. Rychlé volby z 0.1 navázat na typ činnosti (bod 2), předvyplnit poslední zónu.
+4. **Filtrování deníku** podle typu činnosti a fulltext v názvu a poznámce (filtr podle zóny je hotový v 0.1).
 5. **Jednoduché úkoly s připomínkou** (název, termín, zóna, opakování týdně/měsíčně), lokální notifikace s tichými hodinami (kap. 5.3). Dokončení úkolu nabídne vytvořit záznam v deníku.
 6. **Statistika** pro testery: počet záznamů za týden, nejaktivnější zóny (podklad pro H1).
 7. **Světlý motiv** a přepínání podle systému (venku na slunci je tmavý motiv špatně čitelný, kap. 10).
 8. **Technický dluh:** přechod `hive` → `hive_ce` (udržovaná náhrada), přejmenování `applicationId` z `com.example…` (Google Play ho nepřijme), schéma s `schemaVersion` a časovými razítky (kap. 8).
 9. **Distribuce:** Google Play interní testování (do 100 testerů).
 
-**Nice-to-have (jen pokud zbude čas):** sklizeň s množstvím (kg/ks), náklady (Kč) u záznamu, porovnání dvou fotek „před a po“, onboarding s výběrem zón z předvoleb.
+**Nice-to-have (jen pokud zbude čas):** sklizeň s množstvím (kg/ks), náklady (Kč) u záznamu, porovnání dvou fotek „před a po“, lokalita v onboardingu pro sezónní tipy.
 
 **Definice hotovo:**
 - Export → odinstalace → instalace → import obnoví všechna data včetně fotek (ověřeno ručně i testem).
@@ -187,8 +187,8 @@ Každý požadavek má ID pro odkazování v PR a testech. Sloupec **Fáze** ř�
 | FR-D3 | Zóny jako seznam s výchozími položkami; přidat, přejmenovat; zónu se záznamy nelze smazat (jen archivovat od 0.2). | 0.1 ✅ / 0.2 |
 | FR-D4 | Dashboard „Co dnes?“: dnešní záznamy, zóny bez záznamu 7+ dní, počet záznamů za 7 dní, sezónní tip. | 0.1 ✅ |
 | FR-D5 | Typ činnosti u záznamu (pevný číselník, kap. 8.3). | 0.2 |
-| FR-D6 | Rychlý zápis: ≤ 3 klepnutí, předvyplněná poslední zóna. | 0.2 |
-| FR-D7 | Filtr podle zóny a typu, fulltext. | 0.2 |
+| FR-D6 | Rychlý zápis: ≤ 3 klepnutí, předvyplněná poslední zóna. Rychlé volby (Zálivka, Pletí, naposledy použité) jsou hotové. | 0.1 ✅ / 0.2 |
+| FR-D7 | Filtr podle zóny (hotový), podle typu a fulltext. | 0.1 ✅ / 0.2 |
 | FR-D8 | Víc fotek u záznamu (max. 5), zmenšené na delší stranu 1 920 px, JPEG ~80 %. | 0.2 |
 | FR-D9 | Sklizeň s množstvím a jednotkou; náklady v Kč. | 0.2 (nice-to-have) |
 | FR-D10 | Porovnání „před a po“: dvě fotky téže zóny vedle sebe / s posuvníkem. | 0.2 (nice-to-have) |
@@ -477,7 +477,7 @@ Uložené hodnoty jsou anglické klíče, české popisky jsou v lokalizaci.
 1. **Zápis musí být rychlejší než zapomenutí.** Hlavní akce „+ Záznam“ je vždy na jedno klepnutí.
 2. **Venku na slunci, v rukavicích.** Velké dotykové plochy, vysoký kontrast, světlý motiv.
 3. **Klid, ne stres.** Žádné reklamy, žádné agresivní notifikace, upozornění jen když na něm záleží. Tón Bódi: přátelský, věcný, bez poučování.
-4. **Bez registrační zdi.** Aplikace jde používat hned; účet se nabídne až s funkcí, která ho potřebuje (záloha do cloudu, Bóďa). Úvodní obrazovka „Pokračovat jako host“ z v2.0 tím odpadá, host je výchozí stav.
+4. **Bez registrační zdi.** Aplikace jde používat hned; účet se nabídne až s funkcí, která ho potřebuje (záloha do cloudu, Bóďa). Úvodní obrazovka „Začít bez registrace“ (implementovaná v 0.1) slouží jako přivítání, ale nikdy nesmí účet vyžadovat; host je výchozí stav.
 5. **Data patří uživateli.** Export je vždy zdarma a vždy dostupný.
 
 ### 10.2 Barvy a motivy
@@ -493,7 +493,7 @@ Uložené hodnoty jsou anglické klíče, české popisky jsou v lokalizaci.
 | Obrazovka | 0.1 | 0.2 | 1.0 | V2 |
 | --- | --- | --- | --- | --- |
 | **Co dnes?** (bento dashboard) | hero karta z deníku, 7 dní, tip | + dnešní úkoly | + doporučení Bódi | + widget počasí |
-| **Deník** | seznam po dnech, detail | + filtr, typy, víc fotek | + sklizeň, náklady | |
+| **Deník** | seznam po dnech, detail, filtr podle zóny | + typy, fulltext, víc fotek | + sklizeň, náklady | |
 | **Zóny** | seznam | + archivace | + vlastnosti zóny | |
 | **Úkoly** | – | seznam, kalendářní pohled týdne | + materiály, režim víkend | + úkoly z počasí |
 | **Bóďa** | – | – | chat s akcemi | + diagnostika z fotky |
@@ -501,9 +501,9 @@ Uložené hodnoty jsou anglické klíče, české popisky jsou v lokalizaci.
 
 Widget počasí z v2.0 patří až do V2 (počasí v dřívějších fázích není).
 
-### 10.4 Onboarding (0.2)
+### 10.4 Onboarding
 
-Maximálně 3 kroky a 60 sekund: (1) „Co pěstuješ?“ velké karty s ikonami (zelenina, ovoce, okrasná, trávník, skleník), z výběru vzniknou zóny; (2) volitelně lokalita (obec) pro sezónní tipy; (3) první záznam. Vše jde přeskočit.
+Maximálně 3 kroky a 60 sekund: (1) „Co pěstuješ?“ velké karty s ikonami a ukazatelem průběhu, z výběru vzniknou zóny (**hotovo v 0.1**); (2) volitelně lokalita (obec) pro sezónní tipy (0.2); (3) první záznam. Vše jde přeskočit.
 
 ---
 

@@ -81,8 +81,8 @@ Proč: aplikace se používá venku na slunci, kde je tmavý motiv špatně čit
 Dopad: paleta v kap. 10.2; tmavý motiv zůstává jako volba.
 
 **D19. Bez registrační zdi: host je výchozí stav.**
-Proč: úvodní obrazovka „Pokračovat jako host“ je zbytečný krok; účet má smysl až s funkcí, která ho potřebuje.
-Dopad: účet se nabídne při zapnutí zálohy do cloudu nebo Bódi.
+Proč: účet má smysl až s funkcí, která ho potřebuje; povinná registrace na začátku odradí.
+Dopad: úvodní obrazovka „Začít bez registrace“ z PR #1 zůstává jako přivítání, ale nikdy účet nevyžaduje. Účet se nabídne při zapnutí zálohy do cloudu nebo Bódi.
 
 **D20. Byznys: roční tarif 449 Kč (nebo 69 Kč/měsíc), bez reklam, deník vždy zdarma; cíl 100 000 uživatelů do 2026 zrušen.**
 Proč: cíl k říjnu 2026 neplatí; 129 Kč měsíčně je pro českého hobby zahradníka hodně a měsíční platba nesedí sezónnímu používání; reklamy odporují poslání „klid místo stresu“.

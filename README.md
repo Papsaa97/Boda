@@ -35,10 +35,11 @@ Cílem této verze je ověřit, jestli lidé budou digitálně zapisovat práci 
 Proto je to jednoduchý, **100% offline deník** bez 2D plátna a bez AI.
 
 ## Funkce (MVP 0.1)
+* ✅ **Úvod a výběr zón:** při prvním spuštění „Začít bez registrace“ a výběr zón velkými kartami.
 * ✅ **Co dnes?** Dashboard s hero kartou (co je dnes zapsané, nebo kterou zónu dlouho nikdo neviděl), statistikou za 7 dní a sezónním tipem od Bódi.
-* ✅ **Záznam aktivity:** název, datum a čas, zóna ze seznamu, poznámka, fotka (fotoaparát nebo galerie).
-* ✅ **Deník (Timeline):** všechny záznamy od nejnovějšího, seskupené po dnech, s detailem, úpravou a smazáním.
-* ✅ **Zóny:** výchozí seznam (Zelenina, Okrasná zahrada, Ovocný sad, Trávník, Skleník), vlastní zóny lze přidat, přejmenovat i smazat.
+* ✅ **Záznam aktivity:** název, datum a čas, zóna ze seznamu, poznámka, fotka (fotoaparát nebo galerie). Rychlé volby (Zálivka, Pletí, naposledy použité) zapíšou záznam jedním ťuknutím.
+* ✅ **Deník (Timeline):** všechny záznamy od nejnovějšího, seskupené po dnech, s filtrem podle zóny, detailem, úpravou a smazáním.
+* ✅ **Zóny:** výběr z nabídky (Zelenina, Okrasná zahrada, Ovocný sad, Trávník, Skleník, Bylinky, Jezírko), vlastní zóny lze přidat, přejmenovat i smazat.
 * ✅ **Tip od Bódi:** statické sezónní tipy podle měsíce, každý den jiný.
 * ✅ **Offline-first:** data i fotky zůstávají na zařízení (Hive + složka aplikace). Žádný backend.
 
@@ -50,6 +51,7 @@ Na webu funguje vše kromě fotek (prohlížeč nemá trvalé lokální úloži�
   * `features/activity` – záznamy deníku
   * `features/zones` – seznam zón
   * `features/dashboard` – „Co dnes?“ a tipy od Bódi
+  * `features/onboarding` – úvodní obrazovka a výběr zón
 * **State Management:** Riverpod (`AsyncNotifier`, zápisy přes `AsyncValue.guard()`)
 * **Lokální Databáze:** Hive
 * **Design:** tmavý motiv podle palety ze specifikace (kap. 10.2), čeština včetně kalendáře
