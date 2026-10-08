@@ -1,7 +1,7 @@
 // lib/core/di/providers.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../features/activity/data/activity_hive_model.dart';
 import '../../features/activity/data/hive_local_data_source.dart';
@@ -48,7 +48,13 @@ final zoneRepositoryProvider = Provider<ZoneRepository>((ref) {
 });
 
 /// Ukládání fotek k záznamům do složky aplikace.
-final photoStorageProvider = Provider<PhotoStorage>((ref) => PhotoStorage());
+///
+/// Kořenovou složku zná až main.dart, proto se provider přepisuje.
+final photoStorageProvider = Provider<PhotoStorage>((ref) {
+  throw UnimplementedError(
+    'photoStorageProvider musí být override-nut v main.dart.',
+  );
+});
 
 /// Aktuální čas. V testech se přepisuje pevným datem.
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);

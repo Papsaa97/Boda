@@ -70,23 +70,27 @@ TodaySummary buildTodaySummary({
     lastByZone.putIfAbsent(a.zoneId, () => a.date);
   }
 
-  final statuses = zones.map((zone) {
-    final last = lastByZone[zone.id];
-    return ZoneStatus(
-      zone: zone,
-      lastActivity: last,
-      daysSince: last == null ? null : calendarDaysBetween(last, now),
-    );
-  }).where((s) => s.isNeglected).toList()
-    ..sort((a, b) {
-      // Zóny bez jediného záznamu až za ty, které jsou dlouho opomíjené.
-      if (a.daysSince == null && b.daysSince == null) {
-        return a.zone.name.compareTo(b.zone.name);
-      }
-      if (a.daysSince == null) return 1;
-      if (b.daysSince == null) return -1;
-      return b.daysSince!.compareTo(a.daysSince!);
-    });
+  final statuses =
+      zones
+          .map((zone) {
+            final last = lastByZone[zone.id];
+            return ZoneStatus(
+              zone: zone,
+              lastActivity: last,
+              daysSince: last == null ? null : calendarDaysBetween(last, now),
+            );
+          })
+          .where((s) => s.isNeglected)
+          .toList()
+        ..sort((a, b) {
+          // Zóny bez jediného záznamu až za ty, které jsou dlouho opomíjené.
+          if (a.daysSince == null && b.daysSince == null) {
+            return a.zone.name.compareTo(b.zone.name);
+          }
+          if (a.daysSince == null) return 1;
+          if (b.daysSince == null) return -1;
+          return b.daysSince!.compareTo(a.daysSince!);
+        });
 
   return TodaySummary(
     today: todays,

@@ -44,7 +44,9 @@ class ActivityDetailScreen extends ConsumerWidget {
         .firstOrNull;
 
     final photos = ref.read(photoStorageProvider);
-    await ref.read(activityControllerProvider.notifier).deleteActivity(activityId);
+    await ref
+        .read(activityControllerProvider.notifier)
+        .deleteActivity(activityId);
     if (!context.mounted) return;
     if (ref.read(activityControllerProvider).hasError) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -95,11 +97,25 @@ class ActivityDetailScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           if (activity.imagePath != null) ...[
-            ActivityPhoto(
-              path: activity.imagePath,
-              height: 260,
-              borderRadius: 20,
-              iconSize: 64,
+            Semantics(
+              button: true,
+              label: 'Zobrazit fotku přes celou obrazovku',
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PhotoViewerScreen(
+                      path: activity.imagePath!,
+                      title: activity.title,
+                    ),
+                  ),
+                ),
+                child: ActivityPhoto(
+                  path: activity.imagePath,
+                  height: 260,
+                  borderRadius: 20,
+                  iconSize: 64,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
           ],

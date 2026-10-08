@@ -9,22 +9,21 @@ import '../helpers/fakes.dart';
 void main() {
   setUpAll(() => initializeDateFormatting('cs'));
 
-  testWidgets('first run: welcome, pick zones, land on Co dnes?', (tester) async {
+  testWidgets('first run: pick zones and land on Co dnes?', (tester) async {
     final zones = InMemoryZoneRepository(const []);
     await pumpApp(tester, testOverrides(zones: zones));
 
-    await tester.tap(find.text('Začít bez registrace'));
-    await tester.pumpAndSettle();
-    expect(find.text('Co máš na zahradě?'), findsOneWidget);
+    // Žádná úvodní obrazovka ani registrace, rovnou výběr (spec 10.1, 10.4).
+    expect(find.text('Co pěstuješ?'), findsOneWidget);
 
     // Zelenina je předvybraná, přidáme Bylinky a Zeleninu odebereme.
+    await tester.ensureVisible(find.text('Bylinky'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Bylinky'));
+    await tester.ensureVisible(find.text('Zelenina'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Zelenina'));
     await tester.pump();
-    await tester.tap(find.text('Pokračovat'));
-    await tester.pumpAndSettle();
-    expect(find.text('Tvoje zahrada je připravená'), findsOneWidget);
-
     await tester.tap(find.text('Jdeme na zahradu'));
     await tester.pumpAndSettle();
 
@@ -32,16 +31,29 @@ void main() {
     expect(find.text('Co dnes?'), findsOneWidget);
   });
 
-  testWidgets('cannot continue onboarding with no zone selected', (tester) async {
-    await pumpApp(tester, testOverrides(zones: InMemoryZoneRepository(const [])));
-    await tester.tap(find.text('Začít bez registrace'));
+  testWidgets('onboarding can be skipped with default zones', (tester) async {
+    final zones = InMemoryZoneRepository(const []);
+    await pumpApp(tester, testOverrides(zones: zones));
+
+    await tester.tap(find.text('Přeskočit'));
     await tester.pumpAndSettle();
+
+    expect(zones.items.keys, unorderedEquals(['Z1', 'Z2', 'Z3', 'Z4', 'Z5']));
+    expect(find.text('Co dnes?'), findsOneWidget);
+  });
+
+  testWidgets('cannot finish onboarding with no zone selected', (tester) async {
+    await pumpApp(
+      tester,
+      testOverrides(zones: InMemoryZoneRepository(const [])),
+    );
 
     await tester.tap(find.text('Zelenina'));
     await tester.pump();
 
     final button = tester.widget<FilledButton>(
-        find.widgetWithText(FilledButton, 'Vyber aspoň jednu'));
+      find.widgetWithText(FilledButton, 'Vyber aspoň jednu'),
+    );
     expect(button.onPressed, isNull);
   });
 
@@ -63,8 +75,18 @@ void main() {
 
   testWidgets('timeline can be filtered by zone', (tester) async {
     final repo = InMemoryActivityRepository([
-      activity('a', date: DateTime(2026, 10, 6, 9), zoneId: 'Z1', title: 'Zálivka mrkve'),
-      activity('b', date: DateTime(2026, 10, 5, 9), zoneId: 'Z3', title: 'Řez jabloně'),
+      activity(
+        'a',
+        date: DateTime(2026, 10, 6, 9),
+        zoneId: 'Z1',
+        title: 'Zálivka mrkve',
+      ),
+      activity(
+        'b',
+        date: DateTime(2026, 10, 5, 9),
+        zoneId: 'Z3',
+        title: 'Řez jabloně',
+      ),
     ]);
     await pumpApp(tester, testOverrides(activities: repo));
     await tester.tap(find.text('Deník'));
@@ -92,7 +114,9 @@ void main() {
     await tester.tap(find.byTooltip('Nový záznam'));
     await tester.pumpAndSettle();
     await tester.enterText(
-        find.widgetWithText(TextFormField, 'Název aktivity'), 'Nová zálivka');
+      find.widgetWithText(TextFormField, 'Název aktivity'),
+      'Nová zálivka',
+    );
     await tester.ensureVisible(find.text('Uložit záznam'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Uložit záznam'));
@@ -101,7 +125,11 @@ void main() {
     expect(find.text('Záznam se nepodařilo uložit.'), findsOneWidget);
     expect(find.text('Nový záznam'), findsOneWidget);
 
+    // Formulář má neuložené změny, takže se zeptá, jestli je zahodit.
     await tester.tap(find.byTooltip('Zpět'));
+    await tester.pumpAndSettle();
+    expect(find.text('Zahodit změny?'), findsOneWidget);
+    await tester.tap(find.text('Zahodit'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Deník'));
     await tester.pumpAndSettle();
@@ -116,7 +144,9 @@ void main() {
     addTearDown(container.dispose);
     await container.read(activityControllerProvider.future);
 
-    await container.read(activityControllerProvider.notifier).deleteActivity('a');
+    await container
+        .read(activityControllerProvider.notifier)
+        .deleteActivity('a');
 
     final state = container.read(activityControllerProvider);
     expect(state.hasError, isTrue);

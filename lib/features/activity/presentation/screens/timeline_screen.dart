@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/di/providers.dart';
+import '../../../../core/time/today.dart';
 import '../../../../core/formatting/dates.dart';
 import '../../../zones/domain/zone_entity.dart';
 import '../../../zones/presentation/zones_controller.dart';
@@ -27,17 +27,17 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   @override
   Widget build(BuildContext context) {
     final activitiesAsync = ref.watch(activityControllerProvider);
-    final zones = ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[];
-    final now = ref.watch(clockProvider)();
+    final zones =
+        ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[];
+    final now = ref.watch(todayProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Deník')),
       body: activitiesAsync.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Text('Chyba při načítání deníku: $error'),
-        ),
+        error: (error, _) =>
+            Center(child: Text('Chyba při načítání deníku: $error')),
         data: (activities) {
           if (activities.isEmpty) {
             return const _EmptyTimeline();
@@ -45,7 +45,9 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
 
           // Filtr nabízí jen zóny, ve kterých něco je.
           final usedZoneIds = activities.map((a) => a.zoneId).toSet();
-          final filterZones = zones.where((z) => usedZoneIds.contains(z.id)).toList();
+          final filterZones = zones
+              .where((z) => usedZoneIds.contains(z.id))
+              .toList();
           final filter = usedZoneIds.contains(_zoneFilter) ? _zoneFilter : null;
           final visible = filter == null
               ? activities
@@ -73,7 +75,8 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                         ChoiceChip(
                           label: Text(zone.name),
                           selected: filter == zone.id,
-                          onSelected: (_) => setState(() => _zoneFilter = zone.id),
+                          onSelected: (_) =>
+                              setState(() => _zoneFilter = zone.id),
                         ),
                       ],
                     ],
@@ -89,11 +92,12 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                     child: Text(
                       formatDayHeader(group.first.date, now),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                   ),
-                  for (final activity in group) ActivityTile(activity: activity),
+                  for (final activity in group)
+                    ActivityTile(activity: activity),
                 ],
               );
             },
@@ -132,8 +136,11 @@ class _EmptyTimeline extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.menu_book_outlined,
-                size: 56, color: Theme.of(context).colorScheme.primary),
+            Icon(
+              Icons.menu_book_outlined,
+              size: 56,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(height: 16),
             const Text('Zatím žádné záznamy', textAlign: TextAlign.center),
             const SizedBox(height: 8),

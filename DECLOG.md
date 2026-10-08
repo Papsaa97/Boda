@@ -80,7 +80,7 @@ Dopad: úkol pro MVP 0.2, s migračním testem.
 Proč: aplikace se používá venku na slunci, kde je tmavý motiv špatně čitelný. Tyrkysová `#2DD4BF` na bílé nemá dost kontrastu pro text, proto světlý motiv používá `#0F766E`.
 Dopad: paleta v kap. 10.2; tmavý motiv zůstává jako volba.
 
-**D19. Bez registrační zdi: host je výchozí stav.**
+**D19. Bez registrační zdi: host je výchozí stav.** *(úvodní obrazovka zrušena, viz D36)*
 Proč: účet má smysl až s funkcí, která ho potřebuje; povinná registrace na začátku odradí.
 Dopad: úvodní obrazovka „Začít bez registrace“ z PR #1 zůstává jako přivítání, ale nikdy účet nevyžaduje. Účet se nabídne při zapnutí zálohy do cloudu nebo Bódi.
 
@@ -157,3 +157,21 @@ Dopad: kap. 7.1 a 9 (seznam zpracovatelů); balíčky se přidávají až ve fá
 | Testy `flutter_test` + Mockito | ponecháno | Už v kódu a v CI; výměna za Mocktail by nic nepřinesla. |
 | CI GitHub Actions | ponecháno, od 1.0 rozšířeno | Od 1.0 přibudou testy databáze (`supabase test db`); iOS build přes macOS runner nebo Codemagic. |
 | Distribuce: Google Play interní testování | ponecháno | Do 100 testerů zdarma a bez veřejné stránky v obchodě. |
+
+## 2026-10-08 – Revize kódu MVP 0.1 (PR #5)
+
+**D33. `hive_ce` a Riverpod 3 už v MVP 0.1, bez generátoru `@riverpod` (upřesňuje D2; cíl z D26 platí).**
+Proč: balíček `hive` se už neudržuje a dokud aplikaci nikdo nepoužívá, je výměna nejlevnější. `hive_ce` čte soubory starého `hive` beze změny, takže to není převod dat, jen výměna balíčku. Riverpod 3 sám drží poslední data při chybě zápisu. Generátor providerů by přidal krok `build_runner` ke každé změně bez přínosu pro tak malý počet providerů.
+Dopad: migrační test `test/core/local_storage_migration_test.dart` čte box zapsaný verzí 0.1. `hive_ce` je mezikrok: v MVP 0.2 data jednorázově převede do Driftu (D26) a čte je přitom přes `hive_ce`.
+
+**D34. Fotka se v záznamu ukládá jako relativní cesta ke složce aplikace.**
+Proč: na iOS se absolutní cesta ke složce aplikace mění s každou aktualizací; spec 8.2 to tak vyžaduje a usnadní to export (0.2).
+Dopad: starší absolutní cesty se při zobrazení dohledají; fotky, které verze 0.1 nechala v cache, se při startu zkopírují do složky aplikace. Fotka se zmenšuje na 1 920 px (FR-D8).
+
+**D35. `applicationId` a iOS bundle ID jsou `cz.zahradnikboda.app`.**
+Proč: `com.example…` Google Play odmítne a po prvním nahrání už ID změnit nejde; aplikace zatím nikde vydaná není, takže změna nic nestojí.
+Dopad: kdyby Papi chtěl jiné ID (např. podle vlastní domény), stačí ho změnit kdykoli před prvním nahráním do obchodu.
+
+**D36. Onboarding a světlý motiv už v 0.1 (předsunuto z 0.2, viz D18); onboarding má jeden krok „Co pěstuješ?“, jde přeskočit a úvodní obrazovka „Začít bez registrace“ odpadá (upřesňuje D19).**
+Proč: bez onboardingu nový uživatel dostal pět zón, které nemusí mít; podoba odpovídá spec 10.1 (bez úvodní obrazovky) a 10.4. Světlý motiv byl levný, protože paleta ve spec 10.2 je hotová.
+Dopad: lokalita a první záznam ze spec 10.4 zůstávají na 0.2. Výchozí motiv je „podle systému“.

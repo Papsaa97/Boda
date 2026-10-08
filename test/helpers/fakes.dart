@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zahradnik_boda_mvp01/app.dart';
 import 'package:zahradnik_boda_mvp01/core/di/providers.dart';
+import 'package:zahradnik_boda_mvp01/core/photos/photo_storage.dart';
 import 'package:zahradnik_boda_mvp01/features/activity/domain/activity_entity.dart';
 import 'package:zahradnik_boda_mvp01/features/activity/domain/activity_repository.dart';
 import 'package:zahradnik_boda_mvp01/features/zones/domain/zone_entity.dart';
@@ -18,7 +22,8 @@ class InMemoryActivityRepository implements ActivityRepository {
   final Map<String, ActivityEntity> items = {};
 
   @override
-  Future<List<ActivityEntity>> getAllActivities() async => items.values.toList();
+  Future<List<ActivityEntity>> getAllActivities() async =>
+      items.values.toList();
 
   @override
   Future<ActivityEntity?> getActivityById(String id) async => items[id];
@@ -70,21 +75,25 @@ ProviderContainer makeContainer({
   InMemoryActivityRepository? activities,
   InMemoryZoneRepository? zones,
 }) {
-  return ProviderContainer(overrides: testOverrides(
-    activities: activities,
-    zones: zones,
-  ));
+  return ProviderContainer(
+    overrides: testOverrides(activities: activities, zones: zones),
+  );
 }
 
 List<Override> testOverrides({
   InMemoryActivityRepository? activities,
   InMemoryZoneRepository? zones,
+  DateTime Function()? clock,
 }) {
   return [
-    activityRepositoryProvider
-        .overrideWithValue(activities ?? InMemoryActivityRepository()),
+    activityRepositoryProvider.overrideWithValue(
+      activities ?? InMemoryActivityRepository(),
+    ),
     zoneRepositoryProvider.overrideWithValue(zones ?? InMemoryZoneRepository()),
-    clockProvider.overrideWithValue(() => testNow),
+    clockProvider.overrideWithValue(clock ?? () => testNow),
+    photoStorageProvider.overrideWithValue(
+      PhotoStorage('${Directory.systemTemp.path}/boda_test_photos'),
+    ),
   ];
 }
 

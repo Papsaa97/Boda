@@ -13,7 +13,11 @@ void main() {
   ];
 
   test('empty diary: nothing today, every zone needs attention', () {
-    final summary = buildTodaySummary(activities: [], zones: zones, now: testNow);
+    final summary = buildTodaySummary(
+      activities: [],
+      zones: zones,
+      now: testNow,
+    );
 
     expect(summary.today, isEmpty);
     expect(summary.lastActivity, isNull);
@@ -54,14 +58,33 @@ void main() {
   });
 
   test('calendarDaysBetween counts calendar days, not 24h blocks', () {
-    expect(calendarDaysBetween(DateTime(2026, 10, 6, 23, 59), DateTime(2026, 10, 7, 0, 1)), 1);
-    expect(calendarDaysBetween(DateTime(2026, 10, 7, 1), DateTime(2026, 10, 7, 23)), 0);
+    expect(
+      calendarDaysBetween(
+        DateTime(2026, 10, 6, 23, 59),
+        DateTime(2026, 10, 7, 0, 1),
+      ),
+      1,
+    );
+    expect(
+      calendarDaysBetween(DateTime(2026, 10, 7, 1), DateTime(2026, 10, 7, 23)),
+      0,
+    );
     // Přes změnu času (25. 10. 2026).
-    expect(calendarDaysBetween(DateTime(2026, 10, 24, 12), DateTime(2026, 10, 26, 12)), 2);
+    expect(
+      calendarDaysBetween(
+        DateTime(2026, 10, 24, 12),
+        DateTime(2026, 10, 26, 12),
+      ),
+      2,
+    );
   });
 
   test('Bóďa has a tip for every day of the year', () {
-    for (var d = DateTime(2026, 1, 1); d.year == 2026; d = d.add(const Duration(days: 1))) {
+    for (
+      var d = DateTime(2026, 1, 1);
+      d.year == 2026;
+      d = d.add(const Duration(days: 1))
+    ) {
       expect(BodaTips.forDate(d), isNotEmpty);
     }
   });

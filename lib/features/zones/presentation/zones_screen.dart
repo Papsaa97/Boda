@@ -3,38 +3,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../domain/zone_entity.dart';
-import 'zones_controller.dart';
+import '../domain/zone_rules.dart';
 import 'zone_icons.dart';
+import 'zones_controller.dart';
 
 /// Správa seznamu zón: přidat, přejmenovat, smazat.
 class ZonesScreen extends ConsumerWidget {
   const ZonesScreen({super.key});
 
-  Future<String?> _askName(BuildContext context, {String? initial}) {
-    final controller = TextEditingController(text: initial);
-    return showDialog<String>(
+  /// Dialog s názvem zóny. [onSubmit] vrací chybu, která se ukáže v poli,
+  /// nebo null, když se uložení povedlo a dialog se může zavřít.
+  Future<void> _nameDialog(
+    BuildContext context, {
+    required String title,
+    String? initial,
+    required Future<String?> Function(String name) onSubmit,
+  }) {
+    return showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(initial == null ? 'Nová zóna' : 'Přejmenovat zónu'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(hintText: 'např. Záhon u plotu'),
-          onSubmitted: (v) => Navigator.pop(context, v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Zrušit'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Uložit'),
-          ),
-        ],
-      ),
-    ).whenComplete(controller.dispose);
+      builder: (context) =>
+          _ZoneNameDialog(title: title, initial: initial, onSubmit: onSubmit),
+    );
   }
 
   void _reportFailure(BuildContext context, WidgetRef ref) {
@@ -44,48 +33,38 @@ class ZonesScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _add(BuildContext context, WidgetRef ref) async {
-    final name = await _askName(context);
-    if (name == null || name.trim().isEmpty) return;
-    await ref.read(zonesControllerProvider.notifier).addZone(name);
-    if (context.mounted) _reportFailure(context, ref);
-  }
-
-  Future<void> _rename(BuildContext context, WidgetRef ref, ZoneEntity zone) async {
-    final name = await _askName(context, initial: zone.name);
-    if (name == null || name.trim().isEmpty) return;
-    await ref.read(zonesControllerProvider.notifier).renameZone(zone.id, name);
-    if (context.mounted) _reportFailure(context, ref);
-  }
-
   Future<void> _delete(
     BuildContext context,
     WidgetRef ref,
     ZoneEntity zone,
-    int usage,
-    int zoneCount,
   ) async {
     final messenger = ScaffoldMessenger.of(context);
-    if (usage > 0) {
-      messenger.showSnackBar(SnackBar(
-        content: Text('Zónu ${zone.name} nejde smazat, má v deníku záznamy: $usage.'),
-      ));
-      return;
+    final blocker = await ref
+        .read(zonesControllerProvider.notifier)
+        .deleteZone(zone.id);
+    switch (blocker) {
+      case ZoneDeleteBlocker.hasActivities:
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              'Zónu ${zone.name} nejde smazat, má v deníku záznamy.',
+            ),
+          ),
+        );
+      case ZoneDeleteBlocker.lastZone:
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Aspoň jedna zóna musí zůstat.')),
+        );
+      case null:
+        if (context.mounted) _reportFailure(context, ref);
     }
-    if (zoneCount <= 1) {
-      messenger.showSnackBar(const SnackBar(
-        content: Text('Aspoň jedna zóna musí zůstat.'),
-      ));
-      return;
-    }
-    await ref.read(zonesControllerProvider.notifier).deleteZone(zone.id);
-    if (context.mounted) _reportFailure(context, ref);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final zonesAsync = ref.watch(zonesControllerProvider);
     final activities = ref.watch(activityControllerProvider).value ?? const [];
+    final controller = ref.read(zonesControllerProvider.notifier);
 
     final usage = <String, int>{};
     for (final a in activities) {
@@ -96,7 +75,15 @@ class ZonesScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Zóny')),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'add-zone',
-        onPressed: () => _add(context, ref),
+        onPressed: () => _nameDialog(
+          context,
+          title: 'Nová zóna',
+          onSubmit: (name) async {
+            final error = await controller.addZone(name);
+            if (context.mounted) _reportFailure(context, ref);
+            return error;
+          },
+        ),
         icon: const Icon(Icons.add),
         label: const Text('Nová zóna'),
       ),
@@ -112,17 +99,96 @@ class ZonesScreen extends ConsumerWidget {
                 leading: Icon(zoneIcon(zone.id)),
                 title: Text(zone.name),
                 subtitle: Text('Záznamů: ${usage[zone.id] ?? 0}'),
-                onTap: () => _rename(context, ref, zone),
+                onTap: () => _nameDialog(
+                  context,
+                  title: 'Přejmenovat zónu',
+                  initial: zone.name,
+                  onSubmit: (name) async {
+                    final error = await controller.renameZone(zone.id, name);
+                    if (context.mounted) _reportFailure(context, ref);
+                    return error;
+                  },
+                ),
                 trailing: IconButton(
-                  tooltip: 'Smazat zónu',
+                  tooltip: 'Smazat zónu ${zone.name}',
                   icon: const Icon(Icons.delete_outline),
-                  onPressed: () => _delete(
-                      context, ref, zone, usage[zone.id] ?? 0, zones.length),
+                  onPressed: () => _delete(context, ref, zone),
                 ),
               ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ZoneNameDialog extends StatefulWidget {
+  const _ZoneNameDialog({
+    required this.title,
+    required this.initial,
+    required this.onSubmit,
+  });
+
+  final String title;
+  final String? initial;
+  final Future<String?> Function(String name) onSubmit;
+
+  @override
+  State<_ZoneNameDialog> createState() => _ZoneNameDialogState();
+}
+
+class _ZoneNameDialogState extends State<_ZoneNameDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initial,
+  );
+  String? _error;
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    final error = await widget.onSubmit(_controller.text);
+    if (!mounted) return;
+    if (error == null) {
+      Navigator.of(context).pop();
+    } else {
+      setState(() {
+        _error = error;
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.sentences,
+        decoration: InputDecoration(
+          hintText: 'např. Záhon u plotu',
+          errorText: _error,
+        ),
+        onSubmitted: (_) => _submit(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Zrušit'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: const Text('Uložit'),
+        ),
+      ],
     );
   }
 }

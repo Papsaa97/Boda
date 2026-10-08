@@ -35,13 +35,13 @@ Cílem této verze je ověřit, jestli lidé budou digitálně zapisovat práci 
 Proto je to jednoduchý, **100% offline deník** bez 2D plátna a bez AI.
 
 ## Funkce (MVP 0.1)
-* ✅ **Úvod a výběr zón:** při prvním spuštění „Začít bez registrace“ a výběr zón velkými kartami.
+* ✅ **Výběr zón:** při prvním spuštění „Co pěstuješ?“ velkými kartami, bez registrace; jde přeskočit.
 * ✅ **Co dnes?** Dashboard s hero kartou (co je dnes zapsané, nebo kterou zónu dlouho nikdo neviděl), statistikou za 7 dní a sezónním tipem od Bódi.
 * ✅ **Záznam aktivity:** název, datum a čas, zóna ze seznamu, poznámka, fotka (fotoaparát nebo galerie). Rychlé volby (Zálivka, Pletí, naposledy použité) zapíšou záznam jedním ťuknutím.
 * ✅ **Deník (Timeline):** všechny záznamy od nejnovějšího, seskupené po dnech, s filtrem podle zóny, detailem, úpravou a smazáním.
 * ✅ **Zóny:** výběr z nabídky (Zelenina, Okrasná zahrada, Ovocný sad, Trávník, Skleník, Bylinky, Jezírko), vlastní zóny lze přidat, přejmenovat i smazat.
 * ✅ **Tip od Bódi:** statické sezónní tipy podle měsíce, každý den jiný.
-* ✅ **Offline-first:** data i fotky zůstávají na zařízení (Hive + složka aplikace). Žádný backend.
+* ✅ **Offline-first:** data i fotky zůstávají na zařízení (Hive CE + složka aplikace). Žádný backend.
 
 Na webu funguje vše kromě fotek (prohlížeč nemá trvalé lokální úložiště souborů).
 
@@ -51,11 +51,11 @@ Na webu funguje vše kromě fotek (prohlížeč nemá trvalé lokální úloži�
   * `features/activity` – záznamy deníku
   * `features/zones` – seznam zón
   * `features/dashboard` – „Co dnes?“ a tipy od Bódi
-  * `features/onboarding` – úvodní obrazovka a výběr zón
-* **State Management:** Riverpod (`AsyncNotifier`, zápisy přes `AsyncValue.guard()`)
-* **Lokální Databáze:** Hive (v MVP 0.2 přechod na Drift / SQLite, DECLOG D26)
+  * `features/onboarding` – první spuštění, výběr zón
+* **State Management:** Riverpod 3 (`AsyncNotifier`, zápisy přes `AsyncValue.guard()`)
+* **Lokální Databáze:** Hive CE (`hive_ce`); v MVP 0.2 přechod na Drift / SQLite (DECLOG D26)
 * **Backend (od MVP 1.0):** Supabase (PostgreSQL, Auth, Storage, Edge Functions), viz [specifikace, kap. 7](docs/SPECIFIKACE.md#7-architektura)
-* **Design:** tmavý motiv podle palety ze specifikace (kap. 10.2), čeština včetně kalendáře
+* **Design:** světlý i tmavý motiv podle specifikace (kap. 10.2), přepíná se podle systému; čeština včetně kalendáře
 * **Testování:** flutter_test + Mockito, CI v GitHub Actions
 
 
@@ -70,9 +70,12 @@ nebo mockovaných tříd je přegenerujte:
 
 ## Testy
 ```
+dart format lib test
 flutter analyze
 flutter test
 ```
+CI na každém PR kontroluje formátování, analýzu a testy a sestaví instalační APK
+(ke stažení u běhu v záložce *Actions* jako artefakt `zahradnik-boda-apk`).
 
 ---
 *Verze: 0.1.0*

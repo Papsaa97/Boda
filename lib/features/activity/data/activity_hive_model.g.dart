@@ -8,7 +8,7 @@ part of 'activity_hive_model.dart';
 
 class ActivityHiveModelAdapter extends TypeAdapter<ActivityHiveModel> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
   ActivityHiveModel read(BinaryReader reader) {

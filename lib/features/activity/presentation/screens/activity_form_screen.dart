@@ -47,7 +47,57 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
 
   bool _saving = false;
 
+  /// Po úspěšném uložení se obrazovka zavírá bez dotazu na neuložené změny.
+  bool _saved = false;
+
   bool get _isEdit => widget.initial != null;
+
+  /// Zóna, která se opravdu uloží: vybraná, pokud ještě existuje,
+  /// jinak první ze seznamu.
+  String? _effectiveZoneId(List<ZoneEntity> zones) {
+    if (zones.any((z) => z.id == _zoneId)) return _zoneId;
+    return zones.isEmpty ? null : zones.first.id;
+  }
+
+  bool _hasChanges() {
+    final initial = widget.initial;
+    final notes = _notesController.text.trim();
+    if (initial == null) {
+      return _titleController.text.trim().isNotEmpty ||
+          notes.isNotEmpty ||
+          _pickedImage != null;
+    }
+    return _titleController.text.trim() != initial.title ||
+        notes != (initial.notes ?? '') ||
+        _date != initial.date ||
+        _zoneId != initial.zoneId ||
+        _pickedImage != null ||
+        _savedImagePath != initial.imagePath;
+  }
+
+  Future<void> _confirmLeave() async {
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Zahodit změny?'),
+        content: const Text('Záznam není uložený.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Pokračovat v úpravách'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Zahodit'),
+          ),
+        ],
+      ),
+    );
+    if (leave == true && mounted) {
+      _saved = true;
+      Navigator.of(context).pop();
+    }
+  }
 
   @override
   void initState() {
@@ -123,10 +173,12 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     );
     if (source == null) return;
 
+    // Delší strana max. 1 920 px, JPEG ~80 % (spec FR-D8).
     final picked = await ImagePicker().pickImage(
       source: source,
-      maxWidth: 2048,
-      imageQuality: 85,
+      maxWidth: 1920,
+      maxHeight: 1920,
+      imageQuality: 80,
     );
     if (picked == null || !mounted) return;
     setState(() => _pickedImage = picked);
@@ -142,6 +194,10 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
   Future<void> _submit() async {
     final formState = _formKey.currentState;
     if (formState == null || !formState.validate()) return;
+    final zoneId = _effectiveZoneId(
+      ref.read(zonesControllerProvider).value ?? const [],
+    );
+    if (zoneId == null) return;
 
     setState(() => _saving = true);
 
@@ -173,19 +229,21 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
       await controller.addActivity(
         title: title,
         date: _date,
-        zoneId: _zoneId!,
+        zoneId: zoneId,
         notes: notes,
         imagePath: imagePath,
       );
     } else {
-      await controller.updateActivity(ActivityEntity(
-        id: initial.id,
-        title: title,
-        date: _date,
-        zoneId: _zoneId!,
-        notes: notes,
-        imagePath: imagePath,
-      ));
+      await controller.updateActivity(
+        ActivityEntity(
+          id: initial.id,
+          title: title,
+          date: _date,
+          zoneId: zoneId,
+          notes: notes,
+          imagePath: imagePath,
+        ),
+      );
     }
 
     if (!mounted) return;
@@ -204,88 +262,102 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
       await photos.delete(previousImage);
     }
     if (!mounted) return;
+    _saved = true;
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    final zones = ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[];
-    final zoneIds = zones.map((z) => z.id).toSet();
-    // Když předvybraná zóna neexistuje, vezmeme první ze seznamu.
-    if (_zoneId == null || !zoneIds.contains(_zoneId)) {
-      _zoneId = zones.isEmpty ? null : zones.first.id;
-    }
+    final zones =
+        ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[];
+    final zoneId = _effectiveZoneId(zones);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEdit ? 'Upravit záznam' : 'Nový záznam'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Název aktivity',
-                hintText: 'např. Zálivka rajčat',
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        if (_saved || !_hasChanges()) {
+          _saved = true;
+          Navigator.of(context).pop();
+        } else {
+          _confirmLeave();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text(_isEdit ? 'Upravit záznam' : 'Nový záznam')),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Název aktivity',
+                  hintText: 'např. Zálivka rajčat',
+                ),
+                textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.next,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Zadej název aktivity';
+                  }
+                  return null;
+                },
               ),
-              textCapitalization: TextCapitalization.sentences,
-              textInputAction: TextInputAction.next,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Zadej název aktivity';
-                }
-                return null;
-              },
-            ),
-            if (!_isEdit) ...[
-              const SizedBox(height: 8),
-              _TitleSuggestions(
-                onPick: (title) => setState(() => _titleController.text = title),
+              if (!_isEdit) ...[
+                const SizedBox(height: 8),
+                _TitleSuggestions(
+                  onPick: (title) =>
+                      setState(() => _titleController.text = title),
+                ),
+              ],
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _dateController,
+                decoration: const InputDecoration(
+                  labelText: 'Datum a čas',
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                readOnly: true,
+                onTap: _pickDateTime,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                key: ValueKey(zoneId),
+                decoration: const InputDecoration(labelText: 'Zóna'),
+                initialValue: zoneId,
+                // Dlouhé názvy a velké písmo se zalomí do šířky pole.
+                isExpanded: true,
+                items: [
+                  for (final zone in zones)
+                    DropdownMenuItem(
+                      value: zone.id,
+                      child: Text(zone.name, overflow: TextOverflow.ellipsis),
+                    ),
+                ],
+                onChanged: (value) => setState(() => _zoneId = value),
+                validator: (value) => value == null ? 'Vyber zónu' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Poznámka (volitelné)',
+                ),
+                textCapitalization: TextCapitalization.sentences,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              if (!kIsWeb) ..._photoSection(),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: _saving ? null : _submit,
+                icon: const Icon(Icons.check),
+                label: Text(_isEdit ? 'Uložit změny' : 'Uložit záznam'),
               ),
             ],
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _dateController,
-              decoration: const InputDecoration(
-                labelText: 'Datum a čas',
-                suffixIcon: Icon(Icons.calendar_today),
-              ),
-              readOnly: true,
-              onTap: _pickDateTime,
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              key: ValueKey(_zoneId),
-              decoration: const InputDecoration(labelText: 'Zóna'),
-              initialValue: _zoneId,
-              items: [
-                for (final zone in zones)
-                  DropdownMenuItem(value: zone.id, child: Text(zone.name)),
-              ],
-              onChanged: (value) => setState(() => _zoneId = value),
-              validator: (value) => value == null ? 'Vyber zónu' : null,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Poznámka (volitelné)',
-              ),
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            if (!kIsWeb) ..._photoSection(),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: _saving ? null : _submit,
-              icon: const Icon(Icons.check),
-              label: Text(_isEdit ? 'Uložit změny' : 'Uložit záznam'),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -29,8 +29,8 @@ GitHub Actions (`.github/workflows/ci.yml`) na každý push a PR spustí `flutte
 | Platforma | Současná hodnota | Plán |
 | --- | --- | --- |
 | Dart balíček | `zahradnik_boda_mvp01` | `zahradnik_boda` (MVP 0.2) |
-| Android `applicationId` | `com.example.zahradnik_boda_mvp01` | např. `cz.zahradnikboda.app` – **před prvním nahráním na Google Play**, `com.example` obchod odmítne a později už ID změnit nejde |
-| iOS bundle ID | `com.example.zahradnikBodaMvp01` | stejný základ jako Android (MVP 1.0) |
+| Android `applicationId` | `cz.zahradnikboda.app` (DECLOG D35) | změnit jde jen **před prvním nahráním na Google Play**, potom už ne |
+| iOS bundle ID | `cz.zahradnikboda.app` (DECLOG D35) | |
 
 ## Prostředí backendu (od MVP 1.0)
 

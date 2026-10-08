@@ -1,13 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'app.dart';
 import 'core/di/providers.dart';
 import 'core/formatting/dates.dart';
-import 'features/activity/data/activity_hive_model.dart';
-import 'features/zones/data/zone_repository_impl.dart';
+import 'core/photos/photo_storage.dart';
+import 'core/storage/local_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,23 +17,19 @@ Future<void> main() async {
   await initializeDateFormatting(appLocale);
   await Hive.initFlutter();
 
-  // Registrace Hive adapteru pro ActivityHiveModel.
-  Hive.registerAdapter(ActivityHiveModelAdapter());
+  // Na webu fotky nejsou (prohlížeč nemá trvalou složku pro soubory).
+  final photos = kIsWeb
+      ? PhotoStorage('')
+      : PhotoStorage((await getApplicationDocumentsDirectory()).path);
 
-  // Otevření boxů. 'activities' drží deník, 'zones' seznam zón.
-  final activityBox = await Hive.openBox<ActivityHiveModel>('activities');
-  final zoneBox = await Hive.openBox<String>('zones');
-  // Kdo už má záznamy z verze před onboardingem, dostane výchozí zóny
-  // a onboarding přeskočí. Nový uživatel si zóny vybere sám.
-  if (activityBox.isNotEmpty) {
-    await ZoneRepositoryImpl(zoneBox).seedDefaultsIfEmpty();
-  }
+  final boxes = await openLocalBoxes(photos: kIsWeb ? null : photos);
 
   runApp(
     ProviderScope(
       overrides: [
-        activityBoxProvider.overrideWithValue(activityBox),
-        zoneBoxProvider.overrideWithValue(zoneBox),
+        activityBoxProvider.overrideWithValue(boxes.activities),
+        zoneBoxProvider.overrideWithValue(boxes.zones),
+        photoStorageProvider.overrideWithValue(photos),
       ],
       child: const ZahradnikBodaApp(),
     ),

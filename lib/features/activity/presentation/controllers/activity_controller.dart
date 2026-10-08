@@ -14,8 +14,9 @@ import '../../../../core/di/providers.dart';
 class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
   @override
   Future<List<ActivityEntity>> build() async {
-    final activities =
-        await ref.watch(activityRepositoryProvider).getAllActivities();
+    final activities = await ref
+        .watch(activityRepositoryProvider)
+        .getAllActivities();
     return _sorted(activities);
   }
 
@@ -62,9 +63,10 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
   }
 
   /// Provede zápis a nový seznam dá do stavu. Při chybě stav nese chybu,
-  /// ale zachová poslední známý seznam, takže obrazovky nezmizí.
+  /// ale Riverpod v něm zachová poslední známý seznam, takže obrazovky
+  /// nezmizí a volající pozná neúspěch přes `hasError`.
   Future<void> _mutate(Future<List<ActivityEntity>> Function() op) async {
-    state = (await AsyncValue.guard(op)).copyWithPrevious(state);
+    state = await AsyncValue.guard(op);
   }
 
   static List<ActivityEntity> _sorted(List<ActivityEntity> activities) =>
@@ -77,5 +79,5 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
 /// DI (ActivityRepository) bere z core/di/providers.dart.
 final activityControllerProvider =
     AsyncNotifierProvider<ActivityController, List<ActivityEntity>>(
-  ActivityController.new,
-);
+      ActivityController.new,
+    );
