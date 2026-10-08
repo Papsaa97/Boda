@@ -21,7 +21,11 @@ Future<void> main() async {
   // Otevření boxů. 'activities' drží deník, 'zones' seznam zón.
   final activityBox = await Hive.openBox<ActivityHiveModel>('activities');
   final zoneBox = await Hive.openBox<String>('zones');
-  await ZoneRepositoryImpl(zoneBox).seedDefaultsIfEmpty();
+  // Kdo už má záznamy z verze před onboardingem, dostane výchozí zóny
+  // a onboarding přeskočí. Nový uživatel si zóny vybere sám.
+  if (activityBox.isNotEmpty) {
+    await ZoneRepositoryImpl(zoneBox).seedDefaultsIfEmpty();
+  }
 
   runApp(
     ProviderScope(

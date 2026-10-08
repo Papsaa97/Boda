@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:zahradnik_boda_mvp01/app.dart';
 
 import 'helpers/fakes.dart';
 
@@ -10,8 +9,7 @@ void main() {
 
   testWidgets('empty diary suggests a zone on the Co dnes? dashboard',
       (tester) async {
-    await tester.pumpWidget(wrap(const ZahradnikBodaApp(), testOverrides()));
-    await tester.pumpAndSettle();
+    await pumpApp(tester, testOverrides());
 
     expect(find.text('Co dnes?'), findsOneWidget);
     expect(find.text('Dnes zatím nic'), findsOneWidget);
@@ -22,15 +20,15 @@ void main() {
   testWidgets('adding an activity shows it on the dashboard and timeline',
       (tester) async {
     final repo = InMemoryActivityRepository();
-    await tester.pumpWidget(
-        wrap(const ZahradnikBodaApp(), testOverrides(activities: repo)));
-    await tester.pumpAndSettle();
+    await pumpApp(tester, testOverrides(activities: repo));
 
     await tester.tap(find.byTooltip('Nový záznam'));
     await tester.pumpAndSettle();
 
     await tester.enterText(
         find.widgetWithText(TextFormField, 'Název aktivity'), 'Výsadba česneku');
+    await tester.ensureVisible(find.text('Uložit záznam'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Uložit záznam'));
     await tester.pumpAndSettle();
 
@@ -45,10 +43,11 @@ void main() {
   });
 
   testWidgets('title is required', (tester) async {
-    await tester.pumpWidget(wrap(const ZahradnikBodaApp(), testOverrides()));
-    await tester.pumpAndSettle();
+    await pumpApp(tester, testOverrides());
 
     await tester.tap(find.byTooltip('Nový záznam'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Uložit záznam'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Uložit záznam'));
     await tester.pumpAndSettle();
@@ -60,9 +59,7 @@ void main() {
     final repo = InMemoryActivityRepository([
       activity('a', date: DateTime(2026, 10, 5, 9), title: 'Řez maliní'),
     ]);
-    await tester.pumpWidget(
-        wrap(const ZahradnikBodaApp(), testOverrides(activities: repo)));
-    await tester.pumpAndSettle();
+    await pumpApp(tester, testOverrides(activities: repo));
 
     await tester.tap(find.text('Deník'));
     await tester.pumpAndSettle();
@@ -83,9 +80,7 @@ void main() {
       activity('a', date: DateTime(2026, 10, 5, 9), zoneId: 'Z1'),
     ]);
     final zones = InMemoryZoneRepository();
-    await tester.pumpWidget(wrap(const ZahradnikBodaApp(),
-        testOverrides(activities: repo, zones: zones)));
-    await tester.pumpAndSettle();
+    await pumpApp(tester, testOverrides(activities: repo, zones: zones));
 
     await tester.tap(find.text('Zóny'));
     await tester.pumpAndSettle();

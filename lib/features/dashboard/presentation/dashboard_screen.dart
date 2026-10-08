@@ -11,6 +11,7 @@ import '../../zones/domain/zone_entity.dart';
 import '../../zones/presentation/zones_controller.dart';
 import '../domain/boda_tips.dart';
 import '../domain/today_summary.dart';
+import '../../zones/presentation/zone_icons.dart';
 
 /// Souhrn „Co dnes?“ přepočítaný při každé změně deníku nebo zón.
 final todaySummaryProvider = Provider<AsyncValue<TodaySummary>>((ref) {
@@ -18,11 +19,17 @@ final todaySummaryProvider = Provider<AsyncValue<TodaySummary>>((ref) {
   final zones = ref.watch(zonesControllerProvider);
   final now = ref.watch(clockProvider)();
 
-  if (activities.hasError) {
-    return AsyncError(activities.error!, activities.stackTrace!);
+  // Po chybě zápisu nesou stavy chybu i poslední seznam; počítáme z něj.
+  if (!activities.hasValue) {
+    return activities.hasError
+        ? AsyncError(activities.error!, activities.stackTrace!)
+        : const AsyncLoading();
   }
-  if (zones.hasError) return AsyncError(zones.error!, zones.stackTrace!);
-  if (!activities.hasValue || !zones.hasValue) return const AsyncLoading();
+  if (!zones.hasValue) {
+    return zones.hasError
+        ? AsyncError(zones.error!, zones.stackTrace!)
+        : const AsyncLoading();
+  }
 
   return AsyncData(buildTodaySummary(
     activities: activities.value!,
@@ -252,7 +259,7 @@ class _AttentionCard extends StatelessWidget {
             for (final s in statuses)
               ListTile(
                 dense: true,
-                leading: const Icon(Icons.grass),
+                leading: Icon(zoneIcon(s.zone.id)),
                 title: Text(s.zone.name),
                 subtitle: Text(s.daysSince == null
                     ? 'zatím bez záznamu'

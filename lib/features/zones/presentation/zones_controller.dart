@@ -17,12 +17,25 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
     await _save(zone);
   }
 
+  /// Uloží více zón najednou (onboarding).
+  Future<void> addZones(List<ZoneEntity> zones) async {
+    final previous = state.value ?? const <ZoneEntity>[];
+    await _mutate(() async {
+      final repo = ref.read(zoneRepositoryProvider);
+      for (final zone in zones) {
+        await repo.saveZone(zone);
+      }
+      final ids = zones.map((z) => z.id).toSet();
+      return _sorted([...previous.where((z) => !ids.contains(z.id)), ...zones]);
+    });
+  }
+
   Future<void> renameZone(String id, String name) =>
       _save(ZoneEntity(id: id, name: name.trim()));
 
   Future<void> deleteZone(String id) async {
     final previous = state.value ?? const <ZoneEntity>[];
-    state = await AsyncValue.guard(() async {
+    await _mutate(() async {
       await ref.read(zoneRepositoryProvider).deleteZone(id);
       return previous.where((z) => z.id != id).toList();
     });
@@ -30,10 +43,16 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
 
   Future<void> _save(ZoneEntity zone) async {
     final previous = state.value ?? const <ZoneEntity>[];
-    state = await AsyncValue.guard(() async {
+    await _mutate(() async {
       await ref.read(zoneRepositoryProvider).saveZone(zone);
       return _sorted([...previous.where((z) => z.id != zone.id), zone]);
     });
+  }
+
+  /// Provede zápis a nový seznam dá do stavu. Při chybě stav nese chybu,
+  /// ale zachová poslední známý seznam, takže obrazovky nezmizí.
+  Future<void> _mutate(Future<List<ZoneEntity>> Function() op) async {
+    state = (await AsyncValue.guard(op)).copyWithPrevious(state);
   }
 
   static List<ZoneEntity> _sorted(List<ZoneEntity> zones) =>

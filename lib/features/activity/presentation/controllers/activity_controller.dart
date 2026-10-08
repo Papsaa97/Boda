@@ -36,7 +36,7 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
     );
 
     final previous = state.value ?? const <ActivityEntity>[];
-    state = await AsyncValue.guard(() async {
+    await _mutate(() async {
       await ref.read(activityRepositoryProvider).addActivity(newActivity);
       return _sorted([...previous, newActivity]);
     });
@@ -44,7 +44,7 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
 
   Future<void> updateActivity(ActivityEntity activity) async {
     final previous = state.value ?? const <ActivityEntity>[];
-    state = await AsyncValue.guard(() async {
+    await _mutate(() async {
       await ref.read(activityRepositoryProvider).updateActivity(activity);
       return _sorted([
         for (final a in previous)
@@ -55,10 +55,16 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
 
   Future<void> deleteActivity(String id) async {
     final previous = state.value ?? const <ActivityEntity>[];
-    state = await AsyncValue.guard(() async {
+    await _mutate(() async {
       await ref.read(activityRepositoryProvider).deleteActivity(id);
       return previous.where((a) => a.id != id).toList();
     });
+  }
+
+  /// Provede zápis a nový seznam dá do stavu. Při chybě stav nese chybu,
+  /// ale zachová poslední známý seznam, takže obrazovky nezmizí.
+  Future<void> _mutate(Future<List<ActivityEntity>> Function() op) async {
+    state = (await AsyncValue.guard(op)).copyWithPrevious(state);
   }
 
   static List<ActivityEntity> _sorted(List<ActivityEntity> activities) =>
