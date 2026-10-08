@@ -31,9 +31,7 @@ void main() {
       find.widgetWithText(TextFormField, 'Název aktivity'),
       'Výsadba česneku',
     );
-    await tester.ensureVisible(find.text('Uložit záznam'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Uložit záznam'));
+    await tester.tap(find.widgetWithText(TextButton, 'Uložit'));
     await tester.pumpAndSettle();
 
     expect(repo.items.values.single.title, 'Výsadba česneku');
@@ -51,9 +49,7 @@ void main() {
 
     await tester.tap(find.byTooltip('Nový záznam'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Uložit záznam'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Uložit záznam'));
+    await tester.tap(find.widgetWithText(TextButton, 'Uložit'));
     await tester.pumpAndSettle();
 
     expect(find.text('Zadej název aktivity'), findsOneWidget);
@@ -88,16 +84,18 @@ void main() {
 
     await tester.tap(find.text('Zóny'));
     await tester.pumpAndSettle();
-    final zeleninaTile = find.widgetWithText(ListTile, 'Zelenina');
-    await tester.tap(
-      find.descendant(
-        of: zeleninaTile,
-        matching: find.byTooltip('Smazat zónu Zelenina'),
-      ),
-    );
+    await tester.tap(find.byTooltip('Další akce pro Zelenina'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Smazat zónu'));
     await tester.pumpAndSettle();
 
     expect(zones.items.containsKey('Z1'), isTrue);
-    expect(find.textContaining('nejde smazat'), findsOneWidget);
+    expect(find.text('Zónu nejde smazat'), findsOneWidget);
+
+    // Místo smazání nabídne archivaci (FR-D3).
+    await tester.tap(find.widgetWithText(FilledButton, 'Archivovat'));
+    await tester.pumpAndSettle();
+    expect(zones.items['Z1']!.archived, isTrue);
+    expect(find.text('Archivované'), findsOneWidget);
   });
 }

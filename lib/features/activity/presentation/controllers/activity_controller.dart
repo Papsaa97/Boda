@@ -1,9 +1,7 @@
-// lib/features/activity/presentation/controllers/activity_controller.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../domain/activity_entity.dart';
+import '../../domain/activity_type.dart';
 import '../../../../core/di/providers.dart';
 
 /// Controller spravující seznam aktivit.
@@ -20,20 +18,26 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
     return _sorted(activities);
   }
 
-  Future<void> addActivity({
+  /// Uloží nový záznam. Vrací ho, nebo null, když se uložení nepovedlo.
+  Future<ActivityEntity?> addActivity({
     required String title,
     required DateTime date,
     required String zoneId,
+    ActivityType type = ActivityType.other,
     String? notes,
-    String? imagePath,
+    List<PhotoRef> photos = const [],
   }) async {
+    final now = ref.read(clockProvider)();
     final newActivity = ActivityEntity(
-      id: const Uuid().v4(),
+      id: ref.read(newIdProvider)(),
+      type: type,
       title: title,
       date: date,
       zoneId: zoneId,
       notes: notes,
-      imagePath: imagePath,
+      photos: photos,
+      createdAt: now,
+      updatedAt: now,
     );
 
     final previous = state.value ?? const <ActivityEntity>[];
@@ -41,15 +45,17 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
       await ref.read(activityRepositoryProvider).addActivity(newActivity);
       return _sorted([...previous, newActivity]);
     });
+    return state.hasError ? null : newActivity;
   }
 
   Future<void> updateActivity(ActivityEntity activity) async {
     final previous = state.value ?? const <ActivityEntity>[];
     await _mutate(() async {
-      await ref.read(activityRepositoryProvider).updateActivity(activity);
+      final updated = activity.copyWith(updatedAt: ref.read(clockProvider)());
+      await ref.read(activityRepositoryProvider).updateActivity(updated);
       return _sorted([
         for (final a in previous)
-          if (a.id == activity.id) activity else a,
+          if (a.id == activity.id) updated else a,
       ]);
     });
   }

@@ -1,15 +1,17 @@
-// lib/features/activity/presentation/screens/activity_detail_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/di/providers.dart';
 import '../../../../core/formatting/dates.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../zones/domain/zone_entity.dart';
+import '../../../zones/presentation/zone_icons.dart';
 import '../../../zones/presentation/zones_controller.dart';
+import '../../domain/activity_entity.dart';
+import '../activity_type_ui.dart';
 import '../controllers/activity_controller.dart';
 import '../widgets/activity_photo.dart';
 import 'activity_form_screen.dart';
-import '../../../zones/presentation/zone_icons.dart';
 
 /// Detail jednoho záznamu s úpravou a smazáním.
 class ActivityDetailScreen extends ConsumerWidget {
@@ -17,68 +19,71 @@ class ActivityDetailScreen extends ConsumerWidget {
 
   final String activityId;
 
-  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    ActivityEntity activity,
+  ) async {
+    final l = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Smazat záznam?'),
-        content: const Text('Záznam i jeho fotka zmizí z deníku.'),
+        title: Text(l.activityDeleteTitle),
+        content: Text(l.activityDeleteBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Zrušit'),
+            child: Text(l.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Smazat'),
+            child: Text(l.commonDelete),
           ),
         ],
       ),
     );
     if (confirmed != true || !context.mounted) return;
 
-    final activities = ref.read(activityControllerProvider).value ?? const [];
-    final imagePath = activities
-        .where((a) => a.id == activityId)
-        .map((a) => a.imagePath)
-        .firstOrNull;
-
-    final photos = ref.read(photoStorageProvider);
+    final storage = ref.read(photoStorageProvider);
     await ref
         .read(activityControllerProvider.notifier)
-        .deleteActivity(activityId);
+        .deleteActivity(activity.id);
     if (!context.mounted) return;
     if (ref.read(activityControllerProvider).hasError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Záznam se nepodařilo smazat.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l.activityDeleteFailed)));
       return;
     }
     Navigator.of(context).pop();
-    await photos.delete(imagePath);
+    for (final photo in activity.photos) {
+      await storage.delete(photo.path);
+    }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final activities = ref.watch(activityControllerProvider).value ?? const [];
     final activity = activities.where((a) => a.id == activityId).firstOrNull;
 
     if (activity == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Záznam už neexistuje.')),
+        body: Center(child: Text(l.activityGone)),
       );
     }
 
-    final zoneName = ref.watch(zoneNameProvider(activity.zoneId));
+    final zone = ref.watch(zoneByIdProvider(activity.zoneId));
     final textTheme = Theme.of(context).textTheme;
+    final photos = activity.photos;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Záznam'),
+        title: Text(l.activityDetailTitle),
         actions: [
           IconButton(
-            tooltip: 'Upravit',
+            tooltip: l.commonEdit,
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
@@ -87,33 +92,43 @@ class ActivityDetailScreen extends ConsumerWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Smazat',
+            tooltip: l.commonDelete,
             icon: const Icon(Icons.delete_outline),
-            onPressed: () => _confirmDelete(context, ref),
+            onPressed: () => _confirmDelete(context, ref, activity),
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (activity.imagePath != null) ...[
-            Semantics(
-              button: true,
-              label: 'Zobrazit fotku přes celou obrazovku',
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => PhotoViewerScreen(
-                      path: activity.imagePath!,
-                      title: activity.title,
+          if (photos.isNotEmpty) ...[
+            SizedBox(
+              height: 260,
+              child: PageView.builder(
+                itemCount: photos.length,
+                itemBuilder: (context, i) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Semantics(
+                    button: true,
+                    label: l.photoOpenFullscreen,
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PhotoViewerScreen(
+                            paths: [for (final p in photos) p.path],
+                            title: activity.title,
+                            initialIndex: i,
+                          ),
+                        ),
+                      ),
+                      child: ActivityPhoto(
+                        path: photos[i].path,
+                        height: 260,
+                        borderRadius: 20,
+                        iconSize: 64,
+                      ),
                     ),
                   ),
-                ),
-                child: ActivityPhoto(
-                  path: activity.imagePath,
-                  height: 260,
-                  borderRadius: 20,
-                  iconSize: 64,
                 ),
               ),
             ),
@@ -126,12 +141,16 @@ class ActivityDetailScreen extends ConsumerWidget {
             runSpacing: 8,
             children: [
               Chip(
+                avatar: Icon(activityTypeIcon(activity.type), size: 18),
+                label: Text(activityTypeLabel(l, activity.type)),
+              ),
+              Chip(
                 avatar: const Icon(Icons.schedule, size: 18),
                 label: Text(formatDateTime(activity.date)),
               ),
               Chip(
-                avatar: Icon(zoneIcon(activity.zoneId), size: 18),
-                label: Text(zoneName),
+                avatar: Icon(zoneIcon(zone?.type ?? ZoneType.other), size: 18),
+                label: Text(zone?.name ?? l.commonUnknownZone),
               ),
             ],
           ),

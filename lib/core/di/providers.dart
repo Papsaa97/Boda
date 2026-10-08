@@ -1,60 +1,73 @@
-// lib/core/di/providers.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_ce/hive.dart';
+import 'package:uuid/uuid.dart';
 
-import '../../features/activity/data/activity_hive_model.dart';
-import '../../features/activity/data/hive_local_data_source.dart';
-import '../../features/activity/data/activity_repository_impl.dart';
+import '../../features/activity/data/drift_activity_repository.dart';
 import '../../features/activity/domain/activity_repository.dart';
-import '../../features/zones/data/zone_repository_impl.dart';
+import '../../features/settings/domain/settings_repository.dart';
+import '../../features/tasks/data/drift_task_repository.dart';
+import '../../features/tasks/domain/task_repository.dart';
+import '../../features/zones/data/drift_zone_repository.dart';
 import '../../features/zones/domain/zone_repository.dart';
+import '../database/app_database.dart';
+import '../notifications/notification_scheduler.dart';
 import '../photos/photo_storage.dart';
 
-/// Provider pro Hive box s aktivitami.
-///
-/// V těle je jen placeholder – skutečný Box předáme v main.dart
-/// pomocí ProviderScope(overrides: ...).
-final activityBoxProvider = Provider<Box<ActivityHiveModel>>((ref) {
-  throw UnimplementedError(
-    'activityBoxProvider musí být override-nut v main.dart otevřeným Hive boxem.',
-  );
-});
+Never _notOverridden(String name) =>
+    throw UnimplementedError('$name se nastavuje v main.dart (overrides).');
 
-/// Provider pro Hive box se zónami (klíč = id, hodnota = název).
-final zoneBoxProvider = Provider<Box<String>>((ref) {
-  throw UnimplementedError(
-    'zoneBoxProvider musí být override-nut v main.dart otevřeným Hive boxem.',
-  );
-});
+/// Otevřená lokální databáze. Nastavuje main.dart, v testech paměťová.
+final databaseProvider = Provider<AppDatabase>(
+  (ref) => _notOverridden('databaseProvider'),
+);
 
-/// Provider pro lokální data source (Hive).
-final hiveLocalDataSourceProvider = Provider<HiveLocalDataSource>((ref) {
-  final box = ref.watch(activityBoxProvider);
-  return HiveLocalDataSource(box);
-});
+/// Id implicitní zahrady (v 0.x je jen jedna, spec 8.2).
+final gardenIdProvider = Provider<String>(
+  (ref) => _notOverridden('gardenIdProvider'),
+);
 
-/// Provider pro ActivityRepository (Domain vrstva).
-///
-/// Presentation (controllery, UI) budou číst tento provider.
-final activityRepositoryProvider = Provider<ActivityRepository>((ref) {
-  final dataSource = ref.watch(hiveLocalDataSourceProvider);
-  return ActivityRepositoryImpl(dataSource);
-});
-
-/// Provider pro ZoneRepository (Domain vrstva).
-final zoneRepositoryProvider = Provider<ZoneRepository>((ref) {
-  return ZoneRepositoryImpl(ref.watch(zoneBoxProvider));
-});
+/// Nastavení načtená při startu.
+final settingsRepositoryProvider = Provider<SettingsRepository>(
+  (ref) => _notOverridden('settingsRepositoryProvider'),
+);
 
 /// Ukládání fotek k záznamům do složky aplikace.
 ///
 /// Kořenovou složku zná až main.dart, proto se provider přepisuje.
-final photoStorageProvider = Provider<PhotoStorage>((ref) {
-  throw UnimplementedError(
-    'photoStorageProvider musí být override-nut v main.dart.',
-  );
-});
+final photoStorageProvider = Provider<PhotoStorage>(
+  (ref) => _notOverridden('photoStorageProvider'),
+);
+
+/// Plánování lokálních notifikací. Bez přepsání nic neplánuje (testy, web).
+final notificationSchedulerProvider = Provider<NotificationScheduler>(
+  (ref) => NoopNotificationScheduler(),
+);
 
 /// Aktuální čas. V testech se přepisuje pevným datem.
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
+/// Generátor nových id (UUID v4).
+final newIdProvider = Provider<String Function()>((ref) => const Uuid().v4);
+
+final activityRepositoryProvider = Provider<ActivityRepository>(
+  (ref) => DriftActivityRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+final zoneRepositoryProvider = Provider<ZoneRepository>(
+  (ref) => DriftZoneRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+final taskRepositoryProvider = Provider<TaskRepository>(
+  (ref) => DriftTaskRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);

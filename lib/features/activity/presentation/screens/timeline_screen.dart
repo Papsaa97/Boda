@@ -1,18 +1,20 @@
-// lib/features/activity/presentation/screens/timeline_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/time/today.dart';
 import '../../../../core/formatting/dates.dart';
+import '../../../../core/time/today.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../zones/domain/zone_entity.dart';
 import '../../../zones/presentation/zones_controller.dart';
 import '../../domain/activity_entity.dart';
+import '../../domain/activity_filter.dart';
+import '../../domain/activity_type.dart';
+import '../activity_type_ui.dart';
 import '../controllers/activity_controller.dart';
 import '../widgets/activity_tile.dart';
 
 /// Časová osa: všechny záznamy od nejnovějšího, seskupené po dnech,
-/// s volitelným filtrem podle zóny.
+/// s filtrem podle zóny, typu činnosti a fulltextem (FR-D7).
 class TimelineScreen extends ConsumerStatefulWidget {
   const TimelineScreen({super.key});
 
@@ -21,76 +23,141 @@ class TimelineScreen extends ConsumerStatefulWidget {
 }
 
 class _TimelineScreenState extends ConsumerState<TimelineScreen> {
-  /// Id vybrané zóny, nebo null pro všechny záznamy.
   String? _zoneFilter;
+  ActivityType? _typeFilter;
+  bool _searching = false;
+  final _search = TextEditingController();
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _searching = !_searching;
+      if (!_searching) _search.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final activitiesAsync = ref.watch(activityControllerProvider);
     final zones =
         ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[];
     final now = ref.watch(todayProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Deník')),
+      appBar: AppBar(
+        title: _searching
+            ? TextField(
+                controller: _search,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: l.timelineSearchHint,
+                  border: InputBorder.none,
+                ),
+                textInputAction: TextInputAction.search,
+                onChanged: (_) => setState(() {}),
+              )
+            : Text(l.navDiary),
+        actions: [
+          IconButton(
+            tooltip: _searching ? l.timelineSearchClose : l.timelineSearch,
+            icon: Icon(_searching ? Icons.close : Icons.search),
+            onPressed: _toggleSearch,
+          ),
+        ],
+      ),
       body: activitiesAsync.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text('Chyba při načítání deníku: $error')),
+        error: (error, _) => Center(child: Text(l.timelineLoadError('$error'))),
         data: (activities) {
-          if (activities.isEmpty) {
-            return const _EmptyTimeline();
-          }
+          if (activities.isEmpty) return const _EmptyTimeline();
 
-          // Filtr nabízí jen zóny, ve kterých něco je.
+          // Filtry nabízí jen zóny a typy, které v deníku jsou.
           final usedZoneIds = activities.map((a) => a.zoneId).toSet();
           final filterZones = zones
               .where((z) => usedZoneIds.contains(z.id))
               .toList();
-          final filter = usedZoneIds.contains(_zoneFilter) ? _zoneFilter : null;
-          final visible = filter == null
-              ? activities
-              : activities.where((a) => a.zoneId == filter).toList();
+          final usedTypes = activities.map((a) => a.type).toSet();
+          final filterTypes = quickPickTypes.where(usedTypes.contains).toList();
+
+          final filter = ActivityFilter(
+            zoneId: usedZoneIds.contains(_zoneFilter) ? _zoneFilter : null,
+            type: usedTypes.contains(_typeFilter) ? _typeFilter : null,
+            query: _search.text,
+          );
+          final visible = filter.apply(activities);
           final groups = _groupByDay(visible);
+
+          final header = <Widget>[
+            if (filterZones.length > 1)
+              _ChipRow(
+                children: [
+                  ChoiceChip(
+                    label: Text(l.filterAllZones),
+                    selected: filter.zoneId == null,
+                    onSelected: (_) => setState(() => _zoneFilter = null),
+                  ),
+                  for (final zone in filterZones)
+                    ChoiceChip(
+                      label: Text(zone.name),
+                      selected: filter.zoneId == zone.id,
+                      onSelected: (_) => setState(() => _zoneFilter = zone.id),
+                    ),
+                ],
+              ),
+            if (filterTypes.length > 1)
+              _ChipRow(
+                children: [
+                  ChoiceChip(
+                    label: Text(l.filterAllTypes),
+                    selected: filter.type == null,
+                    onSelected: (_) => setState(() => _typeFilter = null),
+                  ),
+                  for (final type in filterTypes)
+                    ChoiceChip(
+                      avatar: Icon(activityTypeIcon(type), size: 18),
+                      showCheckmark: false,
+                      label: Text(activityTypeLabel(l, type)),
+                      selected: filter.type == type,
+                      onSelected: (_) => setState(() => _typeFilter = type),
+                    ),
+                ],
+              ),
+            if (filter.isActive)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: Text(
+                  l.filterResultCount(visible.length),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+          ];
 
           return ListView.builder(
             padding: const EdgeInsets.only(bottom: 96),
-            itemCount: groups.length + 1,
+            itemCount: header.length + (groups.isEmpty ? 1 : groups.length),
             itemBuilder: (context, index) {
-              if (index == 0) {
-                if (filterZones.length < 2) return const SizedBox.shrink();
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      ChoiceChip(
-                        label: const Text('Vše'),
-                        selected: filter == null,
-                        onSelected: (_) => setState(() => _zoneFilter = null),
-                      ),
-                      for (final zone in filterZones) ...[
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: Text(zone.name),
-                          selected: filter == zone.id,
-                          onSelected: (_) =>
-                              setState(() => _zoneFilter = zone.id),
-                        ),
-                      ],
-                    ],
-                  ),
+              if (index < header.length) return header[index];
+              if (groups.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Text(l.filterNoMatch, textAlign: TextAlign.center),
                 );
               }
-              final group = groups[index - 1];
+              final group = groups[index - header.length];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
                     child: Text(
-                      formatDayHeader(group.first.date, now),
+                      capitalize(formatDayHeader(l, group.first.date, now)),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -125,11 +192,34 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   }
 }
 
+class _ChipRow extends StatelessWidget {
+  const _ChipRow({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Row(
+        children: [
+          for (var i = 0; i < children.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            children[i],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _EmptyTimeline extends StatelessWidget {
   const _EmptyTimeline();
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -142,10 +232,10 @@ class _EmptyTimeline extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(height: 16),
-            const Text('Zatím žádné záznamy', textAlign: TextAlign.center),
+            Text(l.timelineEmptyTitle, textAlign: TextAlign.center),
             const SizedBox(height: 8),
             Text(
-              'Zapiš první práci na zahradě tlačítkem dole.',
+              l.timelineEmptyBody,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
             ),

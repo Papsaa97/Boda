@@ -1,36 +1,43 @@
 import 'zone_entity.dart';
 
-/// Ověří název zóny. Vrací chybovou hlášku, nebo null, když je název v pořádku.
-String? validateZoneName(
+/// Proč název zóny neprošel kontrolou.
+enum ZoneNameError { empty, duplicate }
+
+/// Ověří název zóny. Vrací důvod, nebo null, když je název v pořádku.
+ZoneNameError? validateZoneName(
   String name,
   List<ZoneEntity> zones, {
   String? exceptId,
 }) {
   final trimmed = name.trim();
-  if (trimmed.isEmpty) return 'Zadej název zóny';
+  if (trimmed.isEmpty) return ZoneNameError.empty;
   final lower = trimmed.toLowerCase();
   final duplicate = zones.any(
     (z) => z.id != exceptId && z.name.trim().toLowerCase() == lower,
   );
-  if (duplicate) return 'Zóna s tímto názvem už existuje';
+  if (duplicate) return ZoneNameError.duplicate;
   return null;
 }
 
 /// Proč zónu nejde smazat.
 enum ZoneDeleteBlocker {
-  /// V zóně jsou záznamy deníku; smazáním by osiřely.
+  /// V zóně jsou záznamy deníku; smazáním by osiřely. Jde ji archivovat.
   hasActivities,
 
-  /// Musí zůstat aspoň jedna zóna, jinak by nešlo nic zapsat.
+  /// Musí zůstat aspoň jedna aktivní zóna, jinak by nešlo nic zapsat.
   lastZone,
 }
 
 ZoneDeleteBlocker? zoneDeleteBlocker({
   required String zoneId,
-  required int zoneCount,
+  required int activeZoneCount,
+  required bool isArchived,
   required int activityCount,
 }) {
   if (activityCount > 0) return ZoneDeleteBlocker.hasActivities;
-  if (zoneCount <= 1) return ZoneDeleteBlocker.lastZone;
+  if (!isArchived && activeZoneCount <= 1) return ZoneDeleteBlocker.lastZone;
   return null;
 }
+
+/// Archivovat jde jen zónu, po které zůstane aspoň jedna aktivní.
+bool canArchiveZone({required int activeZoneCount}) => activeZoneCount > 1;

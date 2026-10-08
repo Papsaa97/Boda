@@ -30,17 +30,18 @@ class PhotoStorage {
     return dir;
   }
 
-  String _newName(String sourcePath) {
+  String _newName(String sourcePath, [String? baseName]) {
     final ext = p.extension(sourcePath).isEmpty
         ? '.jpg'
         : p.extension(sourcePath);
-    return '${DateTime.now().microsecondsSinceEpoch}$ext';
+    return '${baseName ?? DateTime.now().microsecondsSinceEpoch}$ext';
   }
 
   /// Zkopíruje vybranou fotku do složky aplikace a vrátí relativní cestu.
-  Future<String> persist(XFile picked) async {
+  /// [baseName] je název souboru bez přípony (id fotky).
+  Future<String> persist(XFile picked, {String? baseName}) async {
     await _ensureFolder();
-    final relative = p.join(folder, _newName(picked.path));
+    final relative = p.join(folder, _newName(picked.path, baseName));
     await picked.saveTo(p.join(rootPath, relative));
     return relative;
   }
@@ -64,6 +65,28 @@ class PhotoStorage {
     final file = File(path);
     if (file.existsSync()) {
       await file.delete();
+    }
+  }
+
+  /// Relativní cesta pro soubor [name] ve složce fotek.
+  String relativePathFor(String name) => p.join(folder, p.basename(name));
+
+  /// Připraví složku a vrátí plnou cestu pro soubor [name] (obnova zálohy).
+  Future<String> prepareFile(String name) async {
+    await _ensureFolder();
+    return p.join(rootPath, relativePathFor(name));
+  }
+
+  /// Smaže soubory ve složce fotek, na které nic neodkazuje (po obnově
+  /// zálohy). [keep] jsou relativní cesty, které zůstávají.
+  Future<void> deleteAllExcept(Set<String> keep) async {
+    final dir = Directory(_folderPath);
+    if (!dir.existsSync()) return;
+    final keepNames = {for (final k in keep) p.normalize(k)};
+    await for (final entity in dir.list()) {
+      if (entity is! File) continue;
+      final relative = p.normalize(p.relative(entity.path, from: rootPath));
+      if (!keepNames.contains(relative)) await entity.delete();
     }
   }
 

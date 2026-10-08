@@ -1,0 +1,114 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/di/providers.dart';
+import '../domain/task_actions.dart';
+import '../domain/task_entity.dart';
+
+/// Všechny úkoly, seřazené podle dne, kdy jsou na řadě.
+class TasksController extends AsyncNotifier<List<TaskEntity>> {
+  @override
+  Future<List<TaskEntity>> build() async {
+    return _sorted(await ref.watch(taskRepositoryProvider).getAllTasks());
+  }
+
+  DateTime get _now => ref.read(clockProvider)();
+
+  Future<void> save(TaskEntity task) async {
+    final now = _now;
+    final stored = task.copyWith(
+      createdAt: task.createdAt ?? now,
+      updatedAt: now,
+    );
+    await _mutate((list) async {
+      await ref.read(taskRepositoryProvider).saveTask(stored);
+      return [...list.where((t) => t.id != stored.id), stored];
+    });
+  }
+
+  /// Nový úkol s vygenerovaným id.
+  Future<TaskEntity> create(TaskEntity draft) async {
+    final task = TaskEntity(
+      id: ref.read(newIdProvider)(),
+      title: draft.title,
+      zoneId: draft.zoneId,
+      due: draft.due,
+      remindAt: draft.remindAt,
+      rrule: draft.rrule,
+      notes: draft.notes,
+    );
+    await save(task);
+    return task;
+  }
+
+  /// Uzavře úkol (hotovo / přeskočeno); u opakovaného založí další výskyt.
+  Future<TaskClosure?> close(String id, TaskStatus status) async {
+    final task = _find(id);
+    if (task == null) return null;
+    final closure = closeTask(
+      task,
+      status: status,
+      now: _now,
+      nextId: ref.read(newIdProvider)(),
+    );
+    await _mutate((list) async {
+      final repo = ref.read(taskRepositoryProvider);
+      await repo.saveTask(closure.closed);
+      final next = closure.next;
+      if (next != null) await repo.saveTask(next);
+      return [...list.where((t) => t.id != id), closure.closed, ?next];
+    });
+    return state.hasError ? null : closure;
+  }
+
+  /// Vrátí uzavřený úkol mezi otevřené.
+  Future<void> reopen(String id) async {
+    final task = _find(id);
+    if (task == null) return;
+    await save(task.copyWith(status: TaskStatus.open, completedAt: () => null));
+  }
+
+  Future<void> snooze(String id, SnoozeOption option) async {
+    final task = _find(id);
+    if (task == null) return;
+    await save(task.copyWith(snoozedUntil: () => snoozeTarget(option, _now)));
+  }
+
+  /// Propojí hotový úkol se záznamem v deníku (FR-U4).
+  Future<void> linkActivity(String id, String activityId) async {
+    final task = _find(id);
+    if (task == null) return;
+    await save(task.copyWith(completedActivityId: () => activityId));
+  }
+
+  Future<void> delete(String id) async {
+    await _mutate((list) async {
+      await ref.read(taskRepositoryProvider).deleteTask(id);
+      return list.where((t) => t.id != id).toList();
+    });
+  }
+
+  TaskEntity? _find(String id) => (state.value ?? const <TaskEntity>[])
+      .where((t) => t.id == id)
+      .firstOrNull;
+
+  Future<void> _mutate(
+    Future<List<TaskEntity>> Function(List<TaskEntity> current) op,
+  ) async {
+    // Při chybě Riverpod ve stavu zachová poslední seznam (viz
+    // ActivityController._mutate).
+    final current = state.value ?? const <TaskEntity>[];
+    state = await AsyncValue.guard(() async => _sorted(await op(current)));
+  }
+
+  static List<TaskEntity> _sorted(List<TaskEntity> tasks) =>
+      [...tasks]..sort((a, b) {
+        final byDate = a.effectiveDate.compareTo(b.effectiveDate);
+        if (byDate != 0) return byDate;
+        return (a.remindAt ?? 24 * 60).compareTo(b.remindAt ?? 24 * 60);
+      });
+}
+
+final tasksControllerProvider =
+    AsyncNotifierProvider<TasksController, List<TaskEntity>>(
+      TasksController.new,
+    );

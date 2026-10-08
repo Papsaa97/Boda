@@ -1,5 +1,3 @@
-// lib/features/activity/presentation/screens/activity_form_screen.dart
-
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -9,15 +7,38 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/di/providers.dart';
 import '../../../../core/formatting/dates.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../settings/presentation/settings_controller.dart';
 import '../../../zones/domain/zone_entity.dart';
 import '../../../zones/presentation/zones_controller.dart';
 import '../../domain/activity_entity.dart';
+import '../../domain/activity_type.dart';
+import '../activity_type_ui.dart';
 import '../controllers/activity_controller.dart';
 import '../widgets/activity_photo.dart';
 
+/// Předvyplnění nového záznamu (např. z dokončeného úkolu, FR-U4).
+class ActivityDraft {
+  const ActivityDraft({this.title, this.type, this.zoneId, this.notes});
+
+  final String? title;
+  final ActivityType? type;
+  final String? zoneId;
+  final String? notes;
+}
+
 /// Formulář pro nový záznam, nebo úpravu existujícího ([initial]).
+///
+/// Rychlý zápis (FR-D6): tlačítko + → typ činnosti → Uložit v horní liště
+/// jsou tři klepnutí; zóna je předvyplněná naposledy použitou. Po uložení
+/// se obrazovka zavře s uloženým záznamem jako výsledkem.
 class ActivityFormScreen extends ConsumerStatefulWidget {
-  const ActivityFormScreen({super.key, this.initial, this.initialZoneId});
+  const ActivityFormScreen({
+    super.key,
+    this.initial,
+    this.initialZoneId,
+    this.draft,
+  });
 
   /// Záznam k úpravě. Když je null, vytváří se nový.
   final ActivityEntity? initial;
@@ -25,8 +46,20 @@ class ActivityFormScreen extends ConsumerStatefulWidget {
   /// Předvybraná zóna pro nový záznam (např. z dashboardu).
   final String? initialZoneId;
 
+  final ActivityDraft? draft;
+
   @override
   ConsumerState<ActivityFormScreen> createState() => _ActivityFormScreenState();
+}
+
+/// Fotka ve formuláři: už uložená, nebo nově vybraná (do složky aplikace
+/// se zkopíruje až při uložení).
+class _PhotoItem {
+  const _PhotoItem.saved(PhotoRef this.saved) : picked = null;
+  const _PhotoItem.picked(XFile this.picked) : saved = null;
+
+  final PhotoRef? saved;
+  final XFile? picked;
 }
 
 class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
@@ -37,13 +70,13 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
   late final TextEditingController _dateController;
 
   late DateTime _date;
+  late ActivityType _type;
   String? _zoneId;
+  late List<_PhotoItem> _photos;
 
-  /// Cesta k fotce, která už je uložená u záznamu.
-  String? _savedImagePath;
-
-  /// Nově vybraná fotka; do složky aplikace se zkopíruje až při uložení.
-  XFile? _pickedImage;
+  /// Název, který formulář sám doplnil podle typu; když ho uživatel
+  /// nepřepsal, změna typu ho zase přepíše.
+  String? _autoTitle;
 
   bool _saving = false;
 
@@ -52,7 +85,53 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
 
   bool get _isEdit => widget.initial != null;
 
-  /// Zóna, která se opravdu uloží: vybraná, pokud ještě existuje,
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initial;
+    final draft = widget.draft;
+    _titleController = TextEditingController(
+      text: initial?.title ?? draft?.title ?? '',
+    );
+    _notesController = TextEditingController(
+      text: initial?.notes ?? draft?.notes ?? '',
+    );
+    _date = initial?.date ?? ref.read(clockProvider)();
+    final draftTitle = draft?.title;
+    _type =
+        initial?.type ??
+        draft?.type ??
+        (draftTitle == null
+            ? ActivityType.other
+            : ActivityType.guessFromTitle(draftTitle));
+    _zoneId =
+        initial?.zoneId ??
+        draft?.zoneId ??
+        widget.initialZoneId ??
+        ref.read(settingsControllerProvider).lastZoneId;
+    _photos = [
+      for (final photo in initial?.photos ?? const <PhotoRef>[])
+        _PhotoItem.saved(photo),
+    ];
+    _dateController = TextEditingController(text: formatDateTime(_date));
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _notesController.dispose();
+    _dateController.dispose();
+    super.dispose();
+  }
+
+  /// Zóny k výběru: aktivní, a k tomu zóna upravovaného záznamu, i když
+  /// je mezitím archivovaná.
+  List<ZoneEntity> _selectableZones(List<ZoneEntity> all) => [
+    for (final z in all)
+      if (!z.archived || z.id == widget.initial?.zoneId) z,
+  ];
+
+  /// Zóna, která se opravdu uloží: vybraná, pokud ještě jde vybrat,
   /// jinak první ze seznamu.
   String? _effectiveZoneId(List<ZoneEntity> zones) {
     if (zones.any((z) => z.id == _zoneId)) return _zoneId;
@@ -62,33 +141,35 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
   bool _hasChanges() {
     final initial = widget.initial;
     final notes = _notesController.text.trim();
+    final title = _titleController.text.trim();
     if (initial == null) {
-      return _titleController.text.trim().isNotEmpty ||
+      return (title.isNotEmpty && title != _autoTitle) ||
           notes.isNotEmpty ||
-          _pickedImage != null;
+          _photos.isNotEmpty;
     }
-    return _titleController.text.trim() != initial.title ||
+    return title != initial.title ||
         notes != (initial.notes ?? '') ||
+        _type != initial.type ||
         _date != initial.date ||
         _zoneId != initial.zoneId ||
-        _pickedImage != null ||
-        _savedImagePath != initial.imagePath;
+        !listEquals([for (final p in _photos) p.saved], [...initial.photos]);
   }
 
   Future<void> _confirmLeave() async {
+    final l = AppLocalizations.of(context);
     final leave = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Zahodit změny?'),
-        content: const Text('Záznam není uložený.'),
+        title: Text(l.activityDiscardTitle),
+        content: Text(l.activityDiscardBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Pokračovat v úpravách'),
+            child: Text(l.activityDiscardKeepEditing),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Zahodit'),
+            child: Text(l.activityDiscardConfirm),
           ),
         ],
       ),
@@ -99,24 +180,16 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    final initial = widget.initial;
-    _titleController = TextEditingController(text: initial?.title ?? '');
-    _notesController = TextEditingController(text: initial?.notes ?? '');
-    _date = initial?.date ?? ref.read(clockProvider)();
-    _zoneId = initial?.zoneId ?? widget.initialZoneId;
-    _savedImagePath = initial?.imagePath;
-    _dateController = TextEditingController(text: formatDateTime(_date));
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _notesController.dispose();
-    _dateController.dispose();
-    super.dispose();
+  void _pickType(AppLocalizations l, ActivityType type) {
+    setState(() {
+      _type = type;
+      final current = _titleController.text.trim();
+      if (current.isEmpty || current == _autoTitle) {
+        final label = activityTypeLabel(l, type);
+        _titleController.text = label;
+        _autoTitle = label;
+      }
+    });
   }
 
   Future<void> _pickDateTime() async {
@@ -150,7 +223,7 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     });
   }
 
-  Future<void> _pickPhoto() async {
+  Future<void> _addPhotos(AppLocalizations l) async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       builder: (context) => SafeArea(
@@ -159,12 +232,12 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_camera_outlined),
-              title: const Text('Vyfotit'),
+              title: Text(l.photoTake),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Vybrat z galerie'),
+              title: Text(l.photoFromGallery),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ],
@@ -173,21 +246,29 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     );
     if (source == null) return;
 
-    // Delší strana max. 1 920 px, JPEG ~80 % (spec FR-D8).
-    final picked = await ImagePicker().pickImage(
-      source: source,
-      maxWidth: 1920,
-      maxHeight: 1920,
-      imageQuality: 80,
-    );
-    if (picked == null || !mounted) return;
-    setState(() => _pickedImage = picked);
-  }
-
-  void _removePhoto() {
+    // FR-D8: delší strana nejvýš 1 920 px, JPEG ~80 %.
+    final picker = ImagePicker();
+    final remaining = maxPhotosPerActivity - _photos.length;
+    final List<XFile> picked;
+    if (source == ImageSource.gallery && remaining > 1) {
+      picked = await picker.pickMultiImage(
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 80,
+        limit: remaining,
+      );
+    } else {
+      final one = await picker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 80,
+      );
+      picked = one == null ? const [] : [one];
+    }
+    if (picked.isEmpty || !mounted) return;
     setState(() {
-      _pickedImage = null;
-      _savedImagePath = null;
+      _photos = [..._photos, ...picked.take(remaining).map(_PhotoItem.picked)];
     });
   }
 
@@ -195,29 +276,41 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     final formState = _formKey.currentState;
     if (formState == null || !formState.validate()) return;
     final zoneId = _effectiveZoneId(
-      ref.read(zonesControllerProvider).value ?? const [],
+      _selectableZones(ref.read(zonesControllerProvider).value ?? const []),
     );
     if (zoneId == null) return;
+    final l = AppLocalizations.of(context);
 
     setState(() => _saving = true);
 
-    final photos = ref.read(photoStorageProvider);
+    final storage = ref.read(photoStorageProvider);
+    final newId = ref.read(newIdProvider);
     final controller = ref.read(activityControllerProvider.notifier);
-    final previousImage = widget.initial?.imagePath;
+    final messenger = ScaffoldMessenger.of(context);
 
-    var imagePath = _savedImagePath;
-    final picked = _pickedImage;
-    if (picked != null) {
-      try {
-        imagePath = await photos.persist(picked);
-      } catch (_) {
-        if (!mounted) return;
-        setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Fotku se nepodařilo uložit.')),
-        );
-        return;
+    // Nové fotky se do složky aplikace kopírují až teď.
+    final photos = <PhotoRef>[];
+    final newlyStored = <String>[];
+    try {
+      for (final item in _photos) {
+        final picked = item.picked;
+        if (picked == null) {
+          photos.add(item.saved!);
+          continue;
+        }
+        final id = newId();
+        final path = await storage.persist(picked, baseName: id);
+        newlyStored.add(path);
+        photos.add(PhotoRef(id: id, path: path));
       }
+    } catch (_) {
+      for (final path in newlyStored) {
+        await storage.delete(path);
+      }
+      if (!mounted) return;
+      setState(() => _saving = false);
+      messenger.showSnackBar(SnackBar(content: Text(l.photoSaveFailed)));
+      return;
     }
 
     final title = _titleController.text.trim();
@@ -225,51 +318,58 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     final notes = notesText.isEmpty ? null : notesText;
 
     final initial = widget.initial;
+    ActivityEntity? saved;
     if (initial == null) {
-      await controller.addActivity(
+      saved = await controller.addActivity(
+        type: _type,
         title: title,
         date: _date,
         zoneId: zoneId,
         notes: notes,
-        imagePath: imagePath,
+        photos: photos,
       );
     } else {
-      await controller.updateActivity(
-        ActivityEntity(
-          id: initial.id,
-          title: title,
-          date: _date,
-          zoneId: zoneId,
-          notes: notes,
-          imagePath: imagePath,
-        ),
+      final updated = initial.copyWith(
+        type: _type,
+        title: title,
+        date: _date,
+        zoneId: zoneId,
+        notes: notes,
+        clearNotes: notes == null,
+        photos: photos,
       );
+      await controller.updateActivity(updated);
+      if (!ref.read(activityControllerProvider).hasError) saved = updated;
     }
 
     if (!mounted) return;
-    if (ref.read(activityControllerProvider).hasError) {
-      // Kopie nové fotky by po neúspěšném uložení zůstala viset.
-      if (picked != null) await photos.delete(imagePath);
+    if (saved == null) {
+      // Kopie nových fotek by po neúspěšném uložení zůstaly viset.
+      for (final path in newlyStored) {
+        await storage.delete(path);
+      }
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Záznam se nepodařilo uložit.')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l.activitySaveFailed)));
       return;
     }
 
-    if (previousImage != null && previousImage != imagePath) {
-      await photos.delete(previousImage);
+    final kept = {for (final p in photos) p.id};
+    for (final old in initial?.photos ?? const <PhotoRef>[]) {
+      if (!kept.contains(old.id)) await storage.delete(old.path);
     }
+    await ref.read(settingsControllerProvider.notifier).rememberZone(zoneId);
     if (!mounted) return;
     _saved = true;
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(saved);
   }
 
   @override
   Widget build(BuildContext context) {
-    final zones =
-        ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[];
+    final l = AppLocalizations.of(context);
+    final zones = _selectableZones(
+      ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[],
+    );
     final zoneId = _effectiveZoneId(zones);
 
     return PopScope(
@@ -284,40 +384,68 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(_isEdit ? 'Upravit záznam' : 'Nový záznam')),
+        appBar: AppBar(
+          title: Text(_isEdit ? l.activityEditTitle : l.activityNewTitle),
+          actions: [
+            TextButton(
+              onPressed: _saving ? null : _submit,
+              child: Text(l.commonSave),
+            ),
+          ],
+        ),
         body: Form(
           key: _formKey,
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              Text(
+                l.activityTypeLabel,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final type in quickPickTypes)
+                    ChoiceChip(
+                      avatar: Icon(activityTypeIcon(type), size: 18),
+                      label: Text(activityTypeLabel(l, type)),
+                      selected: _type == type,
+                      showCheckmark: false,
+                      onSelected: (_) => _pickType(l, type),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Název aktivity',
-                  hintText: 'např. Zálivka rajčat',
+                decoration: InputDecoration(
+                  labelText: l.activityTitleLabel,
+                  hintText: l.activityTitleHint,
                 ),
                 textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.next,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Zadej název aktivity';
-                  }
-                  return null;
-                },
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? l.activityTitleRequired
+                    : null,
               ),
               if (!_isEdit) ...[
                 const SizedBox(height: 8),
-                _TitleSuggestions(
-                  onPick: (title) =>
-                      setState(() => _titleController.text = title),
+                _RecentTitles(
+                  onPick: (activity) => setState(() {
+                    _titleController.text = activity.title;
+                    _autoTitle = null;
+                    _type = activity.type;
+                  }),
                 ),
               ],
               const SizedBox(height: 16),
               TextFormField(
                 controller: _dateController,
-                decoration: const InputDecoration(
-                  labelText: 'Datum a čas',
-                  suffixIcon: Icon(Icons.calendar_today),
+                decoration: InputDecoration(
+                  labelText: l.activityDateLabel,
+                  suffixIcon: const Icon(Icons.calendar_today),
                 ),
                 readOnly: true,
                 onTap: _pickDateTime,
@@ -325,7 +453,7 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 key: ValueKey(zoneId),
-                decoration: const InputDecoration(labelText: 'Zóna'),
+                decoration: InputDecoration(labelText: l.activityZoneLabel),
                 initialValue: zoneId,
                 // Dlouhé názvy a velké písmo se zalomí do šířky pole.
                 isExpanded: true,
@@ -337,24 +465,25 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
                     ),
                 ],
                 onChanged: (value) => setState(() => _zoneId = value),
-                validator: (value) => value == null ? 'Vyber zónu' : null,
+                validator: (value) =>
+                    value == null ? l.activityZoneRequired : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Poznámka (volitelné)',
-                ),
+                decoration: InputDecoration(labelText: l.activityNotesLabel),
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: 3,
               ),
-              const SizedBox(height: 16),
-              if (!kIsWeb) ..._photoSection(),
+              // Na webu fotky nejsou (prohlížeč nemá trvalou složku).
+              if (!kIsWeb) ...[const SizedBox(height: 16), ..._photoSection(l)],
               const SizedBox(height: 24),
               FilledButton.icon(
                 onPressed: _saving ? null : _submit,
                 icon: const Icon(Icons.check),
-                label: Text(_isEdit ? 'Uložit změny' : 'Uložit záznam'),
+                label: Text(
+                  _isEdit ? l.activitySaveChanges : l.activitySaveNew,
+                ),
               ),
             ],
           ),
@@ -363,80 +492,94 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     );
   }
 
-  List<Widget> _photoSection() {
-    final picked = _pickedImage;
-    final hasPhoto = picked != null || _savedImagePath != null;
+  List<Widget> _photoSection(AppLocalizations l) {
+    final canAdd = _photos.length < maxPhotosPerActivity;
     return [
-      if (picked != null)
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.file(File(picked.path), height: 200, fit: BoxFit.cover),
-        )
-      else if (_savedImagePath != null)
-        ActivityPhoto(path: _savedImagePath, height: 200, iconSize: 48),
-      if (hasPhoto) const SizedBox(height: 8),
-      Row(
-        children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: _pickPhoto,
-              icon: const Icon(Icons.add_a_photo_outlined),
-              label: Text(hasPhoto ? 'Změnit fotku' : 'Přidat fotku'),
-            ),
+      if (_photos.isNotEmpty) ...[
+        SizedBox(
+          height: 112,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _photos.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (context, i) {
+              final item = _photos[i];
+              final picked = item.picked;
+              return Stack(
+                children: [
+                  if (picked != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(picked.path),
+                        width: 112,
+                        height: 112,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  else
+                    ActivityPhoto(
+                      path: item.saved!.path,
+                      width: 112,
+                      height: 112,
+                    ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton.filledTonal(
+                      tooltip: l.photoRemove,
+                      icon: const Icon(Icons.close, size: 18),
+                      onPressed: () =>
+                          setState(() => _photos = [..._photos]..removeAt(i)),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          if (hasPhoto) ...[
-            const SizedBox(width: 8),
-            IconButton(
-              tooltip: 'Odebrat fotku',
-              onPressed: _removePhoto,
-              icon: const Icon(Icons.delete_outline),
-            ),
-          ],
-        ],
+        ),
+        const SizedBox(height: 8),
+      ],
+      OutlinedButton.icon(
+        onPressed: canAdd ? () => _addPhotos(l) : null,
+        icon: const Icon(Icons.add_a_photo_outlined),
+        label: Text(
+          canAdd
+              ? l.photoAdd(_photos.length, maxPhotosPerActivity)
+              : l.photoLimitReached(maxPhotosPerActivity),
+        ),
       ),
     ];
   }
 }
 
-/// Nejčastější práce na zahradě pro rychlý zápis jedním ťuknutím.
-const commonActivityTitles = [
-  'Zálivka',
-  'Pletí',
-  'Hnojení',
-  'Výsev',
-  'Výsadba',
-  'Sklizeň',
-  'Řez',
-  'Sekání trávy',
-  'Postřik',
-  'Mulčování',
-];
+/// Naposledy použité názvy pro zápis jedním klepnutím (s jejich typem).
+class _RecentTitles extends ConsumerWidget {
+  const _RecentTitles({required this.onPick});
 
-/// Návrhy názvu: nejdřív naposledy použité, pak běžné práce.
-class _TitleSuggestions extends ConsumerWidget {
-  const _TitleSuggestions({required this.onPick});
-
-  final ValueChanged<String> onPick;
+  final ValueChanged<ActivityEntity> onPick;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activities = ref.watch(activityControllerProvider).value ?? const [];
     final seen = <String>{};
-    final suggestions = <String>[];
-    for (final title in [
-      ...activities.map((a) => a.title).take(20),
-      ...commonActivityTitles,
-    ]) {
-      if (seen.add(title.toLowerCase())) suggestions.add(title);
-      if (suggestions.length == 8) break;
+    final recent = <ActivityEntity>[];
+    for (final a in activities.take(30)) {
+      if (seen.add(a.title.toLowerCase())) recent.add(a);
+      if (recent.length == 6) break;
     }
+    if (recent.isEmpty) return const SizedBox.shrink();
 
     return Wrap(
       spacing: 8,
       runSpacing: 4,
       children: [
-        for (final title in suggestions)
-          ActionChip(label: Text(title), onPressed: () => onPick(title)),
+        for (final a in recent)
+          ActionChip(
+            avatar: const Icon(Icons.history, size: 16),
+            label: Text(a.title),
+            onPressed: () => onPick(a),
+          ),
       ],
     );
   }

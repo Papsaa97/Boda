@@ -1,3 +1,4 @@
+import '../../../core/time/calendar.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../zones/domain/zone_entity.dart';
 
@@ -33,7 +34,11 @@ class TodaySummary {
   /// Počet záznamů za posledních 7 dní včetně dneška.
   final int lastWeekCount;
 
+  /// Počet všech záznamů v deníku.
+  final int totalCount;
+
   const TodaySummary({
+    required this.totalCount,
     required this.today,
     required this.needsAttention,
     required this.lastActivity,
@@ -42,13 +47,6 @@ class TodaySummary {
 }
 
 DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
-
-/// Počet kalendářních dní mezi dvěma daty (bez ohledu na čas a letní čas).
-int calendarDaysBetween(DateTime from, DateTime to) {
-  final a = DateTime.utc(from.year, from.month, from.day);
-  final b = DateTime.utc(to.year, to.month, to.day);
-  return b.difference(a).inDays;
-}
 
 TodaySummary buildTodaySummary({
   required List<ActivityEntity> activities,
@@ -93,6 +91,7 @@ TodaySummary buildTodaySummary({
         });
 
   return TodaySummary(
+    totalCount: activities.length,
     today: todays,
     needsAttention: statuses,
     lastActivity: sorted.isEmpty ? null : sorted.first,

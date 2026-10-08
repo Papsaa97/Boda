@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zahradnik_boda_mvp01/features/activity/presentation/controllers/activity_controller.dart';
+import 'package:zahradnik_boda/features/activity/presentation/controllers/activity_controller.dart';
 
 import '../../../helpers/fakes.dart';
 

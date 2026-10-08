@@ -1,0 +1,465 @@
+{
+  "@@locale": "cs",
+  "appTitle": "Zahradník Bóďa",
+  "commonCancel": "Zrušit",
+  "commonSave": "Uložit",
+  "commonDelete": "Smazat",
+  "commonBack": "Zpět",
+  "commonEdit": "Upravit",
+  "commonClose": "Zavřít",
+  "commonContinue": "Pokračovat",
+  "commonUnknownZone": "Neznámá zóna",
+  "commonErrorWithDetail": "Chyba: {error}",
+  "zonesLoadError": "Chyba při načítání zón: {error}",
+  "navToday": "Dnes",
+  "navDiary": "Deník",
+  "navTasks": "Úkoly",
+  "navZones": "Zóny",
+  "newActivityTooltip": "Nový záznam",
+  "newTaskTooltip": "Nový úkol",
+  "relativeToday": "dnes",
+  "relativeYesterday": "včera",
+  "relativeDaysAgo": "před {days} dny",
+  "@relativeDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dayHeaderToday": "Dnes",
+  "dayHeaderYesterday": "Včera",
+  "dayHeaderTomorrow": "Zítra",
+  "onboardingZonesTitle": "Co pěstuješ?",
+  "onboardingZonesBody": "Vyber, co máš na zahradě. Z toho budou zóny, ke kterým budeš zapisovat práci. Upravit je můžeš kdykoli.",
+  "onboardingPickAtLeastOne": "Vyber aspoň jednu",
+  "onboardingFinish": "Jdeme na zahradu",
+  "onboardingSaveFailed": "Zóny se nepodařilo uložit, zkus to znovu.",
+  "onboardingSkip": "Přeskočit",
+  "activityTypeSowing": "Výsev",
+  "activityTypePlanting": "Výsadba",
+  "activityTypeWatering": "Zálivka",
+  "activityTypeFertilizing": "Hnojení",
+  "activityTypeSpraying": "Postřik",
+  "activityTypePruning": "Řez",
+  "activityTypeHarvest": "Sklizeň",
+  "activityTypeWeeding": "Pletí",
+  "activityTypeMowing": "Sekání",
+  "activityTypeOther": "Jiné",
+  "activityHasNote": "Má poznámku",
+  "activityNewTitle": "Nový záznam",
+  "activityEditTitle": "Upravit záznam",
+  "activityDetailTitle": "Záznam",
+  "activityTypeLabel": "Co jsi dělal?",
+  "activityTitleLabel": "Název aktivity",
+  "activityTitleHint": "např. Zálivka rajčat",
+  "activityTitleRequired": "Zadej název aktivity",
+  "activityDateLabel": "Datum a čas",
+  "activityZoneLabel": "Zóna",
+  "activityZoneRequired": "Vyber zónu",
+  "activityNotesLabel": "Poznámka (volitelné)",
+  "activitySaveNew": "Uložit záznam",
+  "activitySaveChanges": "Uložit změny",
+  "activitySaveFailed": "Záznam se nepodařilo uložit.",
+  "activityDeleteTitle": "Smazat záznam?",
+  "activityDeleteBody": "Záznam i jeho fotky zmizí z deníku.",
+  "activityDeleteFailed": "Záznam se nepodařilo smazat.",
+  "activityGone": "Záznam už neexistuje.",
+  "photoTake": "Vyfotit",
+  "photoFromGallery": "Vybrat z galerie",
+  "photoRemove": "Odebrat fotku",
+  "photoSaveFailed": "Fotku se nepodařilo uložit.",
+  "photoAdd": "Přidat fotku ({count}/{max})",
+  "@photoAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "photoLimitReached": "Víc než {max} fotek k záznamu nejde",
+  "@photoLimitReached": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "timelineSearch": "Hledat v deníku",
+  "timelineSearchClose": "Zavřít hledání",
+  "timelineSearchHint": "Hledat v názvu a poznámce",
+  "timelineLoadError": "Chyba při načítání deníku: {error}",
+  "timelineEmptyTitle": "Zatím žádné záznamy",
+  "timelineEmptyBody": "Zapiš první práci na zahradě tlačítkem dole.",
+  "filterAllZones": "Všechny zóny",
+  "filterAllTypes": "Všechny práce",
+  "filterResultCount": "{count, plural, =0{Nic nenalezeno} =1{1 záznam} few{{count} záznamy} other{{count} záznamů}}",
+  "@filterResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filterNoMatch": "Tomuhle filtru nic neodpovídá.",
+  "photoSemantic": "Fotka záznamu",
+  "photoSemanticOf": "Fotka záznamu {title}",
+  "@photoSemanticOf": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "photoViewerTitle": "{title} ({index}/{count})",
+  "@photoViewerTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "index": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "activityDiscardTitle": "Zahodit změny?",
+  "activityDiscardBody": "Záznam není uložený.",
+  "activityDiscardKeepEditing": "Pokračovat v úpravách",
+  "activityDiscardConfirm": "Zahodit",
+  "photoOpenFullscreen": "Zobrazit fotku přes celou obrazovku",
+  "zoneNewTitle": "Nová zóna",
+  "zoneRenameTitle": "Přejmenovat zónu",
+  "zoneNameHint": "např. Záhon u plotu",
+  "zoneSaveFailed": "Změnu zón se nepodařilo uložit.",
+  "zoneCannotDeleteTitle": "Zónu nejde smazat",
+  "zoneCannotDeleteBody": "{name} má v deníku {count, plural, =1{1 záznam} few{{count} záznamy} other{{count} záznamů}}. Můžeš ji archivovat: nebude se nabízet pro nové záznamy, ale záznamy zůstanou.",
+  "@zoneCannotDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "zoneArchive": "Archivovat",
+  "zoneUnarchive": "Vrátit z archivu",
+  "zoneDelete": "Smazat zónu",
+  "zoneKeepOne": "Aspoň jedna zóna musí zůstat.",
+  "zoneArchivedSection": "Archivované",
+  "zoneActivityCount": "{count, plural, =0{Zatím bez záznamů} =1{1 záznam} few{{count} záznamy} other{{count} záznamů}}",
+  "@zoneActivityCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "zoneTypeVegetable": "Zelenina",
+  "zoneTypeHerbs": "Bylinky",
+  "zoneTypeFruit": "Ovocný sad",
+  "zoneTypeOrnamental": "Okrasná zahrada",
+  "zoneTypeLawn": "Trávník",
+  "zoneTypeGreenhouse": "Skleník",
+  "zoneTypePond": "Jezírko",
+  "zoneTypeStructure": "Stavba",
+  "zoneTypeOther": "Jiné",
+  "zoneTypeLabel": "Druh zóny",
+  "zoneNameEmpty": "Zadej název zóny",
+  "zoneNameDuplicate": "Zóna s tímhle názvem už existuje",
+  "zoneTitle": "Zóny",
+  "zoneArchiveKeepOne": "Poslední aktivní zónu nejde archivovat.",
+  "zoneMoreActions": "Další akce pro {name}",
+  "@zoneMoreActions": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneArchived": "Archivováno",
+  "zoneDeleted": "Zóna {name} smazána",
+  "@zoneDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardTitle": "Co dnes?",
+  "dashboardLastWeek": "{count, plural, =1{záznam za 7 dní} few{záznamy za 7 dní} other{záznamů za 7 dní}}",
+  "@dashboardLastWeek": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardLastEntry": "poslední záznam",
+  "dashboardHeroToday": "{count, plural, =1{Dnes máš zapsaný 1 záznam} few{Dnes máš zapsané {count} záznamy} other{Dnes máš zapsáno {count} záznamů}}",
+  "@dashboardHeroToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardHeroTodayBody": "Dobrá práce. Zahrada ti to vrátí.",
+  "dashboardHeroNothing": "Dnes zatím nic",
+  "dashboardHeroZoneEmpty": "V zóně {zone} ještě nemáš žádný záznam. Co se tam teď děje?",
+  "@dashboardHeroZoneEmpty": {
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardHeroZoneStale": "Poslední záznam v zóně {zone} je {when}. Mrkni, jak se jí daří.",
+  "@dashboardHeroZoneStale": {
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardHeroAllFresh": "Všechny zóny máš za poslední týden zapsané. Co dnes uděláš?",
+  "dashboardLogActivity": "Zapsat aktivitu",
+  "dashboardTip": "Tip od Bódi",
+  "dashboardAttention": "Zaslouží pozornost",
+  "dashboardZoneNoEntry": "zatím bez záznamu",
+  "dashboardZoneLast": "naposledy {when}",
+  "@dashboardZoneLast": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardTodayTasks": "{count, plural, =1{Dnes je na řadě 1 úkol} few{Dnes jsou na řadě {count} úkoly} other{Dnes je na řadě {count} úkolů}}",
+  "@dashboardTodayTasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardAllTasks": "Všechny úkoly",
+  "backupShareSubject": "Záloha deníku Zahradník Bóďa",
+  "backupExportDone": "Záloha je hotová.",
+  "backupExportFailed": "Zálohu se nepodařilo vytvořit.",
+  "backupImportConfirmTitle": "Nahradit všechna data?",
+  "backupImportConfirmBody": "Záloha obsahuje {activities, plural, =1{1 záznam} few{{activities} záznamy} other{{activities} záznamů}}, {tasks, plural, =1{1 úkol} few{{tasks} úkoly} other{{tasks} úkolů}} a {photos, plural, =1{1 fotku} few{{photos} fotky} other{{photos} fotek}}. Všechno, co teď v aplikaci máš, se smaže a nahradí obsahem zálohy.",
+  "@backupImportConfirmBody": {
+    "placeholders": {
+      "activities": {
+        "type": "int"
+      },
+      "tasks": {
+        "type": "int"
+      },
+      "photos": {
+        "type": "int"
+      }
+    }
+  },
+  "backupImportConfirm": "Nahradit",
+  "backupImportDone": "Data ze zálohy jsou obnovená.",
+  "backupImportFailed": "Obnova se nepovedla, data zůstala beze změny.",
+  "backupErrorNotABackup": "Tohle není záloha ze Zahradníka Bódi.",
+  "backupErrorCorrupted": "Záloha je poškozená a nejde načíst.",
+  "backupErrorTooNew": "Záloha je z novější verze aplikace. Nejdřív si aplikaci aktualizuj.",
+  "backupReminderTitle": "Zálohuj si deník",
+  "backupReminderBody": "Data jsou jen v tomhle telefonu. Záloha zabere chvilku a uložíš ji třeba na Disk nebo do e-mailu.",
+  "backupReminderAction": "Zálohovat",
+  "backupExport": "Exportovat zálohu",
+  "backupExportSubtitleNever": "Zatím žádná záloha",
+  "backupExportSubtitle": "Naposledy {date}",
+  "@backupExportSubtitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backupImport": "Obnovit ze zálohy",
+  "backupImportSubtitle": "Nahradí všechna data obsahem ZIP souboru",
+  "backupUnavailableWeb": "Záloha je dostupná v aplikaci pro Android a iOS.",
+  "settingsTitle": "Nastavení",
+  "settingsTooltip": "Nastavení",
+  "settingsAppearance": "Vzhled",
+  "settingsThemeSystem": "Podle systému",
+  "settingsThemeLight": "Světlý",
+  "settingsThemeDark": "Tmavý",
+  "settingsNotifications": "Připomínky",
+  "settingsQuietStart": "Tiché hodiny od",
+  "settingsQuietEnd": "Tiché hodiny do",
+  "settingsQuietHelp": "V tichých hodinách žádná připomínka nepřijde. Co by na ně připadlo, přijde po jejich konci.",
+  "settingsDigest": "Ranní přehled úkolů",
+  "digestAuto": "Automaticky",
+  "digestDaily": "Denně",
+  "digestWeekly": "Týdně",
+  "digestOff": "Vypnuto",
+  "digestAutoHelp": "Denně, v zimě (listopad až únor) jen v pondělí",
+  "digestDailyHelp": "Každé ráno po konci tichých hodin",
+  "digestWeeklyHelp": "V pondělí ráno, úkoly na celý týden",
+  "digestOffHelp": "Jen připomínky u jednotlivých úkolů",
+  "settingsData": "Data",
+  "settingsAbout": "O aplikaci",
+  "settingsPrivacy": "Všechna data zůstávají jen v tomhle zařízení. Aplikace nic neodesílá.",
+  "settingsVersion": "Verze {version}",
+  "@settingsVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "statsTitle": "Statistika",
+  "statsSubtitle": "Záznamy po týdnech a nejaktivnější zóny",
+  "statsTotal": "záznamů celkem",
+  "statsThisWeek": "tento týden",
+  "statsActiveWeeks": "týdnů z {weeks} s aspoň 2 záznamy",
+  "@statsActiveWeeks": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "statsPerWeek": "Záznamy po týdnech",
+  "statsTopZones": "Nejaktivnější zóny",
+  "statsTopTypes": "Nejčastější práce",
+  "statsEmpty": "Zatím žádné záznamy.",
+  "taskNewTitle": "Nový úkol",
+  "taskEditTitle": "Upravit úkol",
+  "taskTitleLabel": "Co je potřeba udělat",
+  "taskTitleHint": "např. Postříkat broskvoň",
+  "taskTitleRequired": "Zadej, co je potřeba udělat",
+  "taskDueLabel": "Termín",
+  "taskReminderLabel": "Připomenout",
+  "taskReminderAt": "V {time}",
+  "@taskReminderAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "taskReminderOff": "Jen v ranním přehledu",
+  "taskReminderChange": "Změnit čas",
+  "taskZoneLabel": "Zóna",
+  "taskNoZone": "Bez zóny",
+  "taskRepeatLabel": "Opakovat",
+  "taskRepeatMonthsLabel": "Jen v měsících (nic = celý rok)",
+  "taskNotesLabel": "Poznámka (volitelné)",
+  "taskSaveNew": "Uložit úkol",
+  "taskSaveFailed": "Úkol se nepodařilo uložit.",
+  "taskDeleteTitle": "Smazat úkol?",
+  "taskMarkDone": "Označit jako hotové",
+  "taskMoreActions": "Další akce",
+  "taskSkip": "Přeskočit",
+  "taskReopen": "Vrátit mezi otevřené",
+  "taskStatusDone": "Hotovo",
+  "taskStatusSkipped": "Přeskočeno",
+  "taskDoneSnack": "Hotovo: {title}",
+  "@taskDoneSnack": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "taskDoneRecurringSnack": "Hotovo: {title}. Příště {date}.",
+  "@taskDoneRecurringSnack": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "taskLogToDiary": "Zapsat do deníku",
+  "repeatNone": "Neopakovat",
+  "repeatWeekly": "Každý týden",
+  "repeatMonthly": "Každý měsíc",
+  "repeatYearly": "Každý rok",
+  "repeatInMonths": "{base} ({months})",
+  "@repeatInMonths": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      },
+      "months": {
+        "type": "String"
+      }
+    }
+  },
+  "snoozeOneDay": "Odložit o den",
+  "snoozeWeekend": "Odložit na víkend",
+  "snoozeOneWeek": "Odložit o týden",
+  "tasksOverdue": "Po termínu",
+  "tasksNext7Days": "Příštích 7 dní",
+  "tasksLater": "Později",
+  "tasksClosedSection": "Hotové a přeskočené ({count})",
+  "@tasksClosedSection": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksPrevWeek": "Předchozí týden",
+  "tasksNextWeek": "Další týden",
+  "tasksDaySemantics": "{date}, {count, plural, =0{žádný úkol} =1{1 úkol} few{{count} úkoly} other{{count} úkolů}}",
+  "@tasksDaySemantics": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksNoneThatDay": "Na tenhle den nic není.",
+  "tasksEmptyTitle": "Zatím žádné úkoly",
+  "tasksEmptyBody": "Přidej, co tě na zahradě čeká. Připomenu ti to, ale nikdy v tichých hodinách.",
+  "notificationChannelName": "Připomínky úkolů",
+  "notificationTaskBody": "Úkol na zahradě je na řadě.",
+  "notificationDigestDailyTitle": "{count, plural, =1{Dnes tě čeká 1 úkol} few{Dnes tě čekají {count} úkoly} other{Dnes tě čeká {count} úkolů}}",
+  "@notificationDigestDailyTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationDigestWeeklyTitle": "{count, plural, =1{Tento týden tě čeká 1 úkol} few{Tento týden tě čekají {count} úkoly} other{Tento týden tě čeká {count} úkolů}}",
+  "@notificationDigestWeeklyTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationDigestMore": "a {count} další",
+  "@notificationDigestMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:zahradnik_boda_mvp01/features/activity/presentation/controllers/activity_controller.dart';
+import 'package:zahradnik_boda/features/activity/presentation/controllers/activity_controller.dart';
+import 'package:zahradnik_boda/features/zones/domain/zone_entity.dart';
 
 import '../helpers/fakes.dart';
 
@@ -27,7 +28,9 @@ void main() {
     await tester.tap(find.text('Jdeme na zahradu'));
     await tester.pumpAndSettle();
 
-    expect(zones.items.keys, ['Z6']);
+    final zone = zones.items.values.single;
+    expect(zone.name, 'Bylinky');
+    expect(zone.type, ZoneType.herbs);
     expect(find.text('Co dnes?'), findsOneWidget);
   });
 
@@ -38,7 +41,14 @@ void main() {
     await tester.tap(find.text('Přeskočit'));
     await tester.pumpAndSettle();
 
-    expect(zones.items.keys, unorderedEquals(['Z1', 'Z2', 'Z3', 'Z4', 'Z5']));
+    expect(
+      zones.items.values.map((z) => z.type),
+      unorderedEquals(defaultZoneTypes),
+    );
+    expect(
+      zones.items.values.map((z) => z.name),
+      containsAll(['Zelenina', 'Ovocný sad']),
+    );
     expect(find.text('Co dnes?'), findsOneWidget);
   });
 
@@ -63,11 +73,9 @@ void main() {
 
     await tester.tap(find.byTooltip('Nový záznam'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ActionChip, 'Hnojení'));
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Hnojení'));
     await tester.pump();
-    await tester.ensureVisible(find.text('Uložit záznam'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Uložit záznam'));
+    await tester.tap(find.widgetWithText(TextButton, 'Uložit'));
     await tester.pumpAndSettle();
 
     expect(repo.items.values.single.title, 'Hnojení');
@@ -100,7 +108,7 @@ void main() {
     expect(find.text('Zálivka mrkve'), findsNothing);
     expect(find.text('Řez jabloně'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(ChoiceChip, 'Vše'));
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Všechny zóny'));
     await tester.pumpAndSettle();
     expect(find.text('Zálivka mrkve'), findsOneWidget);
   });
@@ -117,9 +125,7 @@ void main() {
       find.widgetWithText(TextFormField, 'Název aktivity'),
       'Nová zálivka',
     );
-    await tester.ensureVisible(find.text('Uložit záznam'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Uložit záznam'));
+    await tester.tap(find.widgetWithText(TextButton, 'Uložit'));
     await tester.pumpAndSettle();
 
     expect(find.text('Záznam se nepodařilo uložit.'), findsOneWidget);
