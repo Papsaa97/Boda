@@ -92,9 +92,9 @@ Dopad: kap. 11; cena je hypotéza H3, před spuštěním plateb změřit náklad
 Proč: vysoké náklady, neprokázaná hodnota, malý tým.
 Dopad: nejsou v roadmapě; vrátí se po ověření H1–H3.
 
-**D22. Způsob práce: Papi + vlákna Clauda v projektu, výstupem draft PR, merguje jen Papi; repo je jediný zdroj pravdy.**
+**D22. Způsob práce: Papi + vlákna Clauda v projektu, výstupem PR, který vlákno po zeleném CI a kontrole samo merguje; repo je jediný zdroj pravdy.**
 Proč: projekt se přesunul z kombinace ChatGPT / Gemini / NotebookLM do tohoto projektu; externí „neomylná paměť“ se nedá ověřit ani verzovat.
-Dopad: [COLLAB_WORKFLOW.md](COLLAB_WORKFLOW.md), [CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md), šablona PR.
+Dopad: [COLLAB_WORKFLOW.md](COLLAB_WORKFLOW.md), [CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md), šablona PR. Samostatné mergování rozhodl Papi 8. 10. 2026 („v GitHubu pracuj vždy sám“, volba „Merguj sám“).
 
 **D23. `NÁPADNÍK.md` se jmenuje `NAPADNIK.md`.**
 Proč: diakritika v názvech souborů dělá potíže v git (normalizace Unicode na macOS), v URL a na Windows.

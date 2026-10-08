@@ -602,8 +602,8 @@ Viz [`CODE_REVIEW_CHECKLIST.md`](../CODE_REVIEW_CHECKLIST.md). Minimum: CI zelen
 
 Podrobně v [`COLLAB_WORKFLOW.md`](../COLLAB_WORKFLOW.md). Shrnutí:
 
-- **Michal Papoušek (Papi)** – vlastník produktu a hlavní architekt: určuje cíle a priority, schvaluje a merguje pull requesty.
-- **Claude** (v tomto projektu) – implementace a revize: každý úkol běží ve vlastním vlákně, výstupem je draft PR s popisem, testy a zeleným CI. Bez schválení nic nemerguje.
+- **Michal Papoušek (Papi)** – vlastník produktu a hlavní architekt: určuje cíle a priority; review může udělat kdykoli a jeho připomínky mají přednost.
+- **Claude** (v tomto projektu) – implementace a revize: každý úkol běží ve vlastním vlákně, výstupem je PR s popisem, testy a zeleným CI, který vlákno po kontrole podle checklistu samo merguje (rozhodnutí Papiho z 8. 10. 2026).
 - **Repozitář je paměť projektu.** Platí, co je v `docs/SPECIFIKACE.md`, `DECLOG.md` a v kódu. Externí poznámky (NotebookLM, chaty) jsou pomůcka, ne zdroj pravdy; nic nepovažujeme za „neomylné“, rozhodnutí lze změnit novým záznamem v DECLOGu.
 - **Rozsah hlídá roadmapa:** nápad mimo aktuální fázi jde do NÁPADNÍKU, ne do kódu.
 

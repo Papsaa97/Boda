@@ -6,9 +6,9 @@ Tento dokument nahrazuje „projektovou směrnici v1.6“ (ChatGPT jako kodér, 
 
 | Kdo | Co dělá | Co nedělá |
 | --- | --- | --- |
-| **Papi** (Michal Papoušek) – vlastník produktu a hlavní architekt | Určuje cíle, priority a rozsah fází. Zadává úkoly v chatu projektu. Dělá review a **jako jediný merguje** do hlavní větve. Rozhoduje spory a mění DECLOG. | Nemusí psát kód ani ručně kopírovat výstupy mezi nástroji. |
+| **Papi** (Michal Papoušek) – vlastník produktu a hlavní architekt | Určuje cíle, priority a rozsah fází. Zadává úkoly v chatu projektu. Může kdykoli udělat review nebo PR zastavit komentářem. Rozhoduje spory a mění DECLOG. | Nemusí psát kód ani ručně kopírovat výstupy mezi nástroji. |
 | **Claude – koordinátor** (chat projektu) | Přijme zadání, založí pro něj vlákno, hlídá, aby se vlákna nepřekrývala, a odpovídá na otázky o stavu projektu. | Sám kód nepíše. |
-| **Claude – vlákno** (jedno na úkol) | Udělá práci od začátku do konce: přečte specifikaci a kód, implementuje, napíše testy, spustí analýzu, otevře **draft PR**, dotáhne CI do zelena a ve vlákně napíše výsledek. U nejasností zvolí rozumnou výchozí variantu a napíše, kterou. | Nemerguje. Nemění produkční nastavení, nemaže data, neposílá nic mimo projekt bez výslovného pokynu. |
+| **Claude – vlákno** (jedno na úkol) | Udělá práci od začátku do konce: přečte specifikaci a kód, implementuje, napíše testy, spustí analýzu, otevře PR, dotáhne CI do zelena, sám ho zkontroluje podle checklistu, **mergne ho** a ve vlákně napíše výsledek. U nejasností zvolí rozumnou výchozí variantu a napíše, kterou. | Nemerguje s červeným CI ani PR, ke kterému Papi napsal připomínku. Nemění produkční nastavení, nemaže data, neposílá nic mimo projekt bez výslovného pokynu. |
 | **CI** (GitHub Actions) | Na každém PR spustí `flutter analyze` a `flutter test`. Nahrazuje „auditní štítek“: místo prohlášení, že kód je v pořádku, to ověří stroj. | |
 
 ## Zdroj pravdy
@@ -32,11 +32,11 @@ Chaty, NotebookLM a poznámky jsou pomůcky. Když se rozcházejí s repem, plat
 3. **Větev** – každé vlákno pracuje na vlastní větvi (viz níže), nikdy přímo na hlavní větvi.
 4. **Draft PR** – popis podle šablony (`.github/pull_request_template.md`): co uvidí uživatel *před* a *po*, jak to funguje, jak to bylo otestováno, odkaz na FR/ID ve specifikaci.
 5. **CI zelené** – PR se nepředá k review s červeným CI.
-6. **Review** – Papi projde PR podle [CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md), komentáře píše přímo do PR nebo do vlákna. Vlákno je zapracuje.
-7. **Merge** – Papi označí PR jako připravený a merguje (preferovaně *Squash and merge*).
+6. **Review** – vlákno samo projde PR podle [CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md). Papi se může podívat kdykoli; jeho komentáře v PR nebo ve vlákně mají přednost a vlákno je zapracuje před mergem.
+7. **Merge** – vlákno označí PR jako připravený a merguje (preferovaně *Squash and merge*). Špatný merge se vrací revertem. (Rozhodl Papi 8. 10. 2026: „v GitHubu pracuj vždy sám“, „Merguj sám“.)
 8. **DECLOG** – pokud PR mění rozhodnutí, rozsah nebo architekturu, obsahuje i záznam v DECLOGu.
 
-**Když Papi spí nebo nemá čas:** vlákna pokračují samostatně s rozumnými výchozími volbami, vše zůstává jako draft PR a čeká na review. Krok, který opravdu potřebuje Papiho (platby, účty v obchodech, nastavení GitHubu), se odloží a zbytek práce pokračuje.
+**Když Papi spí nebo nemá čas:** vlákna pokračují samostatně s rozumnými výchozími volbami. Krok, který opravdu potřebuje Papiho (platby, účty v obchodech, nastavení repozitáře), se odloží a zbytek práce pokračuje.
 
 ## Větve a commity
 
@@ -46,9 +46,9 @@ Chaty, NotebookLM a poznámky jsou pomůcky. Když se rozcházejí s repem, plat
 - **Velikost PR:** jeden PR = jedna věc, ideálně do ~400 změněných řádků bez generovaných souborů. Velké věci rozdělit.
 - **Navazující PR:** když PR stojí na jiném, ještě nezmergovaném PR, cílí na jeho větev (stacked PR) a v popisu to uvádí.
 
-## Jednorázové úkoly pro Papiho (nastavení GitHubu)
+## Jednorázové úkoly pro Papiho (nastavení GitHubu, volitelné)
 
-Tyhle kroky vyžadují práva vlastníka repozitáře, Claude je udělat nemůže:
+Tyhle kroky vyžadují nastavení repozitáře, na které Claude nemá přístup. Nic na nich nestojí:
 
 1. **Přejmenovat výchozí větev** `feat/mvp01-offline-diary-core` na `main` (Settings → General → Default branch, nebo Branches → přejmenovat). Název feature větve jako výchozí větev mate a CI v `.github/workflows/ci.yml` na ni odkazuje; po přejmenování upravit i tam.
 2. **Ochrana hlavní větve** (Settings → Branches → Add rule): vyžadovat PR, vyžadovat zelený check `CI / test`.
