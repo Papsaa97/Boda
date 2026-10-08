@@ -1,6 +1,36 @@
-# Zahradník Bóďa – MVP 0.1 (Offline Deník)
+# 🪴 Zahradník Bóďa
 
-Toto je repozitář pro MVP verze 0.1 aplikace **Zahradník Bóďa**.
+Mobilní aplikace, která vede **deník a digitální model zahrady** a nad ním nabízí asistenta **Bóďu**: radí, *co, kde, kdy, kolik a čím* udělat právě na tvém záhonu.
+
+> *Vrátit do zahradničení radost a klid místo stresu a nejistoty.*
+
+## Kde je projekt teď
+
+| Fáze | Stav |
+| --- | --- |
+| **MVP 0.1 – Offline deník** | ✅ implementováno, používání autorem na vlastní zahradě |
+| MVP 0.2 – Spolehlivý deník (export/import, úkoly, rychlý zápis) | ○ další krok, k testerům do konce února 2027 |
+| Sezóna 2027 – validace „vydrží lidé zapisovat?“ | ○ |
+| MVP 1.0 – Chytrý parťák (účet, synchronizace, Bóďa) | ○ |
+| MVP 1.1 – 2D plátno, V2, V3 | ○ |
+
+Celá roadmapa s definicí hotovo je ve [specifikaci, kap. 4](docs/SPECIFIKACE.md#4-roadmapa-a-rozsah-fází).
+
+## Dokumentace
+
+| Soubor | Obsah |
+| --- | --- |
+| [docs/SPECIFIKACE.md](docs/SPECIFIKACE.md) | Produktová a technická specifikace (v2.1) |
+| [DECLOG.md](DECLOG.md) | Deník rozhodnutí: co, proč, dopad |
+| [NAPADNIK.md](NAPADNIK.md) | Nápady mimo aktuální fázi |
+| [COLLAB_WORKFLOW.md](COLLAB_WORKFLOW.md) | Jak spolu pracujeme (role, větve, PR) |
+| [CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md) | Co kontrolovat v review |
+| [ENVIRONMENT.md](ENVIRONMENT.md) | Verze nástrojů, platformy, nastavení prostředí |
+
+---
+
+## MVP 0.1 – Offline Deník
+
 Cílem této verze je ověřit, jestli lidé budou digitálně zapisovat práci na zahradě.
 Proto je to jednoduchý, **100% offline deník** bez 2D plátna a bez AI.
 
@@ -22,10 +52,9 @@ Na webu funguje vše kromě fotek (prohlížeč nemá trvalé lokální úloži�
   * `features/dashboard` – „Co dnes?“ a tipy od Bódi
 * **State Management:** Riverpod (`AsyncNotifier`, zápisy přes `AsyncValue.guard()`)
 * **Lokální Databáze:** Hive
-* **Design:** tmavý motiv podle palety ze specifikace (kap. 7), čeština včetně kalendáře
+* **Design:** tmavý motiv podle palety ze specifikace (kap. 10.2), čeština včetně kalendáře
 * **Testování:** flutter_test + Mockito, CI v GitHub Actions
 
-Rozhodnutí a jejich důvody jsou v [DECLOG.md](DECLOG.md), prostředí v [ENVIRONMENT.md](ENVIRONMENT.md).
 
 ## Jak spustit
 1. Naklonujte repozitář.
