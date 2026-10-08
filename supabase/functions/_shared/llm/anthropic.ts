@@ -134,14 +134,17 @@ class RetryableError extends Error {
 
 async function readResponse(response: Response): Promise<LlmResult> {
   if (!response.ok) {
-    // Tělo chyby se neloguje celé (může obsahovat části promptu).
+    // Tělo chyby se neloguje celé (může obsahovat části promptu); zpráva
+    // poskytovatele jen zkrácená, aby šlo poznat např. chybějící kredit.
     let errorType = "";
+    let errorMessage = "";
     try {
       const err = await response.json();
       errorType = String(err?.error?.type ?? "");
+      errorMessage = String(err?.error?.message ?? "").slice(0, 160);
     } catch { /* ignore */ }
     const error = new LlmUpstreamError(
-      `HTTP ${response.status}${errorType ? ` ${errorType}` : ""}`,
+      `HTTP ${response.status}${errorType ? ` ${errorType}` : ""}${errorMessage ? `: ${errorMessage}` : ""}`,
       response.status,
     );
     if (RETRYABLE.has(response.status)) throw new RetryableError(error);
