@@ -1,11 +1,11 @@
 {
-    "name": "zahradnik_boda_mvp01",
-    "short_name": "zahradnik_boda_mvp01",
+    "name": "Zahradník Bóďa",
+    "short_name": "Bóďa",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#020617",
+    "theme_color": "#020617",
+    "description": "Zahradník Bóďa – offline deník tvé zahrady.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

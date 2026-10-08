@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="zahradnik_boda_mvp01"
+        android:label="Zahradník Bóďa"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
