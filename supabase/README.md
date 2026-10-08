@@ -82,7 +82,7 @@ supabase functions deploy delete-account
 supabase functions deploy revenuecat-webhook --no-verify-jwt
 ```
 
-Všechny funkce si přihlášení ověřují samy, proto `--no-verify-jwt` (brána neumí tokeny ES256, DECLOG D94); webhook má vlastní ověření tokenem.
+Všechny funkce si přihlášení ověřují samy, brána JWT nekontroluje (`verify_jwt = false` v `config.toml`, brána neumí tokeny ES256, DECLOG D94); webhook má vlastní ověření tokenem. Bez Dockeru jde nasazovat s `--use-api`.
 Logy: dashboard → **Edge Functions → (funkce) → Logs**. U každého dotazu na
 Bóďu je řádek `boda_chat` s počtem tokenů a cenou.
 
