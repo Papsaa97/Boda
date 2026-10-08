@@ -12,9 +12,11 @@ import 'package:zahradnik_boda/features/activity/domain/activity_repository.dart
 import 'package:zahradnik_boda/features/activity/domain/activity_type.dart';
 import 'package:zahradnik_boda/features/assistant/domain/assistant_backend.dart';
 import 'package:zahradnik_boda/features/assistant/domain/assistant_message.dart';
+import 'package:zahradnik_boda/features/incidents/domain/incident.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_repository.dart';
 import 'package:zahradnik_boda/features/inventory/domain/shopping_item.dart';
+import 'package:zahradnik_boda/features/inventory/domain/stock_movement.dart';
 import 'package:zahradnik_boda/features/settings/domain/app_settings.dart';
 import 'package:zahradnik_boda/features/settings/domain/settings_repository.dart';
 import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
@@ -121,6 +123,33 @@ class InMemoryInventoryRepository implements InventoryRepository {
 
   @override
   Future<void> delete(String id) async => items.remove(id);
+
+  final List<StockMovement> movementLog = [];
+
+  @override
+  Future<List<StockMovement>> movements({
+    String? itemId,
+    String? taskId,
+  }) async => [
+    for (final m in movementLog.reversed)
+      if ((itemId == null || m.itemId == itemId) &&
+          (taskId == null || m.taskId == taskId))
+        m,
+  ];
+
+  @override
+  Future<void> applyMovements(
+    List<StockMovement> movements, {
+    bool adjustStock = true,
+  }) async {
+    for (final m in movements) {
+      movementLog.add(m);
+      final item = items[m.itemId];
+      if (!adjustStock || item == null) continue;
+      final stock = item.stockQty + m.qtyDelta;
+      items[m.itemId] = item.copyWith(stockQty: stock < 0 ? 0 : stock);
+    }
+  }
 }
 
 class InMemoryShoppingRepository implements ShoppingRepository {
@@ -224,8 +253,12 @@ List<Override> testOverrides({
   InMemoryAssistantRepository? assistant,
   AssistantBackend? backend,
   DateTime Function()? clock,
+  InMemoryIncidentRepository? incidents,
 }) {
   return [
+    incidentRepositoryProvider.overrideWithValue(
+      incidents ?? InMemoryIncidentRepository(),
+    ),
     assistantRepositoryProvider.overrideWithValue(
       assistant ?? InMemoryAssistantRepository(),
     ),
@@ -293,4 +326,17 @@ Future<void> pumpApp(WidgetTester tester, List<Override> overrides) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(wrap(const ZahradnikBodaApp(), overrides));
   await tester.pumpAndSettle();
+}
+
+class InMemoryIncidentRepository implements IncidentRepository {
+  final Map<String, Incident> items = {};
+
+  @override
+  Future<List<Incident>> getAll() async => items.values.toList();
+
+  @override
+  Future<void> save(Incident incident) async => items[incident.id] = incident;
+
+  @override
+  Future<void> delete(String id) async => items.remove(id);
 }

@@ -471,8 +471,49 @@ class _InventoryFormScreenState extends ConsumerState<InventoryFormScreen> {
               icon: const Icon(Icons.check),
               label: Text(l.commonSave),
             ),
+            if (widget.initial case final item?) _History(item: item),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Posledních 20 pohybů položky (FR-S4).
+class _History extends ConsumerWidget {
+  const _History({required this.item});
+
+  final InventoryItem item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final movements = ref.watch(stockMovementsProvider(item.id)).value;
+    if (movements == null || movements.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.movementHistoryTitle,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          for (final m in movements.take(20))
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              leading: Icon(
+                m.qtyDelta < 0 ? Icons.remove_circle_outline : Icons.add,
+              ),
+              title: Text(movementReasonLabel(l, m.reason)),
+              subtitle: Text(formatDate(m.at)),
+              trailing: Text(
+                '${m.qtyDelta > 0 ? '+' : '−'}'
+                '${formatQty(l, m.qtyDelta.abs(), item.unit)}',
+              ),
+            ),
+        ],
       ),
     );
   }

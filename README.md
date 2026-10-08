@@ -13,7 +13,8 @@ Mobilní aplikace, která vede **deník a digitální model zahrady** a nad ním
 | Sezóna 2027 – validace „vydrží lidé zapisovat?“ | ○ |
 | MVP 1.0 – Chytrý parťák (účet, synchronizace, Bóďa) | ✅ kód hotový (DECLOG D50, D60, D69, D73–D76); vydání čeká na účty (Supabase, AI, RevenueCat, obchody) a testy na zařízeních |
 | MVP 1.1 – 2D plátno | ✅ kód hotový (DECLOG D77–D81); 60 fps s 300 uzly ověřit na telefonu |
-| V2, V3 | ○ |
+| V2 – Počasí, diagnostika, sdílení | ✱ rozpracováno: odpis ze skladu a incidenty hotové (DECLOG D82–D84) |
+| V3 – Parametrické návrhy | ○ |
 
 Celá roadmapa s definicí hotovo je ve [specifikaci, kap. 4](docs/SPECIFIKACE.md#4-roadmapa-a-rozsah-fází).
 
@@ -51,6 +52,8 @@ všechno, co je potřeba, aby se na deník dalo spolehnout celou sezónu.
 * ✅ **Účet a synchronizace (1.0):** přihlášení kódem z e-mailu, synchronizace všech dat i fotek mezi telefony (poslední zápis vyhrává), převzetí zahrady z účtu na druhém telefonu, smazání účtu (DECLOG D69–D71). Zapne se jen v buildu s adresou backendu.
 * ✅ **Premium a souhlasy (1.0):** nabídka Premium se srovnáním tarifů (platby se spustí v sezóně 2028), obrazovka souhlasů s AI a analytikou, analytika jen se souhlasem (DECLOG D73–D75).
 * ✅ **Plán zahrady (1.1):** obrys a zóny jako mnohoúhelníky s přitahováním k mřížce a úpravou uzlů, výměry v m², kalibrace podle známé délky s kontrolní vzdáleností, podklad (fotka plánku), vrstvy Realita a Návrh se „zrealizováním“, zpět/znovu 20 kroků (DECLOG D77–D81).
+* ✅ **Sklad s odpisem (V2):** dokončený úkol odepíše materiál ze skladu (převod g/kg, ml/l), vrácený úkol odpis stornuje, u položky je historie pohybů (DECLOG D82).
+* ✅ **Problémy na zahradě (V2):** karta incidentu se zónou, fotkami „před a po“, šetrným a chemickým plánem a kontrolami za 3 a 7 dní (DECLOG D83).
 * ✅ **Offline-first:** data i fotky jsou vždy v zařízení (SQLite přes Drift + složka aplikace); účet je volitelný a cloud slouží jako záloha a most mezi telefony. Data z verze 0.1 se při prvním spuštění jednorázově převedou.
 
 Na webu funguje vše kromě fotek, zálohy a připomínek (prohlížeč nemá trvalé úložiště souborů ani plánované notifikace).
@@ -61,6 +64,7 @@ Na webu funguje vše kromě fotek, zálohy a připomínek (prohlížeč nemá tr
   * `features/activity` – záznamy deníku
   * `features/zones` – zóny
   * `features/canvas` – plán zahrady: geometrie, historie úprav, plátno
+  * `features/incidents` – problémy na zahradě a jejich kontroly
   * `features/tasks` – úkoly, opakování, plán připomínek
   * `features/inventory` – sklad a nákupní seznam
   * `features/assistant` – Bóďa: kalkulátor dávek, kontext, bezpečnostní kontrola, rozhovor

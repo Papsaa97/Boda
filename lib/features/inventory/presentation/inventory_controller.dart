@@ -4,7 +4,9 @@ import '../../../core/di/providers.dart';
 import '../../../core/time/today.dart';
 import '../domain/inventory_alerts.dart';
 import '../domain/inventory_item.dart';
+import '../../tasks/domain/task_entity.dart';
 import '../domain/shopping_item.dart';
+import '../domain/stock_movement.dart';
 import '../domain/units.dart';
 
 /// Položky skladu seřazené podle názvu.
@@ -27,11 +29,77 @@ class InventoryController extends AsyncNotifier<List<InventoryItem>> {
             details: item.details,
           )
         : item.copyWith(name: item.name.trim());
+    final before = _find(stored.id)?.stockQty ?? 0;
+    final delta = stored.stockQty - before;
     await _mutate((list) async {
-      await ref.read(inventoryRepositoryProvider).save(stored);
+      final repo = ref.read(inventoryRepositoryProvider);
+      await repo.save(stored);
+      // Ruční změna stavu se zapíše jako pohyb (historie položky).
+      if (delta.abs() > 1e-9) {
+        await repo.applyMovements([
+          _movement(stored.id, delta, MovementReason.manual),
+        ], adjustStock: false);
+      }
       return [...list.where((i) => i.id != stored.id), stored];
     });
+    if (!state.hasError) ref.invalidate(stockMovementsProvider(stored.id));
     return state.hasError ? null : stored;
+  }
+
+  StockMovement _movement(
+    String itemId,
+    double delta,
+    MovementReason reason, {
+    String? taskId,
+  }) => StockMovement(
+    id: ref.read(newIdProvider)(),
+    itemId: itemId,
+    qtyDelta: delta,
+    reason: reason,
+    taskId: taskId,
+    at: ref.read(clockProvider)(),
+  );
+
+  /// Odepíše materiál hotového úkolu (FR-S4). Vrací null při chybě
+  /// úložiště; úkol zůstane hotový.
+  Future<Consumption?> consumeForTask(TaskEntity task) async {
+    if (task.materials.isEmpty) return const Consumption();
+    final repo = ref.read(inventoryRepositoryProvider);
+    try {
+      final consumption = planTaskConsumption(
+        task: task,
+        items: await repo.getAll(),
+        existing: await repo.movements(taskId: task.id),
+        now: ref.read(clockProvider)(),
+        newId: ref.read(newIdProvider),
+      );
+      await repo.applyMovements(consumption.movements);
+      if (consumption.movements.isNotEmpty) _refresh(consumption.movements);
+      return consumption;
+    } on Exception {
+      return null;
+    }
+  }
+
+  /// Úkol se vrátil mezi otevřené: odpis se stornuje (FR-S4).
+  Future<void> reverseTask(String taskId) async {
+    final repo = ref.read(inventoryRepositoryProvider);
+    final reversal = planTaskReversal(
+      taskId: taskId,
+      existing: await repo.movements(taskId: taskId),
+      now: ref.read(clockProvider)(),
+      newId: ref.read(newIdProvider),
+    );
+    if (reversal.isEmpty) return;
+    await repo.applyMovements(reversal);
+    _refresh(reversal);
+  }
+
+  void _refresh(List<StockMovement> movements) {
+    for (final id in {for (final m in movements) m.itemId}) {
+      ref.invalidate(stockMovementsProvider(id));
+    }
+    ref.invalidateSelf();
   }
 
   /// Přidá k zásobě [qty] v jednotce [unit] (převede na jednotku položky).
@@ -41,8 +109,14 @@ class InventoryController extends AsyncNotifier<List<InventoryItem>> {
     if (item == null) return false;
     final converted = unit.convert(qty, item.unit);
     if (converted == null) return false;
-    final stock = item.stockQty + converted;
-    await save(item.copyWith(stockQty: stock < 0 ? 0 : stock));
+    await _mutate((list) async {
+      final repo = ref.read(inventoryRepositoryProvider);
+      await repo.applyMovements([
+        _movement(id, converted, MovementReason.purchase),
+      ]);
+      return repo.getAll();
+    });
+    if (!state.hasError) ref.invalidate(stockMovementsProvider(id));
     return !state.hasError;
   }
 
@@ -190,4 +264,11 @@ class ShoppingController extends AsyncNotifier<List<ShoppingItem>> {
 final shoppingControllerProvider =
     AsyncNotifierProvider<ShoppingController, List<ShoppingItem>>(
       ShoppingController.new,
+    );
+
+/// Historie pohybů položky skladu, od nejnovějšího.
+final stockMovementsProvider =
+    FutureProvider.family<List<StockMovement>, String>(
+      (ref, itemId) =>
+          ref.watch(inventoryRepositoryProvider).movements(itemId: itemId),
     );

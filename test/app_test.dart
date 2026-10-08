@@ -96,6 +96,16 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Archivovat'));
     await tester.pumpAndSettle();
     expect(zones.items['Z1']!.archived, isTrue);
+    await tester.scrollUntilVisible(
+      find.text('Archivované'),
+      200,
+      scrollable: find
+          .ancestor(
+            of: find.text('Plán zahrady'),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
     expect(find.text('Archivované'), findsOneWidget);
   });
 }

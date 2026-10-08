@@ -105,6 +105,7 @@ const syncTables = <SyncTable>[
       'polygon': SyncKind.json,
     },
   ),
+  SyncTable('incidents', kinds: {..._times, 'candidates': SyncKind.json}),
   SyncTable(
     'inventory_items',
     kinds: {..._times, 'details': SyncKind.jsonObject},
@@ -122,6 +123,10 @@ const syncTables = <SyncTable>[
     kinds: {..._times, 'occurred_at': SyncKind.timestamp},
   ),
   SyncTable('photos', kinds: _times, localOnly: {'local_path'}),
+  SyncTable(
+    'inventory_movements',
+    kinds: {..._times, 'at': SyncKind.timestamp},
+  ),
   SyncTable('task_materials', pk: ['task_id', 'item_id'], kinds: _times),
   SyncTable(
     'activity_materials',

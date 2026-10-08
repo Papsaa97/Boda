@@ -1,4 +1,4 @@
-# Formát exportu deníku (verze 3)
+# Formát exportu deníku (verze 4)
 
 Záloha z aplikace Zahradník Bóďa (FR-E1, FR-E2, specifikace kap. 8.4). Formát je veřejný, aby data šla kdykoli přečíst i bez aplikace.
 
@@ -21,7 +21,7 @@ boda-export-2026-10-07.zip
 
 ```json
 {
-  "formatVersion": 3,
+  "formatVersion": 4,
   "app": "zahradnik_boda",
   "appVersion": "1.0.0",
   "exportedAt": "2026-10-07T08:00:00.000Z",
@@ -128,6 +128,9 @@ boda-export-2026-10-07.zip
 | `zones[].covered` | bool | Skleník, fóliovník. |
 | `zones[].polygon` | pole bodů | Tvar zóny na plánu zahrady, body `[x, y]` v metrech (osa y dolů, na centimetry). Chybí, když zóna na plánu není (od verze 3). |
 | `zones[].layer` | text | `reality` (zóna existuje) nebo `plan` (jen návrh v plánu; v deníku, kalkulačce a u Bódi se nenabízí). Chybí-li, bere se `reality` (od verze 3). |
+| `tasks[].incidentId` | text | Úkol je kontrola incidentu (od verze 4). |
+| `incidents[]` | pole | Problémy na zahradě (od verze 4): `id`, `zoneId`, `label`, `source` (`user`, `model`), `candidates` (možné příčiny: `label`, `reason`), `planBio`, `planChem`, `status` (`open`, `resolved`), `photoIds` (fotky ve složce `photos/` jako u záznamů), `createdAt`. |
+| `movements[]` | pole | Pohyby na skladě (od verze 4): `id`, `itemId`, `qtyDelta` (v jednotce položky, záporná = odpis), `reason` (`purchase`, `task`, `manual`, `reversal`), `taskId`, `at`. Stav skladu je v `inventory[].stockQty`, pohyby jsou historie. |
 | `garden.outline` | pole bodů | Obrys pozemku ve stejných souřadnicích jako `polygon`; `null`, když plán není nakreslený (od verze 3). Podklad plánu (fotka nebo nákres) se nezálohuje, zůstává jen v telefonu. |
 | `activities[].harvestQty`, `harvestUnit` | číslo, text | Sklizeň (`kg`, `g`, `ks`), od verze 2. |
 | `activities[].costCzk` | číslo | Náklady v Kč. |
@@ -145,7 +148,8 @@ Nepovinná pole mohou chybět nebo být `null`.
 * Před nahrazením se záloha zkontroluje: musí jít o ZIP s `data.json`, záznam musí odkazovat na zónu ze zálohy a cesta k fotce nesmí vést mimo `photos/`. Při chybě zůstanou data beze změny.
 * Fotka, která v ZIP chybí, se vynechá; záznam zůstane.
 * Úkol odkazující na neexistující zónu se načte bez zóny; materiál nebo nákup odkazující na neexistující položku skladu se vynechá (nákup zůstane bez odkazu).
-* Zálohy verze 1 (MVP 0.2) a 2 (MVP 1.0) se načtou celé, nová pole zůstanou prázdná.
+* Zálohy verze 1 (MVP 0.2), 2 (MVP 1.0) a 3 (MVP 1.1) se načtou celé, nová pole zůstanou prázdná.
+* Incident v zóně, která v záloze není, se vynechá; pohyb položky, která v záloze není, se vynechá.
 * Obrys zahrady ze zálohy nahradí obrys v aplikaci; záloha bez obrysu ho smaže.
 
 ## Změna formátu

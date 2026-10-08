@@ -13,6 +13,9 @@ import 'package:zahradnik_boda/features/backup/data/backup_service.dart';
 import 'package:zahradnik_boda/features/backup/domain/backup_format.dart';
 import 'package:zahradnik_boda/features/canvas/data/drift_plan_repository.dart';
 import 'package:zahradnik_boda/features/canvas/domain/geometry.dart';
+import 'package:zahradnik_boda/features/incidents/data/drift_incident_repository.dart';
+import 'package:zahradnik_boda/features/incidents/domain/incident.dart';
+import 'package:zahradnik_boda/features/inventory/domain/stock_movement.dart';
 import 'package:zahradnik_boda/features/inventory/data/drift_inventory_repository.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
 import 'package:zahradnik_boda/features/inventory/domain/shopping_item.dart';
@@ -58,6 +61,8 @@ class _Device {
   DriftShoppingRepository get shopping =>
       DriftShoppingRepository(db, gardenId, clock);
   DriftPlanRepository get plan => DriftPlanRepository(db, gardenId, clock);
+  DriftIncidentRepository get incidents =>
+      DriftIncidentRepository(db, gardenId, clock);
 
   static DateTime clock() => testNow;
 }
@@ -165,6 +170,45 @@ void main() {
         materials: [TaskMaterial(itemId: 'i1', qty: 1.2, unit: 'kg')],
       ),
     );
+    final bugPhoto =
+        File(p.join(d.photos.rootPath, 'activity_photos', 'p9.jpg'))
+          ..createSync(recursive: true)
+          ..writeAsBytesSync([9, 9]);
+    await d.incidents.save(
+      Incident(
+        id: 'inc1',
+        zoneId: 'Z1',
+        label: 'Mšice',
+        candidates: const [IncidentCandidate(label: 'Mšice maková')],
+        planBio: 'Sprcha vodou',
+        photos: [
+          PhotoRef(
+            id: 'p9',
+            path: p.relative(bugPhoto.path, from: d.photos.rootPath),
+          ),
+        ],
+        createdAt: testNow,
+      ),
+    );
+    await d.tasks.saveTask(
+      TaskEntity(
+        id: 'tc',
+        title: 'Kontrola mšic',
+        zoneId: 'Z1',
+        due: DateTime(2026, 10, 10),
+        incidentId: 'inc1',
+      ),
+    );
+    await d.inventory.applyMovements([
+      StockMovement(
+        id: 'mv1',
+        itemId: 'i1',
+        qtyDelta: -0.5,
+        reason: MovementReason.task,
+        taskId: 't1',
+        at: testNow,
+      ),
+    ], adjustStock: false);
     await d.tasks.recordMaterialsUsed(
       TaskEntity(
         id: 't0',
@@ -233,7 +277,26 @@ void main() {
       expect(File(photoPath).readAsBytesSync(), [1, 2, 3, 4]);
       expect(stray.existsSync(), isFalse);
 
-      final task = (await fresh.tasks.getAllTasks()).single;
+      final incident = (await fresh.incidents.getAll()).single;
+      expect(incident.label, 'Mšice');
+      expect(incident.candidates.single.label, 'Mšice maková');
+      expect(
+        File(
+          fresh.photos.resolve(incident.photos.single.path)!,
+        ).readAsBytesSync(),
+        [9, 9],
+      );
+      final check = (await fresh.tasks.getAllTasks()).firstWhere(
+        (t) => t.id == 'tc',
+      );
+      expect(check.incidentId, 'inc1');
+      final moves = await fresh.inventory.movements(itemId: 'i1');
+      expect(moves.single.taskId, 't1');
+      expect(moves.single.qtyDelta, -0.5);
+
+      final task = (await fresh.tasks.getAllTasks()).firstWhere(
+        (t) => t.id == 't1',
+      );
       expect(task.title, 'Zazimovat hadice');
       expect(task.due, DateTime(2026, 10, 25));
       expect(task.remindAt, 10 * 60);
@@ -269,7 +332,7 @@ void main() {
     final json =
         jsonDecode(utf8.decode(archive.find('data.json')!.content))
             as Map<String, Object?>;
-    expect(json['formatVersion'], 3);
+    expect(json['formatVersion'], 4);
     expect((json['garden'] as Map)['outline'], [
       [-1, -1],
       [20.5, -1],
@@ -286,9 +349,16 @@ void main() {
     expect(a1['photoIds'], ['p1']);
     expect(json['photos'], [
       {'id': 'p1', 'file': 'photos/p1.jpg'},
+      {'id': 'p9', 'file': 'photos/p9.jpg'},
     ]);
     expect(archive.find('photos/p1.jpg')!.content, [1, 2, 3, 4]);
-    final t1 = (json['tasks'] as List).single as Map;
+    final t1 = (json['tasks'] as List).cast<Map>().firstWhere(
+      (t) => t['id'] == 't1',
+    );
+    final inc = (json['incidents'] as List).single as Map;
+    expect(inc['label'], 'Mšice');
+    expect(inc['photoIds'], ['p9']);
+    expect((json['movements'] as List).single, containsPair('reason', 'task'));
     expect(t1['due'], '2026-10-25');
     expect(t1['remindAt'], '10:00');
     expect(t1['durationEstMin'], 45);

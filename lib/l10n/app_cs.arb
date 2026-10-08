@@ -1310,5 +1310,88 @@
         "type": "int"
       }
     }
+  },
+  "movementPurchase": "Nákup",
+  "movementTask": "Odpis úkolem",
+  "movementManual": "Ruční úprava",
+  "movementReversal": "Storno odpisu",
+  "movementHistoryTitle": "Pohyby na skladě",
+  "stockConsumed": "Ze skladu odepsáno: {items}.",
+  "@stockConsumed": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "stockShortage": "Na skladě chybělo: {items}. Doplň zásobu.",
+  "@stockShortage": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "stockSkipped": "Neodepsáno (jiná jednotka nebo smazaná položka): {items}.",
+  "@stockSkipped": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "incidentsTitle": "Problémy na zahradě",
+  "incidentsCardSubtitle": "Choroby, škůdci a jiné potíže s plánem řešení a kontrolami",
+  "incidentsCardOpen": "{count, plural, =0{Žádný otevřený problém} =1{1 otevřený problém} few{{count} otevřené problémy} other{{count} otevřených problémů}}",
+  "@incidentsCardOpen": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "incidentsEmpty": "Zatím žádný problém. Když uvidíš mšice, plíseň nebo jiné potíže, zapiš je sem: Bóďa naplánuje kontroly za 3 a za 7 dní.",
+  "incidentNew": "Nový problém",
+  "incidentEditTitle": "Upravit problém",
+  "incidentLabel": "Co se děje",
+  "incidentLabelHint": "Např. mšice na rybízu",
+  "incidentLabelRequired": "Napiš, co se děje.",
+  "incidentZoneRequired": "Vyber zónu.",
+  "incidentPhotos": "Fotky (první je „před“, poslední „po“)",
+  "incidentPlanBio": "Šetrné řešení",
+  "incidentPlanBioHelper": "Nejdřív bez chemie: ruční sběr, vodní sprcha, sítě, užitečný hmyz, výluhy.",
+  "incidentPlanChem": "Chemické řešení (nepovinné)",
+  "incidentPlanChemHelper": "Jen přípravek povolený pro neprofesionální uživatele. Dávku a ochrannou lhůtu ber z etikety, ne odjinud, a dbej na ochranu včel.",
+  "incidentChecksNote": "Po uložení přibudou úkoly zkontrolovat stav za 3 a za 7 dní.",
+  "incidentCheckTask": "Kontrola po {days} dnech: {label}",
+  "@incidentCheckTask": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "incidentCreated": "Problém je zapsaný, kontroly jsou v úkolech.",
+  "incidentSaveFailed": "Problém se nepodařilo uložit.",
+  "incidentOpen": "Otevřený",
+  "incidentResolved": "Vyřešeno",
+  "incidentResolve": "Označit jako vyřešené",
+  "incidentReopen": "Znovu otevřít",
+  "incidentBeforeAfter": "Před a po",
+  "incidentCandidates": "Možné příčiny",
+  "incidentChecks": "Kontroly",
+  "incidentCheckDone": "Zkontrolováno",
+  "incidentCheckSkipped": "Vynecháno",
+  "incidentDeleteTitle": "Smazat problém?",
+  "incidentDeleteBody": "Smaže se karta „{label}“ i její fotky. Úkoly kontrol zůstanou.",
+  "@incidentDeleteBody": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
   }
 }

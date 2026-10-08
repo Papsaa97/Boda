@@ -35,3 +35,4 @@ Nápad sem patří, když je dobrý, ale nedokazuje žádnou z hypotéz aktuáln
 | 2026-10-08 | Claude | **Synchronizace fotek jen přes Wi-Fi** a menší náhled v cloudu | Šetří data; potřebuje zjišťování typu sítě a zmenšení náhledu v telefonu (DECLOG D70). | čeká |
 | 2026-10-08 | Claude | **Ořez a sjednocení zón na plánu** (zóna oříznutá obrysem, sloučení dvou záhonů) | Teď plátno jen upozorní, že zóna přesahuje obrys (DECLOG D81); ořez potřebuje knihovnu pro rovinné operace. | čeká |
 | 2026-10-08 | Claude | **Podklad plánu v cloudu** | Podklad je teď jen v telefonu (DECLOG D78); na druhém telefonu by se hodil, pokud to licence obrázku dovolí. | čeká |
+| 2026-10-08 | Claude | **Stav skladu přepočítaný z pohybů** | Při souběžné úpravě stejné položky na dvou telefonech teď vyhrává poslední zápis stavu (DECLOG D82); součet pohybů by byl přesný vždy. Přijde ke slovu se sdílením v rodině. | čeká |

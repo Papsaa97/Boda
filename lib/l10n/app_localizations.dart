@@ -3633,6 +3633,234 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Plán zahrady, {count, plural, =0{žádná zóna} =1{1 zóna} few{{count} zóny} other{{count} zón}}'**
   String canvasSemantics(int count);
+
+  /// No description provided for @movementPurchase.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nákup'**
+  String get movementPurchase;
+
+  /// No description provided for @movementTask.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odpis úkolem'**
+  String get movementTask;
+
+  /// No description provided for @movementManual.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ruční úprava'**
+  String get movementManual;
+
+  /// No description provided for @movementReversal.
+  ///
+  /// In cs, this message translates to:
+  /// **'Storno odpisu'**
+  String get movementReversal;
+
+  /// No description provided for @movementHistoryTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pohyby na skladě'**
+  String get movementHistoryTitle;
+
+  /// No description provided for @stockConsumed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ze skladu odepsáno: {items}.'**
+  String stockConsumed(String items);
+
+  /// No description provided for @stockShortage.
+  ///
+  /// In cs, this message translates to:
+  /// **'Na skladě chybělo: {items}. Doplň zásobu.'**
+  String stockShortage(String items);
+
+  /// No description provided for @stockSkipped.
+  ///
+  /// In cs, this message translates to:
+  /// **'Neodepsáno (jiná jednotka nebo smazaná položka): {items}.'**
+  String stockSkipped(String items);
+
+  /// No description provided for @incidentsTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Problémy na zahradě'**
+  String get incidentsTitle;
+
+  /// No description provided for @incidentsCardSubtitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Choroby, škůdci a jiné potíže s plánem řešení a kontrolami'**
+  String get incidentsCardSubtitle;
+
+  /// No description provided for @incidentsCardOpen.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =0{Žádný otevřený problém} =1{1 otevřený problém} few{{count} otevřené problémy} other{{count} otevřených problémů}}'**
+  String incidentsCardOpen(int count);
+
+  /// No description provided for @incidentsEmpty.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zatím žádný problém. Když uvidíš mšice, plíseň nebo jiné potíže, zapiš je sem: Bóďa naplánuje kontroly za 3 a za 7 dní.'**
+  String get incidentsEmpty;
+
+  /// No description provided for @incidentNew.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nový problém'**
+  String get incidentNew;
+
+  /// No description provided for @incidentEditTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Upravit problém'**
+  String get incidentEditTitle;
+
+  /// No description provided for @incidentLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Co se děje'**
+  String get incidentLabel;
+
+  /// No description provided for @incidentLabelHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Např. mšice na rybízu'**
+  String get incidentLabelHint;
+
+  /// No description provided for @incidentLabelRequired.
+  ///
+  /// In cs, this message translates to:
+  /// **'Napiš, co se děje.'**
+  String get incidentLabelRequired;
+
+  /// No description provided for @incidentZoneRequired.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vyber zónu.'**
+  String get incidentZoneRequired;
+
+  /// No description provided for @incidentPhotos.
+  ///
+  /// In cs, this message translates to:
+  /// **'Fotky (první je „před“, poslední „po“)'**
+  String get incidentPhotos;
+
+  /// No description provided for @incidentPlanBio.
+  ///
+  /// In cs, this message translates to:
+  /// **'Šetrné řešení'**
+  String get incidentPlanBio;
+
+  /// No description provided for @incidentPlanBioHelper.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nejdřív bez chemie: ruční sběr, vodní sprcha, sítě, užitečný hmyz, výluhy.'**
+  String get incidentPlanBioHelper;
+
+  /// No description provided for @incidentPlanChem.
+  ///
+  /// In cs, this message translates to:
+  /// **'Chemické řešení (nepovinné)'**
+  String get incidentPlanChem;
+
+  /// No description provided for @incidentPlanChemHelper.
+  ///
+  /// In cs, this message translates to:
+  /// **'Jen přípravek povolený pro neprofesionální uživatele. Dávku a ochrannou lhůtu ber z etikety, ne odjinud, a dbej na ochranu včel.'**
+  String get incidentPlanChemHelper;
+
+  /// No description provided for @incidentChecksNote.
+  ///
+  /// In cs, this message translates to:
+  /// **'Po uložení přibudou úkoly zkontrolovat stav za 3 a za 7 dní.'**
+  String get incidentChecksNote;
+
+  /// No description provided for @incidentCheckTask.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kontrola po {days} dnech: {label}'**
+  String incidentCheckTask(int days, String label);
+
+  /// No description provided for @incidentCreated.
+  ///
+  /// In cs, this message translates to:
+  /// **'Problém je zapsaný, kontroly jsou v úkolech.'**
+  String get incidentCreated;
+
+  /// No description provided for @incidentSaveFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Problém se nepodařilo uložit.'**
+  String get incidentSaveFailed;
+
+  /// No description provided for @incidentOpen.
+  ///
+  /// In cs, this message translates to:
+  /// **'Otevřený'**
+  String get incidentOpen;
+
+  /// No description provided for @incidentResolved.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vyřešeno'**
+  String get incidentResolved;
+
+  /// No description provided for @incidentResolve.
+  ///
+  /// In cs, this message translates to:
+  /// **'Označit jako vyřešené'**
+  String get incidentResolve;
+
+  /// No description provided for @incidentReopen.
+  ///
+  /// In cs, this message translates to:
+  /// **'Znovu otevřít'**
+  String get incidentReopen;
+
+  /// No description provided for @incidentBeforeAfter.
+  ///
+  /// In cs, this message translates to:
+  /// **'Před a po'**
+  String get incidentBeforeAfter;
+
+  /// No description provided for @incidentCandidates.
+  ///
+  /// In cs, this message translates to:
+  /// **'Možné příčiny'**
+  String get incidentCandidates;
+
+  /// No description provided for @incidentChecks.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kontroly'**
+  String get incidentChecks;
+
+  /// No description provided for @incidentCheckDone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zkontrolováno'**
+  String get incidentCheckDone;
+
+  /// No description provided for @incidentCheckSkipped.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vynecháno'**
+  String get incidentCheckSkipped;
+
+  /// No description provided for @incidentDeleteTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat problém?'**
+  String get incidentDeleteTitle;
+
+  /// No description provided for @incidentDeleteBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smaže se karta „{label}“ i její fotky. Úkoly kontrol zůstanou.'**
+  String incidentDeleteBody(String label);
 }
 
 class _AppLocalizationsDelegate

@@ -98,6 +98,9 @@ class Photos extends Table {
   TextColumn get gardenId => text().references(Gardens, #id)();
   TextColumn get activityId => text().nullable().references(Activities, #id)();
 
+  /// Fotka problému (V2, schéma 6); fotka patří záznamu, nebo incidentu.
+  TextColumn get incidentId => text().nullable().references(Incidents, #id)();
+
   /// Cesta k souboru relativní ke složce dokumentů aplikace. Na server
   /// se neposílá (tam je `storage_path`).
   TextColumn get localPath => text()();
@@ -140,6 +143,9 @@ class Tasks extends Table {
 
   /// Nářadí jako JSON pole textů (v PostgreSQL `text[]`).
   TextColumn get tools => text().nullable()();
+
+  /// Kontrola incidentu D+3 / D+7 (V2, schéma 6).
+  TextColumn get incidentId => text().nullable().references(Incidents, #id)();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -204,6 +210,57 @@ class ActivityMaterials extends Table {
 
   @override
   Set<Column> get primaryKey => {activityId, itemId};
+}
+
+/// Pohyb na skladě (FR-S4, schéma 6). Pohyby jen přibývají; vrácení
+/// úkolu zapíše opačný pohyb (`reversal`).
+@DataClassName('InventoryMovementRow')
+class InventoryMovements extends Table {
+  TextColumn get id => text()();
+  TextColumn get gardenId => text().references(Gardens, #id)();
+  TextColumn get itemId => text().references(InventoryItems, #id)();
+
+  /// Změna stavu v jednotce položky (záporná = odpis).
+  RealColumn get qtyDelta => real()();
+
+  /// `purchase`, `task`, `manual`, `reversal`.
+  TextColumn get reason => text()();
+  TextColumn get taskId => text().nullable().references(Tasks, #id)();
+  DateTimeColumn get at => dateTime()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Incident: problém v zóně s plánem řešení a kontrolami (FR-V3, V2).
+@DataClassName('IncidentRow')
+class Incidents extends Table {
+  TextColumn get id => text()();
+  TextColumn get gardenId => text().references(Gardens, #id)();
+  TextColumn get zoneId => text().references(Zones, #id)();
+
+  /// Co se děje („mšice na rybízu“).
+  TextColumn get label => text()();
+
+  /// `user` (založeno ručně) nebo `model` (z diagnostiky fotky).
+  TextColumn get source => text().withDefault(const Constant('user'))();
+
+  /// Možné příčiny z diagnostiky jako JSON (FR-V2).
+  TextColumn get candidates => text().nullable()();
+  TextColumn get planBio => text().nullable()();
+  TextColumn get planChem => text().nullable()();
+
+  /// `open` nebo `resolved`.
+  TextColumn get status => text().withDefault(const Constant('open'))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
 /// Nákupní seznam (z rad Bódi a z hlídače zásob).
@@ -298,6 +355,8 @@ class SettingEntries extends Table {
     TaskMaterials,
     ActivityMaterials,
     ShoppingItems,
+    InventoryMovements,
+    Incidents,
     AssistantThreads,
     AssistantMessages,
     SettingEntries,
@@ -308,7 +367,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -387,6 +446,23 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(schema.gardens, schema.gardens.bounds);
         await m.addColumn(schema.zones, schema.zones.polygon);
         await m.addColumn(schema.zones, schema.zones.layer);
+      },
+      // V2: odpis ze skladu a incidenty.
+      from5To6: (m, schema) async {
+        await m.createTable(schema.incidents);
+        await m.createTable(schema.inventoryMovements);
+        await m.addColumn(schema.photos, schema.photos.incidentId);
+        await m.addColumn(schema.tasks, schema.tasks.incidentId);
+        for (final trigger in [
+          schema.incidentsOutboxInsert,
+          schema.incidentsOutboxUpdate,
+          schema.incidentsOutboxDelete,
+          schema.inventoryMovementsOutboxInsert,
+          schema.inventoryMovementsOutboxUpdate,
+          schema.inventoryMovementsOutboxDelete,
+        ]) {
+          await m.create(trigger);
+        }
       },
     ),
     beforeOpen: (details) async {

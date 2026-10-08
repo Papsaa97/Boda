@@ -78,6 +78,9 @@ class TaskEntity extends Equatable {
 
   final TaskSource source;
 
+  /// Kontrola incidentu (FR-V3, V2).
+  final String? incidentId;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -97,6 +100,7 @@ class TaskEntity extends Equatable {
     this.tools = const [],
     this.materials = const [],
     this.source = TaskSource.user,
+    this.incidentId,
     this.createdAt,
     this.updatedAt,
   });
@@ -130,6 +134,7 @@ class TaskEntity extends Equatable {
     int? Function()? durationEstMin,
     List<String>? tools,
     List<TaskMaterial>? materials,
+    String? Function()? incidentId,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -153,6 +158,7 @@ class TaskEntity extends Equatable {
       tools: tools ?? this.tools,
       materials: materials ?? this.materials,
       source: source,
+      incidentId: incidentId == null ? this.incidentId : incidentId(),
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -175,6 +181,7 @@ class TaskEntity extends Equatable {
     tools,
     materials,
     source,
+    incidentId,
     createdAt,
     updatedAt,
   ];

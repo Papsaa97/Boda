@@ -2179,4 +2179,143 @@ class AppLocalizationsCs extends AppLocalizations {
     );
     return 'Plán zahrady, $_temp0';
   }
+
+  @override
+  String get movementPurchase => 'Nákup';
+
+  @override
+  String get movementTask => 'Odpis úkolem';
+
+  @override
+  String get movementManual => 'Ruční úprava';
+
+  @override
+  String get movementReversal => 'Storno odpisu';
+
+  @override
+  String get movementHistoryTitle => 'Pohyby na skladě';
+
+  @override
+  String stockConsumed(String items) {
+    return 'Ze skladu odepsáno: $items.';
+  }
+
+  @override
+  String stockShortage(String items) {
+    return 'Na skladě chybělo: $items. Doplň zásobu.';
+  }
+
+  @override
+  String stockSkipped(String items) {
+    return 'Neodepsáno (jiná jednotka nebo smazaná položka): $items.';
+  }
+
+  @override
+  String get incidentsTitle => 'Problémy na zahradě';
+
+  @override
+  String get incidentsCardSubtitle =>
+      'Choroby, škůdci a jiné potíže s plánem řešení a kontrolami';
+
+  @override
+  String incidentsCardOpen(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count otevřených problémů',
+      few: '$count otevřené problémy',
+      one: '1 otevřený problém',
+      zero: 'Žádný otevřený problém',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get incidentsEmpty =>
+      'Zatím žádný problém. Když uvidíš mšice, plíseň nebo jiné potíže, zapiš je sem: Bóďa naplánuje kontroly za 3 a za 7 dní.';
+
+  @override
+  String get incidentNew => 'Nový problém';
+
+  @override
+  String get incidentEditTitle => 'Upravit problém';
+
+  @override
+  String get incidentLabel => 'Co se děje';
+
+  @override
+  String get incidentLabelHint => 'Např. mšice na rybízu';
+
+  @override
+  String get incidentLabelRequired => 'Napiš, co se děje.';
+
+  @override
+  String get incidentZoneRequired => 'Vyber zónu.';
+
+  @override
+  String get incidentPhotos => 'Fotky (první je „před“, poslední „po“)';
+
+  @override
+  String get incidentPlanBio => 'Šetrné řešení';
+
+  @override
+  String get incidentPlanBioHelper =>
+      'Nejdřív bez chemie: ruční sběr, vodní sprcha, sítě, užitečný hmyz, výluhy.';
+
+  @override
+  String get incidentPlanChem => 'Chemické řešení (nepovinné)';
+
+  @override
+  String get incidentPlanChemHelper =>
+      'Jen přípravek povolený pro neprofesionální uživatele. Dávku a ochrannou lhůtu ber z etikety, ne odjinud, a dbej na ochranu včel.';
+
+  @override
+  String get incidentChecksNote =>
+      'Po uložení přibudou úkoly zkontrolovat stav za 3 a za 7 dní.';
+
+  @override
+  String incidentCheckTask(int days, String label) {
+    return 'Kontrola po $days dnech: $label';
+  }
+
+  @override
+  String get incidentCreated => 'Problém je zapsaný, kontroly jsou v úkolech.';
+
+  @override
+  String get incidentSaveFailed => 'Problém se nepodařilo uložit.';
+
+  @override
+  String get incidentOpen => 'Otevřený';
+
+  @override
+  String get incidentResolved => 'Vyřešeno';
+
+  @override
+  String get incidentResolve => 'Označit jako vyřešené';
+
+  @override
+  String get incidentReopen => 'Znovu otevřít';
+
+  @override
+  String get incidentBeforeAfter => 'Před a po';
+
+  @override
+  String get incidentCandidates => 'Možné příčiny';
+
+  @override
+  String get incidentChecks => 'Kontroly';
+
+  @override
+  String get incidentCheckDone => 'Zkontrolováno';
+
+  @override
+  String get incidentCheckSkipped => 'Vynecháno';
+
+  @override
+  String get incidentDeleteTitle => 'Smazat problém?';
+
+  @override
+  String incidentDeleteBody(String label) {
+    return 'Smaže se karta „$label“ i její fotky. Úkoly kontrol zůstanou.';
+  }
 }

@@ -12,8 +12,10 @@ import '../../activity/data/drift_activity_repository.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../canvas/data/drift_plan_repository.dart';
 import '../../canvas/domain/geometry.dart';
+import '../../incidents/data/drift_incident_repository.dart';
 import '../../inventory/data/drift_inventory_repository.dart';
 import '../../inventory/domain/shopping_item.dart';
+import '../../inventory/domain/stock_movement.dart';
 import '../../tasks/data/drift_task_repository.dart';
 import '../../zones/data/drift_zone_repository.dart';
 import '../domain/backup_format.dart';
@@ -73,6 +75,16 @@ class BackupService {
     final materialRows = await (_db.select(
       _db.activityMaterials,
     )..where((m) => m.deletedAt.isNull())).get();
+    final incidents = await DriftIncidentRepository(
+      _db,
+      _gardenId,
+      _clock,
+    ).getAll();
+    final movements = await DriftInventoryRepository(
+      _db,
+      _gardenId,
+      _clock,
+    ).movements();
     final outline = await DriftPlanRepository(
       _db,
       _gardenId,
@@ -95,6 +107,16 @@ class BackupService {
           ),
       ],
       tasks: tasks,
+      incidents: [
+        for (final i in incidents)
+          i.copyWith(
+            photos: [
+              for (final photo in i.photos)
+                if (_fileOf(photo) != null) photo,
+            ],
+          ),
+      ],
+      movements: movements,
       inventory: inventory,
       shopping: shopping,
       activityMaterials: [
@@ -178,10 +200,12 @@ class BackupService {
       // Pořadí kvůli cizím klíčům: nejdřív tabulky, které odkazují.
       await _db.delete(_db.taskMaterials).go();
       await _db.delete(_db.activityMaterials).go();
+      await _db.delete(_db.inventoryMovements).go();
       await _db.delete(_db.shoppingItems).go();
       await _db.delete(_db.photos).go();
       await _db.delete(_db.activities).go();
       await _db.delete(_db.tasks).go();
+      await _db.delete(_db.incidents).go();
       await _db.delete(_db.inventoryItems).go();
       await _db.delete(_db.zones).go();
 
@@ -243,6 +267,23 @@ class BackupService {
                 ),
         );
       }
+      final incidents = DriftIncidentRepository(_db, _gardenId, _clock);
+      for (final i in data.incidents) {
+        if (!zoneIds.contains(i.zoneId)) continue;
+        await incidents.save(
+          i.copyWith(
+            photos: [
+              for (final photo in i.photos)
+                if (restored[photo.id] case final path?)
+                  PhotoRef(id: photo.id, path: path),
+            ],
+          ),
+        );
+      }
+      final incidentIds = {
+        for (final i in data.incidents)
+          if (zoneIds.contains(i.zoneId)) i.id,
+      };
       final activities = DriftActivityRepository(_db, _gardenId, _clock);
       for (final a in data.activities) {
         await activities.addActivity(
@@ -264,6 +305,8 @@ class BackupService {
           t.copyWith(
             zoneId: () =>
                 zoneId == null || zoneIds.contains(zoneId) ? zoneId : null,
+            incidentId: () =>
+                incidentIds.contains(t.incidentId) ? t.incidentId : null,
             materials: [
               for (final m in t.materials)
                 if (itemIds.contains(m.itemId)) m,
@@ -271,6 +314,20 @@ class BackupService {
           ),
         );
       }
+      final taskIds = {for (final t in data.tasks) t.id};
+      await inventory.applyMovements([
+        for (final m in data.movements)
+          if (itemIds.contains(m.itemId))
+            m.taskId == null || taskIds.contains(m.taskId)
+                ? m
+                : StockMovement(
+                    id: m.id,
+                    itemId: m.itemId,
+                    qtyDelta: m.qtyDelta,
+                    reason: m.reason,
+                    at: m.at,
+                  ),
+      ], adjustStock: false);
       for (final m in data.activityMaterials) {
         if (!itemIds.contains(m.itemId) ||
             !activityIds.contains(m.activityId)) {
@@ -340,14 +397,11 @@ class BackupService {
       if (!zoneIds.contains(a.zoneId)) {
         throw BackupException(BackupError.corrupted, 'zone ${a.zoneId}');
       }
-      for (final photo in a.photos) {
-        // Cesta uvnitř ZIP nesmí vést mimo složku fotek.
-        if (!p.posix.isWithin(
-          backupPhotoFolder,
-          p.posix.normalize(photo.path),
-        )) {
-          throw BackupException(BackupError.corrupted, photo.path);
-        }
+    }
+    for (final photo in data.photos) {
+      // Cesta uvnitř ZIP nesmí vést mimo složku fotek.
+      if (!p.posix.isWithin(backupPhotoFolder, p.posix.normalize(photo.path))) {
+        throw BackupException(BackupError.corrupted, photo.path);
       }
     }
   }

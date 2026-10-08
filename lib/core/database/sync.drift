@@ -256,3 +256,45 @@ BEGIN
   DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = OLD.id;
   INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', OLD.id);
 END;
+
+CREATE TRIGGER incidents_outbox_insert AFTER INSERT ON incidents
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', NEW.id);
+END;
+
+CREATE TRIGGER incidents_outbox_update AFTER UPDATE ON incidents
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', NEW.id);
+END;
+
+CREATE TRIGGER incidents_outbox_delete AFTER DELETE ON incidents
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', OLD.id);
+END;
+
+CREATE TRIGGER inventory_movements_outbox_insert AFTER INSERT ON inventory_movements
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', NEW.id);
+END;
+
+CREATE TRIGGER inventory_movements_outbox_update AFTER UPDATE ON inventory_movements
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', NEW.id);
+END;
+
+CREATE TRIGGER inventory_movements_outbox_delete AFTER DELETE ON inventory_movements
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', OLD.id);
+END;

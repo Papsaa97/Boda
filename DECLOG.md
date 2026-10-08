@@ -368,3 +368,17 @@ Dopad: když se plocha z plánu liší o víc než 1 %, plátno nabídne „Pou�
 **D81. Geometrie: plochy, délky a kalibrace počítá vlastní kód, „bod v polygonu“ a „polygon v polygonu“ balíček `turf`.**
 Proč: spec 5.1; geodetické funkce `turf` počítají ve stupních a na metrové souřadnice se nehodí. Ořez a sjednocení polygonů zatím nikdo nepotřebuje, knihovnu pro ně nevybírám.
 Dopad: zóna přesahující obrys se uloží, plátno jen upozorní. Historie zpět/znovu drží 20 kroků; tah uzlem je jeden krok. Plynulost 60 fps s 300 uzly ověří až test na telefonu střední třídy (definice hotovo, kap. 4); kreslení je jeden `CustomPainter` bez widgetů na uzel.
+
+## 2026-10-08 – V2, část 1: odpis ze skladu a incidenty
+
+**D82. Odpis ze skladu (FR-S4) se zapíše při dokončení úkolu a stornuje při jeho vrácení; stav skladu je dál sloupec položky.**
+Proč: spec chce pohyb a snížení stavu v jedné transakci. Počítat stav jen ze součtu pohybů by znamenalo přepsat sklad i synchronizaci, a dvě souběžné úpravy stavu jedné položky na dvou telefonech jsou zatím vzácné.
+Dopad: `inventory_movements` (Drift schéma 6) s důvody `task`, `reversal`, `purchase` (odškrtnutí nákupu s doplněním skladu) a `manual` (změna stavu ve formuláři). Odpis převádí jednotky jen v rámci veličiny (g a kg ano, kg a litry ne, takový materiál se přeskočí a hláška to řekne). Stav nejde pod nulu; odepíše se, co je, a aplikace řekne, kolik chybělo. Úkol se neodepíše dvakrát. Při souběžné úpravě stavu stejné položky na dvou telefonech vyhrává poslední zápis stavu, pohyby zůstanou všechny; přepočet stavu z pohybů je v NAPADNIKu.
+
+**D83. Incident jde založit ručně (FR-V4); kontroly D+3 a D+7 jsou obyčejné úkoly s `incident_id`.**
+Proč: úkoly už umí připomínky, tiché hodiny a víkendový režim; kontrola nemusí mít vlastní mechanismus.
+Dopad: tabulka `incidents` v telefonu i na serveru (migrace `20261008000700`, RLS jako ostatní data zahrady, pgTAP `08_incidents_stock`), fotky incidentu jsou řádky `photos` s `incident_id`. Vyřešení incidentu přeskočí jeho otevřené kontroly. Chemický plán je volný text s trvalým upozorněním na etiketu (FR-B4); dávku aplikace sama nenavrhuje. Porovnání „před a po“ ukazuje první a poslední fotku. Diagnostika z fotky (FR-V1, FR-V2) přijde v další části a bude plnit `source = model` a `candidates`.
+
+**D84. Záloha formát 4: incidenty, pohyby na skladě a vazba úkolu na incident.**
+Proč: záloha má obnovit všechno, co uživatel zapsal (FR-E1).
+Dopad: nová pole jsou nepovinná, starší zálohy se načtou. Fotky incidentů jsou ve stejné složce `photos/` jako fotky záznamů.
