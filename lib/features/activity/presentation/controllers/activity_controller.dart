@@ -26,6 +26,9 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
     ActivityType type = ActivityType.other,
     String? notes,
     List<PhotoRef> photos = const [],
+    double? harvestQty,
+    String? harvestUnit,
+    double? costCzk,
   }) async {
     final now = ref.read(clockProvider)();
     final newActivity = ActivityEntity(
@@ -36,6 +39,9 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
       zoneId: zoneId,
       notes: notes,
       photos: photos,
+      harvestQty: harvestQty,
+      harvestUnit: harvestQty == null ? null : harvestUnit,
+      costCzk: costCzk,
       createdAt: now,
       updatedAt: now,
     );

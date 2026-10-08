@@ -68,6 +68,9 @@ TaskClosure closeTask(
     remindAt: task.remindAt,
     rrule: task.rrule,
     notes: task.notes,
+    durationEstMin: task.durationEstMin,
+    tools: task.tools,
+    materials: task.materials,
     createdAt: now,
     updatedAt: now,
   );

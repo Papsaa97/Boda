@@ -94,3 +94,12 @@ Future<void> completeTask(
     ),
   );
 }
+
+/// „45 min“, „2 h“, „1 h 30 min“.
+String formatDuration(AppLocalizations l, int minutes) {
+  final h = minutes ~/ 60;
+  final m = minutes % 60;
+  if (h == 0) return l.durationMinutes(m);
+  if (m == 0) return l.durationHours(h);
+  return l.durationHoursMinutes(h, m);
+}

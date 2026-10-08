@@ -41,3 +41,27 @@ ZoneDeleteBlocker? zoneDeleteBlocker({
 
 /// Archivovat jde jen zónu, po které zůstane aspoň jedna aktivní.
 bool canArchiveZone({required int activeZoneCount}) => activeZoneCount > 1;
+
+/// Proč vlastnost zóny neprošla kontrolou.
+enum ZonePropertyError { notANumber, outOfRange }
+
+/// Největší výměra zóny (10 ha), větší číslo je skoro jistě překlep.
+const maxZoneAreaM2 = 100000.0;
+
+/// Ověří výměru zadanou textem; prázdná = nevyplněno (v pořádku).
+ZonePropertyError? validateZoneArea(String text, double? parsed) {
+  if (text.trim().isEmpty) return null;
+  if (parsed == null) return ZonePropertyError.notANumber;
+  if (parsed <= 0 || parsed > maxZoneAreaM2) {
+    return ZonePropertyError.outOfRange;
+  }
+  return null;
+}
+
+/// Ověří pH půdy (rozumný rozsah 3–10); prázdné = nevyplněno.
+ZonePropertyError? validateZonePh(String text, double? parsed) {
+  if (text.trim().isEmpty) return null;
+  if (parsed == null) return ZonePropertyError.notANumber;
+  if (parsed < 3 || parsed > 10) return ZonePropertyError.outOfRange;
+  return null;
+}

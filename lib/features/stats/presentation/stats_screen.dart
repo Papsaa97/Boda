@@ -9,6 +9,8 @@ import '../../activity/presentation/activity_type_ui.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../zones/presentation/zones_controller.dart';
 import '../domain/diary_stats.dart';
+import '../domain/season_summary.dart';
+import 'season_screen.dart';
 
 /// Statistika pro testery: záznamy po týdnech, nejaktivnější zóny a práce.
 ///
@@ -26,7 +28,20 @@ class StatsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.statsTitle)),
+      appBar: AppBar(
+        title: Text(l.statsTitle),
+        actions: [
+          IconButton(
+            tooltip: l.seasonOpen,
+            icon: const Icon(Icons.auto_awesome_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => SeasonScreen(year: seasonYearFor(now)),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

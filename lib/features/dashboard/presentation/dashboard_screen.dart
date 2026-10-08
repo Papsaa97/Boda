@@ -11,8 +11,12 @@ import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../activity/presentation/screens/activity_form_screen.dart';
 import '../../activity/presentation/widgets/activity_tile.dart';
 import '../../backup/presentation/backup_actions.dart';
+import '../../inventory/presentation/inventory_controller.dart';
+import '../../inventory/presentation/inventory_screen.dart';
 import '../../settings/presentation/settings_controller.dart';
 import '../../settings/presentation/settings_screen.dart';
+import '../../stats/domain/season_summary.dart';
+import '../../stats/presentation/season_screen.dart';
 import '../../tasks/domain/task_entity.dart';
 import '../../tasks/presentation/screens/tasks_screen.dart';
 import '../../tasks/presentation/tasks_controller.dart';
@@ -60,6 +64,8 @@ class DashboardScreen extends ConsumerWidget {
     final dateLabel = DateFormat('EEEE d. MMMM', appLocale).format(now);
     final todayTasks = _tasksForToday(ref.watch(tasksControllerProvider), now);
     final settings = ref.watch(settingsControllerProvider);
+    final inventoryAlertCount = ref.watch(inventoryAlertsProvider).length;
+    final activities = ref.watch(activityControllerProvider).value ?? const [];
 
     return Scaffold(
       appBar: AppBar(
@@ -99,6 +105,27 @@ class DashboardScreen extends ConsumerWidget {
                 )) ...[
               const SizedBox(height: 12),
               const _BackupCard(),
+            ],
+            if (inventoryAlertCount > 0) ...[
+              const SizedBox(height: 12),
+              Card(
+                child: ListTile(
+                  leading: Icon(
+                    Icons.notifications_active,
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
+                  title: Text(l.dashboardInventoryAlerts(inventoryAlertCount)),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const InventoryScreen()),
+                  ),
+                ),
+              ),
+            ],
+            if (isWinter(now) &&
+                activities.any((a) => a.date.year == seasonYearFor(now))) ...[
+              const SizedBox(height: 12),
+              _SeasonCard(year: seasonYearFor(now)),
             ],
             const SizedBox(height: 12),
             Row(
@@ -188,6 +215,53 @@ class _TasksCard extends StatelessWidget {
                   child: Text(l.dashboardAllTasks),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// V zimě pozvánka do přehledu sezóny (FR-D11).
+class _SeasonCard extends StatelessWidget {
+  const _SeasonCard({required this.year});
+
+  final int year;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.auto_awesome, color: theme.colorScheme.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l.seasonTitle(year),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(l.seasonCardBody),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton.tonal(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => SeasonScreen(year: year)),
+                ),
+                child: Text(l.seasonCardAction),
+              ),
+            ),
           ],
         ),
       ),

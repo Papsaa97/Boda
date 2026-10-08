@@ -12,6 +12,24 @@ enum TaskStatus {
       values.firstWhere((s) => s.name == key, orElse: () => open);
 }
 
+/// Materiál potřebný k úkolu (FR-U7): položka skladu a množství.
+class TaskMaterial extends Equatable {
+  const TaskMaterial({
+    required this.itemId,
+    required this.qty,
+    required this.unit,
+  });
+
+  final String itemId;
+  final double qty;
+
+  /// Klíč jednotky (`g`, `kg`, `ml`, `l`, `ks`, `pack`).
+  final String unit;
+
+  @override
+  List<Object?> get props => [itemId, qty, unit];
+}
+
 /// Úkol na zahradě s termínem a volitelnou připomínkou.
 class TaskEntity extends Equatable {
   final String id;
@@ -38,6 +56,15 @@ class TaskEntity extends Equatable {
   /// Záznam v deníku vzniklý při dokončení (FR-U4).
   final String? completedActivityId;
 
+  /// Odhad doby v minutách (FR-U7, režim víkend FR-U8).
+  final int? durationEstMin;
+
+  /// Nářadí, které si vzít (FR-U7).
+  final List<String> tools;
+
+  /// Materiál ze skladu (FR-U7).
+  final List<TaskMaterial> materials;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -53,6 +80,9 @@ class TaskEntity extends Equatable {
     this.notes,
     this.completedAt,
     this.completedActivityId,
+    this.durationEstMin,
+    this.tools = const [],
+    this.materials = const [],
     this.createdAt,
     this.updatedAt,
   });
@@ -83,6 +113,9 @@ class TaskEntity extends Equatable {
     String? Function()? notes,
     DateTime? Function()? completedAt,
     String? Function()? completedActivityId,
+    int? Function()? durationEstMin,
+    List<String>? tools,
+    List<TaskMaterial>? materials,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -100,6 +133,11 @@ class TaskEntity extends Equatable {
       completedActivityId: completedActivityId == null
           ? this.completedActivityId
           : completedActivityId(),
+      durationEstMin: durationEstMin == null
+          ? this.durationEstMin
+          : durationEstMin(),
+      tools: tools ?? this.tools,
+      materials: materials ?? this.materials,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -118,6 +156,9 @@ class TaskEntity extends Equatable {
     notes,
     completedAt,
     completedActivityId,
+    durationEstMin,
+    tools,
+    materials,
     createdAt,
     updatedAt,
   ];

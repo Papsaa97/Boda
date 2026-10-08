@@ -47,3 +47,12 @@ const quickPickTypes = [
   ActivityType.spraying,
   ActivityType.other,
 ];
+
+/// Jednotky sklizně (FR-D9).
+const harvestUnits = ['kg', 'g', 'ks'];
+
+String harvestUnitLabel(AppLocalizations l, String unit) => switch (unit) {
+  'g' => l.inventoryUnitG,
+  'ks' => l.inventoryUnitKs,
+  _ => l.inventoryUnitKg,
+};

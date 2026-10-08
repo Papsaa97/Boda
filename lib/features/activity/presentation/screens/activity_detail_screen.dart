@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/di/providers.dart';
 import '../../../../core/formatting/dates.dart';
+import '../../../../core/text/numbers.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../zones/domain/zone_entity.dart';
 import '../../../zones/presentation/zone_icons.dart';
@@ -152,6 +153,23 @@ class ActivityDetailScreen extends ConsumerWidget {
                 avatar: Icon(zoneIcon(zone?.type ?? ZoneType.other), size: 18),
                 label: Text(zone?.name ?? l.commonUnknownZone),
               ),
+              if (activity.harvestQty != null)
+                Chip(
+                  avatar: const Icon(Icons.shopping_basket_outlined, size: 18),
+                  label: Text(
+                    l.activityHarvestValue(
+                      '${formatDecimal(activity.harvestQty!)} '
+                      '${harvestUnitLabel(l, activity.harvestUnit ?? 'kg')}',
+                    ),
+                  ),
+                ),
+              if (activity.costCzk != null)
+                Chip(
+                  avatar: const Icon(Icons.payments_outlined, size: 18),
+                  label: Text(
+                    l.activityCostValue(formatDecimal(activity.costCzk!)),
+                  ),
+                ),
             ],
           ),
           if (activity.notes != null) ...[

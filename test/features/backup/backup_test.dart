@@ -11,6 +11,10 @@ import 'package:zahradnik_boda/features/activity/domain/activity_entity.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_type.dart';
 import 'package:zahradnik_boda/features/backup/data/backup_service.dart';
 import 'package:zahradnik_boda/features/backup/domain/backup_format.dart';
+import 'package:zahradnik_boda/features/inventory/data/drift_inventory_repository.dart';
+import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
+import 'package:zahradnik_boda/features/inventory/domain/shopping_item.dart';
+import 'package:zahradnik_boda/features/inventory/domain/units.dart';
 import 'package:zahradnik_boda/features/tasks/data/drift_task_repository.dart';
 import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
 import 'package:zahradnik_boda/features/zones/data/drift_zone_repository.dart';
@@ -47,6 +51,10 @@ class _Device {
   DriftActivityRepository get activities =>
       DriftActivityRepository(db, gardenId, clock);
   DriftTaskRepository get tasks => DriftTaskRepository(db, gardenId, clock);
+  DriftInventoryRepository get inventory =>
+      DriftInventoryRepository(db, gardenId, clock);
+  DriftShoppingRepository get shopping =>
+      DriftShoppingRepository(db, gardenId, clock);
 
   static DateTime clock() => testNow;
 }
@@ -58,7 +66,43 @@ void main() {
   tearDown(() => dir.delete(recursive: true));
 
   Future<void> fill(_Device d) async {
-    await d.zones.saveZone(testZones[0]);
+    await d.zones.saveZone(
+      testZones[0].copyWith(
+        areaM2: () => 20,
+        soilTexture: () => SoilTexture.loamy,
+        ph: () => 6.6,
+        phMeasuredAt: () => DateTime(2026, 4, 1),
+        sunExposure: () => SunExposure.fullSun,
+        irrigation: () => Irrigation.drip,
+        covered: true,
+      ),
+    );
+    await d.inventory.save(
+      const InventoryItem(
+        id: 'i1',
+        category: InventoryCategory.fertilizer,
+        name: 'Cererit',
+        unit: InventoryUnit.kg,
+        stockQty: 2.5,
+        lowStockThreshold: 1,
+        details: FertilizerDetails(
+          n: 12,
+          p: 11,
+          k: 18,
+          dose: LabelDose(60, InventoryUnit.g),
+        ),
+      ),
+    );
+    await d.shopping.save(
+      const ShoppingItem(
+        id: 's1',
+        name: 'Cererit',
+        qty: 5,
+        unit: InventoryUnit.kg,
+        itemId: 'i1',
+        source: ShoppingSource.lowStock,
+      ),
+    );
     await d.zones.saveZone(testZones[2].copyWith(archived: true));
     final photo = File(p.join(d.photos.rootPath, 'activity_photos', 'p1.jpg'))
       ..createSync(recursive: true)
@@ -71,6 +115,9 @@ void main() {
         date: DateTime(2026, 9, 20, 16, 45),
         zoneId: 'Z3',
         notes: 'Jonagold, 2 bedny',
+        harvestQty: 24.5,
+        harvestUnit: 'kg',
+        costCzk: 120,
         photos: [
           PhotoRef(
             id: 'p1',
@@ -96,7 +143,19 @@ void main() {
         due: DateTime(2026, 10, 25),
         remindAt: 10 * 60,
         rrule: 'FREQ=YEARLY',
+        durationEstMin: 45,
+        tools: ['Klíč na hadice'],
+        materials: [TaskMaterial(itemId: 'i1', qty: 1.2, unit: 'kg')],
       ),
+    );
+    await d.tasks.recordMaterialsUsed(
+      TaskEntity(
+        id: 't0',
+        title: 'Hnojení',
+        due: DateTime(2026, 9, 1),
+        materials: const [TaskMaterial(itemId: 'i1', qty: 500, unit: 'g')],
+      ),
+      'a2',
     );
   }
 
@@ -128,7 +187,15 @@ void main() {
       final zones = await fresh.zones.getAllZones();
       expect(zones.map((z) => z.id), unorderedEquals(['Z1', 'Z3']));
       expect(zones.firstWhere((z) => z.id == 'Z3').archived, isTrue);
-      expect(zones.firstWhere((z) => z.id == 'Z1').type, ZoneType.vegetable);
+      final z1 = zones.firstWhere((z) => z.id == 'Z1');
+      expect(z1.type, ZoneType.vegetable);
+      expect(z1.areaM2, 20);
+      expect(z1.soilTexture, SoilTexture.loamy);
+      expect(z1.ph, 6.6);
+      expect(z1.phMeasuredAt, DateTime(2026, 4, 1));
+      expect(z1.sunExposure, SunExposure.fullSun);
+      expect(z1.irrigation, Irrigation.drip);
+      expect(z1.covered, isTrue);
 
       final activities = await fresh.activities.getAllActivities();
       final a1 = activities.firstWhere((a) => a.id == 'a1');
@@ -136,6 +203,9 @@ void main() {
       expect(a1.type, ActivityType.harvest);
       expect(a1.date, DateTime(2026, 9, 20, 16, 45));
       expect(a1.notes, 'Jonagold, 2 bedny');
+      expect(a1.harvestQty, 24.5);
+      expect(a1.harvestUnit, 'kg');
+      expect(a1.costCzk, 120);
       final photoPath = fresh.photos.resolve(a1.photos.single.path)!;
       expect(File(photoPath).readAsBytesSync(), [1, 2, 3, 4]);
       expect(stray.existsSync(), isFalse);
@@ -145,6 +215,22 @@ void main() {
       expect(task.due, DateTime(2026, 10, 25));
       expect(task.remindAt, 10 * 60);
       expect(task.rrule, 'FREQ=YEARLY');
+      expect(task.durationEstMin, 45);
+      expect(task.tools, ['Klíč na hadice']);
+      expect(task.materials, [
+        const TaskMaterial(itemId: 'i1', qty: 1.2, unit: 'kg'),
+      ]);
+
+      final item = (await fresh.inventory.getAll()).single;
+      expect(item.name, 'Cererit');
+      expect(item.stockQty, 2.5);
+      expect(item.labelDose, const LabelDose(60, InventoryUnit.g));
+      final shopping = (await fresh.shopping.getAll()).single;
+      expect(shopping.itemId, 'i1');
+      expect(shopping.source, ShoppingSource.lowStock);
+      final used = await fresh.db.select(fresh.db.activityMaterials).get();
+      expect(used.single.activityId, 'a2');
+      expect(used.single.qty, 500);
       await fresh.db.close();
     },
   );
@@ -160,7 +246,7 @@ void main() {
     final json =
         jsonDecode(utf8.decode(archive.find('data.json')!.content))
             as Map<String, Object?>;
-    expect(json['formatVersion'], 1);
+    expect(json['formatVersion'], 2);
     expect(json['appVersion'], '0.2.0');
     final a1 = (json['activities'] as List).cast<Map>().firstWhere(
       (a) => a['id'] == 'a1',
@@ -176,7 +262,52 @@ void main() {
     final t1 = (json['tasks'] as List).single as Map;
     expect(t1['due'], '2026-10-25');
     expect(t1['remindAt'], '10:00');
+    expect(t1['durationEstMin'], 45);
+    expect(t1['materials'], [
+      {'itemId': 'i1', 'qty': 1.2, 'unit': 'kg'},
+    ]);
+    final i1 = (json['inventory'] as List).single as Map;
+    expect(i1['category'], 'fertilizer');
+    expect((i1['details'] as Map)['dosePerM2'], 60);
+    expect(a1['harvestQty'], 24.5);
+    final z1 = (json['zones'] as List).cast<Map>().firstWhere(
+      (z) => z['id'] == 'Z1',
+    );
+    expect(z1['soilTexture'], 'loamy');
+    expect(z1['phMeasuredAt'], '2026-04-01');
     await phone.db.close();
+  });
+
+  test('a format 1 backup from MVP 0.2 still imports', () {
+    final data = decodeBackup({
+      'formatVersion': 1,
+      'appVersion': '0.2.0',
+      'exportedAt': '2026-10-07T08:00:00.000Z',
+      'zones': [
+        {'id': 'z', 'name': 'Zelenina', 'type': 'vegetable', 'archived': false},
+      ],
+      'activities': [
+        {
+          'id': 'a',
+          'type': 'watering',
+          'title': 'Zálivka',
+          'occurredAt': '2026-10-06T05:00:00.000Z',
+          'occurredTz': '+02:00',
+          'zoneId': 'z',
+          'photoIds': <String>[],
+        },
+      ],
+      'tasks': [
+        {'id': 't', 'title': 'Pletí', 'due': '2026-10-08', 'status': 'open'},
+      ],
+      'photos': <Object>[],
+    });
+    expect(data.zones.single.areaM2, isNull);
+    expect(data.zones.single.covered, isFalse);
+    expect(data.activities.single.harvestQty, isNull);
+    expect(data.tasks.single.materials, isEmpty);
+    expect(data.inventory, isEmpty);
+    expect(data.shopping, isEmpty);
   });
 
   group('broken files are rejected without touching data', () {

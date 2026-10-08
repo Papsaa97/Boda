@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 
+import 'app_database.steps.dart';
+
 part 'app_database.g.dart';
 
 /// Lokální databáze (Drift nad SQLite), spec kap. 8.2.
@@ -35,6 +37,17 @@ class Zones extends Table {
 
   /// Pořadí v nabídce (menší první); null = podle názvu.
   IntColumn get sortOrder => integer().nullable()();
+
+  // Vlastnosti zóny (1.0, schéma v2), číselníky podle kap. 8.3.
+  RealColumn get areaM2 => real().nullable()();
+  TextColumn get soilTexture => text().nullable()();
+  RealColumn get ph => real().nullable()();
+
+  /// Den měření pH `YYYY-MM-DD`.
+  TextColumn get phMeasuredAt => text().nullable()();
+  TextColumn get sunExposure => text().nullable()();
+  TextColumn get irrigation => text().nullable()();
+  BoolColumn get covered => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -107,6 +120,91 @@ class Tasks extends Table {
   DateTimeColumn get completedAt => dateTime().nullable()();
   TextColumn get completedActivityId => text().nullable()();
   TextColumn get source => text().withDefault(const Constant('user'))();
+
+  /// Odhad doby v minutách (FR-U7, schéma v2).
+  IntColumn get durationEstMin => integer().nullable()();
+
+  /// Nářadí jako JSON pole textů (v PostgreSQL `text[]`).
+  TextColumn get tools => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Položka skladu (FR-S1, schéma v2).
+@DataClassName('InventoryItemRow')
+class InventoryItems extends Table {
+  TextColumn get id => text()();
+  TextColumn get gardenId => text().references(Gardens, #id)();
+
+  /// `seed`, `fertilizer`, `plantProtection`, `tool`, `other`.
+  TextColumn get category => text()();
+  TextColumn get name => text()();
+
+  /// `g`, `kg`, `ml`, `l`, `ks`, `pack`.
+  TextColumn get unit => text()();
+  RealColumn get stockQty => real().withDefault(const Constant(0))();
+  RealColumn get lowStockThreshold => real().nullable()();
+
+  /// Údaje podle kategorie jako JSON (v PostgreSQL `jsonb`).
+  TextColumn get details => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Materiál potřebný k úkolu (FR-U7).
+@DataClassName('TaskMaterialRow')
+class TaskMaterials extends Table {
+  TextColumn get taskId => text().references(Tasks, #id)();
+  TextColumn get itemId => text().references(InventoryItems, #id)();
+  TextColumn get gardenId => text().references(Gardens, #id)();
+  RealColumn get qty => real()();
+  TextColumn get unit => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {taskId, itemId};
+}
+
+/// Materiál spotřebovaný při činnosti (zapisuje se při dokončení úkolu;
+/// automatický odpis ze skladu je až ve V2, FR-S4).
+@DataClassName('ActivityMaterialRow')
+class ActivityMaterials extends Table {
+  TextColumn get activityId => text().references(Activities, #id)();
+  TextColumn get itemId => text().references(InventoryItems, #id)();
+  TextColumn get gardenId => text().references(Gardens, #id)();
+  RealColumn get qty => real()();
+  TextColumn get unit => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {activityId, itemId};
+}
+
+/// Nákupní seznam (z rad Bódi a z hlídače zásob).
+@DataClassName('ShoppingItemRow')
+class ShoppingItems extends Table {
+  TextColumn get id => text()();
+  TextColumn get gardenId => text().references(Gardens, #id)();
+  TextColumn get name => text()();
+  RealColumn get qty => real().nullable()();
+  TextColumn get unit => text().nullable()();
+  TextColumn get itemId => text().nullable().references(InventoryItems, #id)();
+  BoolColumn get done => boolean().withDefault(const Constant(false))();
+
+  /// `user`, `boda`, `lowStock`.
+  TextColumn get source => text().withDefault(const Constant('user'))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -130,17 +228,47 @@ class SettingEntries extends Table {
 }
 
 @DriftDatabase(
-  tables: [Gardens, Zones, Activities, Photos, Tasks, SettingEntries],
+  tables: [
+    Gardens,
+    Zones,
+    Activities,
+    Photos,
+    Tasks,
+    InventoryItems,
+    TaskMaterials,
+    ActivityMaterials,
+    ShoppingItems,
+    SettingEntries,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
+    onUpgrade: stepByStep(
+      // 1.0: vlastnosti zón, odhad doby a nářadí u úkolů, sklad,
+      // materiály a nákupní seznam.
+      from1To2: (m, schema) async {
+        await m.addColumn(schema.zones, schema.zones.areaM2);
+        await m.addColumn(schema.zones, schema.zones.soilTexture);
+        await m.addColumn(schema.zones, schema.zones.ph);
+        await m.addColumn(schema.zones, schema.zones.phMeasuredAt);
+        await m.addColumn(schema.zones, schema.zones.sunExposure);
+        await m.addColumn(schema.zones, schema.zones.irrigation);
+        await m.addColumn(schema.zones, schema.zones.covered);
+        await m.addColumn(schema.tasks, schema.tasks.durationEstMin);
+        await m.addColumn(schema.tasks, schema.tasks.tools);
+        await m.createTable(schema.inventoryItems);
+        await m.createTable(schema.taskMaterials);
+        await m.createTable(schema.activityMaterials);
+        await m.createTable(schema.shoppingItems);
+      },
+    ),
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },

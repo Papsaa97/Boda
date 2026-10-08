@@ -63,7 +63,7 @@ class AppRoot extends ConsumerWidget {
   }
 }
 
-/// Hlavní obrazovka se spodní navigací: Dnes, Deník, Úkoly, Zóny.
+/// Hlavní obrazovka se spodní navigací: Dnes, Deník, Úkoly, Zahrada.
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
@@ -149,9 +149,9 @@ class _HomeShellState extends ConsumerState<HomeShell>
             label: l.navTasks,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.grass_outlined),
-            selectedIcon: const Icon(Icons.grass),
-            label: l.navZones,
+            icon: const Icon(Icons.yard_outlined),
+            selectedIcon: const Icon(Icons.yard),
+            label: l.navGarden,
           ),
         ],
       ),

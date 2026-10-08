@@ -6,9 +6,15 @@ import '../../../../core/di/providers.dart';
 import '../../../../core/formatting/dates.dart';
 import '../../../../core/time/calendar.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/text/numbers.dart';
+import '../../../inventory/domain/inventory_item.dart';
+import '../../../inventory/domain/units.dart';
+import '../../../inventory/presentation/inventory_controller.dart';
+import '../../../inventory/presentation/inventory_ui.dart';
 import '../../../zones/presentation/zones_controller.dart';
 import '../../domain/recurrence.dart';
 import '../../domain/task_entity.dart';
+import '../task_ui.dart';
 import '../tasks_controller.dart';
 
 /// Nový úkol, nebo úprava existujícího ([initial]).
@@ -31,7 +37,13 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   String? _zoneId;
   RepeatFrequency? _frequency;
   Set<int> _months = {};
+  int? _duration;
+  late List<String> _tools;
+  late List<TaskMaterial> _materials;
+  final _toolInput = TextEditingController();
   bool _saving = false;
+
+  static const _durations = [15, 30, 45, 60, 90, 120, 180, 240, 360, 480];
 
   bool get _isEdit => widget.initial != null;
 
@@ -47,12 +59,41 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     final r = t?.recurrence;
     _frequency = r?.frequency;
     _months = {...?r?.months};
+    _duration = t?.durationEstMin;
+    _tools = [...?t?.tools];
+    _materials = [...?t?.materials];
+  }
+
+  void _addTool() {
+    final tool = _toolInput.text.trim();
+    if (tool.isEmpty) return;
+    setState(() {
+      if (!_tools.any((t) => t.toLowerCase() == tool.toLowerCase())) {
+        _tools.add(tool);
+      }
+      _toolInput.clear();
+    });
+  }
+
+  Future<void> _addMaterial() async {
+    final material = await showDialog<TaskMaterial>(
+      context: context,
+      builder: (_) => const _MaterialDialog(),
+    );
+    if (material == null) return;
+    setState(() {
+      _materials = [
+        ..._materials.where((m) => m.itemId != material.itemId),
+        material,
+      ];
+    });
   }
 
   @override
   void dispose() {
     _title.dispose();
     _notes.dispose();
+    _toolInput.dispose();
     super.dispose();
   }
 
@@ -102,6 +143,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           remindAt: _remindAt,
           rrule: rrule,
           notes: notes.isEmpty ? null : notes,
+          durationEstMin: _duration,
+          tools: _tools,
+          materials: _materials,
         ),
       );
     } else {
@@ -115,6 +159,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           remindAt: () => _remindAt,
           rrule: () => rrule,
           notes: () => notes.isEmpty ? null : notes,
+          durationEstMin: () => _duration,
+          tools: _tools,
+          materials: _materials,
         ),
       );
     }
@@ -130,6 +177,34 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     // O oprávnění k notifikacím se žádá až ve chvíli, kdy dává smysl.
     await ref.read(notificationSchedulerProvider).requestPermission();
     if (mounted) Navigator.of(context).pop();
+  }
+
+  Widget _materialTile(AppLocalizations l, TaskMaterial m) {
+    final item = ref.watch(inventoryItemProvider(m.itemId));
+    final unit = InventoryUnit.fromKey(m.unit);
+    final name = item?.name ?? l.taskMaterialMissing;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(
+        item == null
+            ? Icons.help_outline
+            : inventoryCategoryIcon(item.category),
+      ),
+      title: Text(name),
+      subtitle: Text(
+        unit == null ? formatDecimal(m.qty) : formatQty(l, m.qty, unit),
+      ),
+      trailing: IconButton(
+        tooltip: l.taskMaterialRemove(name),
+        icon: const Icon(Icons.close),
+        onPressed: () => setState(
+          () => _materials = [
+            for (final x in _materials)
+              if (x.itemId != m.itemId) x,
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -218,6 +293,18 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               onChanged: (v) => setState(() => _zoneId = v),
             ),
             const SizedBox(height: 16),
+            DropdownButtonFormField<int?>(
+              initialValue: _duration,
+              isExpanded: true,
+              decoration: InputDecoration(labelText: l.taskDurationLabel),
+              items: [
+                DropdownMenuItem(value: null, child: Text(l.taskDurationNone)),
+                for (final m in {..._durations, ?_duration})
+                  DropdownMenuItem(value: m, child: Text(formatDuration(l, m))),
+              ],
+              onChanged: (v) => setState(() => _duration = v),
+            ),
+            const SizedBox(height: 16),
             DropdownButtonFormField<RepeatFrequency?>(
               initialValue: _frequency,
               decoration: InputDecoration(labelText: l.taskRepeatLabel),
@@ -268,6 +355,50 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               ),
             ],
             const SizedBox(height: 16),
+            Text(
+              l.taskToolsLabel,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            if (_tools.isNotEmpty)
+              Wrap(
+                spacing: 6,
+                children: [
+                  for (final tool in _tools)
+                    InputChip(
+                      label: Text(tool),
+                      deleteButtonTooltipMessage: l.taskToolRemove(tool),
+                      onDeleted: () => setState(() => _tools.remove(tool)),
+                    ),
+                ],
+              ),
+            TextField(
+              controller: _toolInput,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                hintText: l.taskToolsHint,
+                suffixIcon: IconButton(
+                  tooltip: l.taskToolAdd,
+                  icon: const Icon(Icons.add),
+                  onPressed: _addTool,
+                ),
+              ),
+              onSubmitted: (_) => _addTool(),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l.taskMaterialsLabel,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            for (final m in _materials) _materialTile(l, m),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: _addMaterial,
+                icon: const Icon(Icons.add),
+                label: Text(l.taskMaterialAdd),
+              ),
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _notes,
               decoration: InputDecoration(labelText: l.taskNotesLabel),
@@ -283,6 +414,113 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Výběr položky skladu a množství pro úkol.
+class _MaterialDialog extends ConsumerStatefulWidget {
+  const _MaterialDialog();
+
+  @override
+  ConsumerState<_MaterialDialog> createState() => _MaterialDialogState();
+}
+
+class _MaterialDialogState extends ConsumerState<_MaterialDialog> {
+  final _qty = TextEditingController();
+  InventoryItem? _item;
+  InventoryUnit? _unit;
+
+  @override
+  void dispose() {
+    _qty.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final item = _item;
+    final unit = _unit;
+    final qty = parseDecimal(_qty.text);
+    if (item == null || unit == null || qty == null || qty <= 0) return;
+    Navigator.of(
+      context,
+    ).pop(TaskMaterial(itemId: item.id, qty: qty, unit: unit.name));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final items = ref.watch(inventoryControllerProvider).value ?? const [];
+    final item = _item;
+    return AlertDialog(
+      title: Text(l.taskMaterialAdd),
+      content: items.isEmpty
+          ? Text(l.taskMaterialNoInventory)
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<InventoryItem>(
+                  initialValue: item,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: l.taskMaterialItemLabel,
+                  ),
+                  items: [
+                    for (final i in items)
+                      DropdownMenuItem(value: i, child: Text(i.name)),
+                  ],
+                  onChanged: (i) => setState(() {
+                    _item = i;
+                    _unit = i?.unit;
+                  }),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        controller: _qty,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: l.taskMaterialQtyLabel,
+                        ),
+                        onSubmitted: (_) => _submit(),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: DropdownButton<InventoryUnit>(
+                        value: _unit,
+                        isExpanded: true,
+                        items: [
+                          for (final u
+                              in item?.unit.compatible ?? InventoryUnit.values)
+                            DropdownMenuItem(
+                              value: u,
+                              child: Text(unitLabel(l, u)),
+                            ),
+                        ],
+                        onChanged: item == null
+                            ? null
+                            : (u) => setState(() => _unit = u ?? _unit),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l.commonCancel),
+        ),
+        if (items.isNotEmpty)
+          FilledButton(onPressed: _submit, child: Text(l.commonSave)),
+      ],
     );
   }
 }

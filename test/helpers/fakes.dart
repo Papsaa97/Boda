@@ -10,6 +10,9 @@ import 'package:zahradnik_boda/core/photos/photo_storage.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_entity.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_repository.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_type.dart';
+import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
+import 'package:zahradnik_boda/features/inventory/domain/inventory_repository.dart';
+import 'package:zahradnik_boda/features/inventory/domain/shopping_item.dart';
 import 'package:zahradnik_boda/features/settings/domain/app_settings.dart';
 import 'package:zahradnik_boda/features/settings/domain/settings_repository.dart';
 import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
@@ -90,6 +93,48 @@ class InMemoryTaskRepository implements TaskRepository {
 
   @override
   Future<void> deleteTask(String id) async => items.remove(id);
+
+  /// Záznamy s materiálem z úkolu: id záznamu → materiál.
+  final Map<String, List<TaskMaterial>> usedMaterials = {};
+
+  @override
+  Future<void> recordMaterialsUsed(TaskEntity task, String activityId) async =>
+      usedMaterials[activityId] = task.materials;
+}
+
+class InMemoryInventoryRepository implements InventoryRepository {
+  InMemoryInventoryRepository([List<InventoryItem> initial = const []]) {
+    for (final i in initial) {
+      items[i.id] = i;
+    }
+  }
+
+  final Map<String, InventoryItem> items = {};
+
+  @override
+  Future<List<InventoryItem>> getAll() async => items.values.toList();
+
+  @override
+  Future<void> save(InventoryItem item) async => items[item.id] = item;
+
+  @override
+  Future<void> delete(String id) async => items.remove(id);
+}
+
+class InMemoryShoppingRepository implements ShoppingRepository {
+  final Map<String, ShoppingItem> items = {};
+
+  @override
+  Future<List<ShoppingItem>> getAll() async => items.values.toList();
+
+  @override
+  Future<void> save(ShoppingItem item) async => items[item.id] = item;
+
+  @override
+  Future<void> delete(String id) async => items.remove(id);
+
+  @override
+  Future<void> clearDone() async => items.removeWhere((_, s) => s.done);
 }
 
 class InMemorySettingsRepository implements SettingsRepository {
@@ -112,6 +157,9 @@ ProviderContainer makeContainer({
   InMemoryZoneRepository? zones,
   InMemoryTaskRepository? tasks,
   InMemorySettingsRepository? settings,
+  InMemoryInventoryRepository? inventory,
+  InMemoryShoppingRepository? shopping,
+  DateTime Function()? clock,
 }) {
   return ProviderContainer(
     overrides: testOverrides(
@@ -119,6 +167,9 @@ ProviderContainer makeContainer({
       zones: zones,
       tasks: tasks,
       settings: settings,
+      inventory: inventory,
+      shopping: shopping,
+      clock: clock,
     ),
   );
 }
@@ -134,9 +185,17 @@ List<Override> testOverrides({
   InMemoryZoneRepository? zones,
   InMemoryTaskRepository? tasks,
   InMemorySettingsRepository? settings,
+  InMemoryInventoryRepository? inventory,
+  InMemoryShoppingRepository? shopping,
   DateTime Function()? clock,
 }) {
   return [
+    inventoryRepositoryProvider.overrideWithValue(
+      inventory ?? InMemoryInventoryRepository(),
+    ),
+    shoppingRepositoryProvider.overrideWithValue(
+      shopping ?? InMemoryShoppingRepository(),
+    ),
     activityRepositoryProvider.overrideWithValue(
       activities ?? InMemoryActivityRepository(),
     ),

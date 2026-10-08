@@ -4,6 +4,9 @@ import '../../../core/time/calendar.dart';
 import '../../../core/time/time_zone.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../activity/domain/activity_type.dart';
+import '../../inventory/domain/inventory_item.dart';
+import '../../inventory/domain/shopping_item.dart';
+import '../../inventory/domain/units.dart';
 import '../../tasks/domain/task_entity.dart';
 import '../../zones/domain/zone_entity.dart';
 
@@ -11,7 +14,7 @@ import '../../zones/domain/zone_entity.dart';
 ///
 /// Při změně formátu verzi zvýšit, starší verze dál umět načíst
 /// v [decodeBackup] (FR-E2) a doplnit test.
-const backupFormatVersion = 1;
+const backupFormatVersion = 2;
 
 /// Složka s fotkami uvnitř ZIP souboru.
 const backupPhotoFolder = 'photos';
@@ -39,6 +42,21 @@ class BackupException implements Exception {
       'BackupException($error${detail == null ? '' : ': $detail'})';
 }
 
+/// Materiál spotřebovaný u záznamu (tabulka `activity_materials`).
+class ActivityMaterialRecord {
+  const ActivityMaterialRecord({
+    required this.activityId,
+    required this.itemId,
+    required this.qty,
+    required this.unit,
+  });
+
+  final String activityId;
+  final String itemId;
+  final double qty;
+  final String unit;
+}
+
 /// Obsah zálohy: všechna data deníku jedné zahrady.
 class BackupData {
   const BackupData({
@@ -48,6 +66,9 @@ class BackupData {
     required this.zones,
     required this.activities,
     required this.tasks,
+    this.inventory = const [],
+    this.shopping = const [],
+    this.activityMaterials = const [],
   });
 
   final int formatVersion;
@@ -56,6 +77,11 @@ class BackupData {
   final List<ZoneEntity> zones;
   final List<ActivityEntity> activities;
   final List<TaskEntity> tasks;
+
+  /// Od verze 2 formátu (MVP 1.0).
+  final List<InventoryItem> inventory;
+  final List<ShoppingItem> shopping;
+  final List<ActivityMaterialRecord> activityMaterials;
 
   /// Všechny fotky, na které záznamy odkazují.
   List<PhotoRef> get photos => [for (final a in activities) ...a.photos];
@@ -89,6 +115,15 @@ Map<String, Object?> encodeBackup(BackupData data) {
           'name': z.name,
           'type': z.type.name,
           'archived': z.archived,
+          'areaM2': z.areaM2,
+          'soilTexture': z.soilTexture?.name,
+          'ph': z.ph,
+          'phMeasuredAt': z.phMeasuredAt == null
+              ? null
+              : _date(z.phMeasuredAt!),
+          'sunExposure': z.sunExposure?.name,
+          'irrigation': z.irrigation?.name,
+          'covered': z.covered,
         },
     ],
     'activities': [
@@ -102,6 +137,14 @@ Map<String, Object?> encodeBackup(BackupData data) {
           'zoneId': a.zoneId,
           'notes': a.notes,
           'photoIds': [for (final photo in a.photos) photo.id],
+          'harvestQty': a.harvestQty,
+          'harvestUnit': a.harvestUnit,
+          'costCzk': a.costCzk,
+          'materials': [
+            for (final m in data.activityMaterials)
+              if (m.activityId == a.id)
+                {'itemId': m.itemId, 'qty': m.qty, 'unit': m.unit},
+          ],
           'createdAt': a.createdAt == null ? null : _instant(a.createdAt!),
           'updatedAt': a.updatedAt == null ? null : _instant(a.updatedAt!),
         },
@@ -124,8 +167,38 @@ Map<String, Object?> encodeBackup(BackupData data) {
               ? null
               : _instant(t.completedAt!),
           'completedActivityId': t.completedActivityId,
+          'durationEstMin': t.durationEstMin,
+          'tools': t.tools,
+          'materials': [
+            for (final m in t.materials)
+              {'itemId': m.itemId, 'qty': m.qty, 'unit': m.unit},
+          ],
           'createdAt': t.createdAt == null ? null : _instant(t.createdAt!),
           'updatedAt': t.updatedAt == null ? null : _instant(t.updatedAt!),
+        },
+    ],
+    'inventory': [
+      for (final i in data.inventory)
+        {
+          'id': i.id,
+          'category': i.category.name,
+          'name': i.name,
+          'unit': i.unit.name,
+          'stockQty': i.stockQty,
+          'lowStockThreshold': i.lowStockThreshold,
+          'details': i.details?.toJson(),
+        },
+    ],
+    'shopping': [
+      for (final s in data.shopping)
+        {
+          'id': s.id,
+          'name': s.name,
+          'qty': s.qty,
+          'unit': s.unit?.name,
+          'itemId': s.itemId,
+          'done': s.done,
+          'source': s.source.name,
         },
     ],
     'photos': [
@@ -144,9 +217,10 @@ BackupData decodeBackup(Map<String, Object?> json) {
   if (version > backupFormatVersion) {
     throw BackupException(BackupError.tooNew, 'formatVersion $version');
   }
-  // Až vznikne verze 2: zde převést mapu verze 1 na 2 a pokračovat.
+  // Verze 2 jen přidala nepovinná pole (vlastnosti zón, sklad, nákupní
+  // seznam, sklizeň, materiál), takže jeden dekodér čte obě verze.
   try {
-    return _decodeV1(json);
+    return _decode(json);
   } on BackupException {
     rethrow;
   } catch (e) {
@@ -154,7 +228,7 @@ BackupData decodeBackup(Map<String, Object?> json) {
   }
 }
 
-BackupData _decodeV1(Map<String, Object?> json) {
+BackupData _decode(Map<String, Object?> json) {
   List<Map<String, Object?>> list(String key) => [
     for (final item in (json[key] as List?) ?? const [])
       (item as Map).cast<String, Object?>(),
@@ -166,6 +240,19 @@ BackupData _decodeV1(Map<String, Object?> json) {
       parseDateKey(v as String) ?? (throw FormatException('date $v'));
 
   DateTime? optDate(Object? v) => v == null ? null : date(v);
+  double? optNum(Object? v) => (v as num?)?.toDouble();
+  List<Map<String, Object?>> nested(Object? v) => [
+    for (final item in (v as List?) ?? const [])
+      (item as Map).cast<String, Object?>(),
+  ];
+  List<TaskMaterial> materials(Object? v) => [
+    for (final m in nested(v))
+      TaskMaterial(
+        itemId: m['itemId'] as String,
+        qty: (m['qty'] as num).toDouble(),
+        unit: m['unit'] as String,
+      ),
+  ];
   int? minuteOfDay(Object? v) {
     if (v == null) return null;
     final parts = (v as String).split(':').map(int.parse).toList();
@@ -189,6 +276,13 @@ BackupData _decodeV1(Map<String, Object?> json) {
           name: z['name'] as String,
           type: ZoneType.fromKey(z['type'] as String?),
           archived: z['archived'] as bool? ?? false,
+          areaM2: optNum(z['areaM2']),
+          soilTexture: SoilTexture.fromKey(z['soilTexture'] as String?),
+          ph: optNum(z['ph']),
+          phMeasuredAt: optDate(z['phMeasuredAt']),
+          sunExposure: SunExposure.fromKey(z['sunExposure'] as String?),
+          irrigation: Irrigation.fromKey(z['irrigation'] as String?),
+          covered: z['covered'] as bool? ?? false,
         ),
     ],
     activities: [
@@ -207,9 +301,24 @@ BackupData _decodeV1(Map<String, Object?> json) {
                 path: photoFiles[id] ?? '$backupPhotoFolder/$id.jpg',
               ),
           ],
+          harvestQty: optNum(a['harvestQty']),
+          harvestUnit: a['harvestQty'] == null
+              ? null
+              : a['harvestUnit'] as String?,
+          costCzk: optNum(a['costCzk']),
           createdAt: optInstant(a['createdAt']),
           updatedAt: optInstant(a['updatedAt']),
         ),
+    ],
+    activityMaterials: [
+      for (final a in list('activities'))
+        for (final m in materials(a['materials']))
+          ActivityMaterialRecord(
+            activityId: a['id'] as String,
+            itemId: m.itemId,
+            qty: m.qty,
+            unit: m.unit,
+          ),
     ],
     tasks: [
       for (final t in list('tasks'))
@@ -225,9 +334,41 @@ BackupData _decodeV1(Map<String, Object?> json) {
           notes: t['notes'] as String?,
           completedAt: optInstant(t['completedAt']),
           completedActivityId: t['completedActivityId'] as String?,
+          durationEstMin: (t['durationEstMin'] as num?)?.round(),
+          tools: [
+            for (final tool in (t['tools'] as List?) ?? const [])
+              tool as String,
+          ],
+          materials: materials(t['materials']),
           createdAt: optInstant(t['createdAt']),
           updatedAt: optInstant(t['updatedAt']),
         ),
     ],
+    inventory: [for (final i in list('inventory')) _inventoryItem(i)],
+    shopping: [
+      for (final s in list('shopping'))
+        ShoppingItem(
+          id: s['id'] as String,
+          name: s['name'] as String,
+          qty: optNum(s['qty']),
+          unit: InventoryUnit.fromKey(s['unit'] as String?),
+          itemId: s['itemId'] as String?,
+          done: s['done'] as bool? ?? false,
+          source: ShoppingSource.fromKey(s['source'] as String?),
+        ),
+    ],
+  );
+}
+
+InventoryItem _inventoryItem(Map<String, Object?> i) {
+  final category = InventoryCategory.fromKey(i['category'] as String?);
+  return InventoryItem(
+    id: i['id'] as String,
+    category: category,
+    name: i['name'] as String,
+    unit: InventoryUnit.fromKey(i['unit'] as String?) ?? InventoryUnit.ks,
+    stockQty: (i['stockQty'] as num?)?.toDouble() ?? 0,
+    lowStockThreshold: (i['lowStockThreshold'] as num?)?.toDouble(),
+    details: ItemDetails.fromJson(category, i['details']),
   );
 }

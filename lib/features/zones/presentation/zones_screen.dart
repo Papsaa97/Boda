@@ -3,12 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
+import '../../inventory/presentation/inventory_controller.dart';
+import '../../inventory/presentation/inventory_screen.dart';
 import '../domain/zone_entity.dart';
 import '../domain/zone_rules.dart';
+import 'zone_detail_screen.dart';
+import 'zone_form_screen.dart';
 import 'zone_icons.dart';
 import 'zones_controller.dart';
 
-/// Správa zón: přidat, upravit, archivovat, smazat (FR-D3).
+/// Záložka Zahrada: vstup do skladu a správa zón (přidat, upravit,
+/// archivovat, smazat; FR-D3).
 class ZonesScreen extends ConsumerWidget {
   const ZonesScreen({super.key});
 
@@ -19,24 +24,25 @@ class ZonesScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _edit(BuildContext context, WidgetRef ref, [ZoneEntity? zone]) {
+  Future<void> _add(BuildContext context, WidgetRef ref) {
     final controller = ref.read(zonesControllerProvider.notifier);
     final l = AppLocalizations.of(context);
     return showDialog<void>(
       context: context,
       builder: (_) => _ZoneDialog(
-        title: zone == null ? l.zoneNewTitle : l.zoneRenameTitle,
-        initial: zone,
+        title: l.zoneNewTitle,
         onSubmit: (name, type) async {
-          final error = zone == null
-              ? await controller.addZone(name, type: type)
-              : await controller.editZone(zone.id, name: name, type: type);
+          final error = await controller.addZone(name, type: type);
           if (context.mounted) _reportFailure(context, ref);
           return error;
         },
       ),
     );
   }
+
+  void _edit(BuildContext context, ZoneEntity zone) => Navigator.of(
+    context,
+  ).push(MaterialPageRoute(builder: (_) => ZoneFormScreen(zone: zone)));
 
   Future<void> _setArchived(
     BuildContext context,
@@ -121,14 +127,18 @@ class ZonesScreen extends ConsumerWidget {
         leading: Icon(zoneIcon(zone.type)),
         title: Text(zone.name),
         subtitle: Text(l.zoneActivityCount(count)),
-        onTap: () => _edit(context, ref, zone),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => ZoneDetailScreen(zoneId: zone.id)),
+        ),
         trailing: PopupMenuButton<String>(
           tooltip: l.zoneMoreActions(zone.name),
           onSelected: (action) => switch (action) {
+            'edit' => _edit(context, zone),
             'archive' => _setArchived(context, ref, zone, !zone.archived),
             _ => _delete(context, ref, zone, count),
           },
           itemBuilder: (_) => [
+            PopupMenuItem(value: 'edit', child: Text(l.zoneEdit)),
             PopupMenuItem(
               value: 'archive',
               child: Text(zone.archived ? l.zoneUnarchive : l.zoneArchive),
@@ -140,10 +150,10 @@ class ZonesScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.zoneTitle)),
+      appBar: AppBar(title: Text(l.navGarden)),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'add-zone',
-        onPressed: () => _edit(context, ref),
+        onPressed: () => _add(context, ref),
         icon: const Icon(Icons.add),
         label: Text(l.zoneNewTitle),
       ),
@@ -158,6 +168,14 @@ class ZonesScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.only(bottom: 96),
             children: [
+              const _InventoryCard(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Text(
+                  l.gardenZonesSection,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
               for (final zone in active) tile(zone),
               if (archived.isNotEmpty) ...[
                 Padding(
@@ -178,14 +196,9 @@ class ZonesScreen extends ConsumerWidget {
 }
 
 class _ZoneDialog extends StatefulWidget {
-  const _ZoneDialog({
-    required this.title,
-    required this.initial,
-    required this.onSubmit,
-  });
+  const _ZoneDialog({required this.title, required this.onSubmit});
 
   final String title;
-  final ZoneEntity? initial;
   final Future<ZoneNameError?> Function(String name, ZoneType type) onSubmit;
 
   @override
@@ -193,10 +206,8 @@ class _ZoneDialog extends StatefulWidget {
 }
 
 class _ZoneDialogState extends State<_ZoneDialog> {
-  late final TextEditingController _controller = TextEditingController(
-    text: widget.initial?.name,
-  );
-  late ZoneType _type = widget.initial?.type ?? ZoneType.other;
+  final _controller = TextEditingController();
+  ZoneType _type = ZoneType.other;
   ZoneNameError? _error;
   bool _saving = false;
 
@@ -274,6 +285,38 @@ class _ZoneDialogState extends State<_ZoneDialog> {
           child: Text(l.commonSave),
         ),
       ],
+    );
+  }
+}
+
+/// Karta skladu s počtem položek a upozornění hlídače.
+class _InventoryCard extends ConsumerWidget {
+  const _InventoryCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final count = ref.watch(inventoryControllerProvider).value?.length ?? 0;
+    final alerts = ref.watch(inventoryAlertsProvider).length;
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: ListTile(
+        leading: const Icon(Icons.inventory_2_outlined),
+        title: Text(l.gardenInventoryCard),
+        subtitle: Text(
+          alerts == 0
+              ? l.gardenInventorySummary(count)
+              : '${l.gardenInventorySummary(count)} · '
+                    '${l.gardenAlertsSummary(alerts)}',
+        ),
+        trailing: alerts == 0
+            ? const Icon(Icons.chevron_right)
+            : Icon(Icons.notifications_active, color: scheme.tertiary),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const InventoryScreen())),
+      ),
     );
   }
 }

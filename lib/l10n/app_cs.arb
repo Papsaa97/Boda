@@ -461,5 +461,398 @@
         "type": "int"
       }
     }
+  },
+  "zoneEditTitle": "Upravit zónu",
+  "zoneEdit": "Upravit",
+  "zoneNameLabel": "Název",
+  "zoneAreaLabel": "Výměra (m²)",
+  "zoneAreaHint": "např. 20",
+  "zoneAreaHelper": "Stačí změřit pásmem: délka × šířka.",
+  "zonePhLabel": "pH půdy",
+  "zonePhHint": "např. 6,5",
+  "zonePhMeasuredLabel": "Změřeno",
+  "zonePhMeasuredNone": "Kdy jsi pH měřil(a)?",
+  "zoneSoilLabel": "Půda",
+  "zoneSunLabel": "Oslunění",
+  "zoneIrrigationLabel": "Závlaha",
+  "zoneCoveredLabel": "Krytá zóna",
+  "zoneCoveredHelp": "Skleník nebo fóliovník",
+  "zoneNotSet": "Nevyplněno",
+  "zoneNumberInvalid": "Zadej číslo, třeba 12,5",
+  "zoneAreaOutOfRange": "Výměra musí být mezi 0 a 100 000 m²",
+  "zonePhOutOfRange": "pH bývá mezi 3 a 10",
+  "zoneSoilSandy": "Písčitá",
+  "zoneSoilLoamy": "Hlinitá",
+  "zoneSoilClay": "Jílovitá",
+  "zoneSoilUnknown": "Nevím",
+  "zoneSunFull": "Plné slunce (6 h a víc)",
+  "zoneSunPartShade": "Polostín (3–6 h)",
+  "zoneSunShade": "Stín (méně než 3 h)",
+  "zoneIrrigationNone": "Žádná",
+  "zoneIrrigationManual": "Konev nebo hadice",
+  "zoneIrrigationDrip": "Kapková",
+  "zoneIrrigationSprinkler": "Postřikovač",
+  "zonePropertiesTitle": "Vlastnosti",
+  "zonePropertiesEmpty": "Doplň výměru a půdu. Bóďa pak spočítá dávky přesně pro tuhle zónu.",
+  "zoneAreaValue": "{area} m²",
+  "@zoneAreaValue": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "zonePhValue": "pH {ph}",
+  "@zonePhValue": {
+    "placeholders": {
+      "ph": {
+        "type": "String"
+      }
+    }
+  },
+  "zonePhValueDated": "pH {ph} ({date})",
+  "@zonePhValueDated": {
+    "placeholders": {
+      "ph": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneRecentActivities": "Poslední záznamy",
+  "zoneNoActivities": "V téhle zóně zatím nic zapsaného.",
+  "zoneCoveredYes": "Krytá (skleník, fóliovník)",
+  "inventoryTitle": "Sklad",
+  "inventoryEmptyTitle": "Sklad je zatím prázdný",
+  "inventoryEmptyBody": "Zapiš osiva, hnojiva, přípravky a nářadí, co máš doma. Bóďa pak radí s tím, co máš, a hlídá, co dochází.",
+  "inventoryAdd": "Přidat do skladu",
+  "inventoryNewTitle": "Nová položka",
+  "inventoryEditTitle": "Upravit položku",
+  "inventoryCategoryLabel": "Kategorie",
+  "inventoryCategorySeed": "Osiva",
+  "inventoryCategoryFertilizer": "Hnojiva",
+  "inventoryCategoryPlantProtection": "Přípravky na ochranu rostlin",
+  "inventoryCategoryTool": "Nářadí",
+  "inventoryCategoryOther": "Ostatní",
+  "inventoryNameLabel": "Název",
+  "inventoryNameRequired": "Zadej název",
+  "inventoryUnitLabel": "Jednotka",
+  "inventoryStockLabel": "Množství doma",
+  "inventoryThresholdLabel": "Upozornit, když klesne na",
+  "inventoryThresholdHelper": "Nech prázdné, když hlídat nechceš.",
+  "inventoryUnitG": "g",
+  "inventoryUnitKg": "kg",
+  "inventoryUnitMl": "ml",
+  "inventoryUnitL": "l",
+  "inventoryUnitKs": "ks",
+  "inventoryUnitPack": "bal.",
+  "inventorySpeciesLabel": "Druh (např. rajče)",
+  "inventoryVarietyLabel": "Odrůda",
+  "inventoryLotLabel": "Šarže",
+  "inventoryBestBeforeLabel": "Spotřebovat do",
+  "inventoryDateNone": "Nezadáno",
+  "inventoryNpkLabel": "Živiny N-P-K (%)",
+  "inventoryNLabel": "N",
+  "inventoryPLabel": "P",
+  "inventoryKLabel": "K",
+  "inventoryFormLabel": "Forma",
+  "inventoryFormGranular": "Granule",
+  "inventoryFormLiquid": "Tekuté",
+  "inventoryFormPowder": "Prášek",
+  "inventoryFormOrganic": "Organické",
+  "inventoryDoseLabel": "Dávka na 1 m² podle obalu",
+  "inventoryDoseHelper": "Opiš z obalu. Z tohohle čísla Bóďa počítá množství na zónu.",
+  "inventoryLabelWarning": "Údaje opiš přesně z etikety. Bóďa doporučí jen přípravek povolený pro neprofesionální uživatele a dávku nikdy neodhaduje.",
+  "inventoryActiveSubstanceLabel": "Účinná látka",
+  "inventoryAuthorizationLabel": "Číslo povolení",
+  "inventoryPhiLabel": "Ochranná lhůta do sklizně (dny)",
+  "inventoryNonProfessionalLabel": "Povoleno pro neprofesionální uživatele",
+  "inventoryConditionLabel": "Stav",
+  "inventoryConditionGood": "V pořádku",
+  "inventoryConditionNeedsService": "Potřebuje servis",
+  "inventoryConditionBroken": "Rozbité",
+  "inventoryServiceIntervalLabel": "Servis každých (dní)",
+  "inventoryLastServiceLabel": "Poslední servis",
+  "inventoryNumberInvalid": "Zadej kladné číslo",
+  "inventoryDeleteTitle": "Smazat položku?",
+  "inventoryDeleteBody": "{name} zmizí ze skladu.",
+  "@inventoryDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryDeleted": "{name} smazáno",
+  "@inventoryDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inventorySaveFailed": "Sklad se nepodařilo uložit.",
+  "inventoryStock": "{qty} {unit}",
+  "@inventoryStock": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryPhi": "ochranná lhůta {count, plural, =1{1 den} few{{count} dny} other{{count} dní}}",
+  "@inventoryPhi": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inventoryBestBefore": "do {date}",
+  "@inventoryBestBefore": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryAlertsTitle": "Hlídač zásob",
+  "inventoryAlertLowStock": "{name}: dochází ({qty})",
+  "@inventoryAlertLowStock": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryAlertSeedExpired": "{name}: osivo je po datu ({date})",
+  "@inventoryAlertSeedExpired": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryAlertSeedExpiringSoon": "{name}: osivo vydrží do {date}",
+  "@inventoryAlertSeedExpiringSoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryAlertToolService": "{name}: čas na servis",
+  "@inventoryAlertToolService": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryToShoppingList": "Na nákupní seznam",
+  "inventoryAddedToShopping": "{name} je na nákupním seznamu",
+  "@inventoryAddedToShopping": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shoppingTitle": "Nákupní seznam",
+  "shoppingEmptyTitle": "Nic nechybí",
+  "shoppingEmptyBody": "Sem přidáš, co koupit. Plní ho i Bóďa a hlídač zásob.",
+  "shoppingAdd": "Přidat na seznam",
+  "shoppingNameLabel": "Co koupit",
+  "shoppingQtyLabel": "Množství (nepovinné)",
+  "shoppingClearDone": "Smazat koupené",
+  "shoppingRestocked": "Do skladu přidáno: {name} +{qty}",
+  "@shoppingRestocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "shoppingFromBoda": "od Bódi",
+  "shoppingFromLowStock": "dochází",
+  "shoppingCount": "{count, plural, =0{prázdný} =1{1 položka} few{{count} položky} other{{count} položek}}",
+  "@shoppingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "navGarden": "Zahrada",
+  "gardenZonesSection": "Zóny",
+  "gardenInventoryCard": "Sklad",
+  "gardenInventorySummary": "{count, plural, =0{Zatím prázdný} =1{1 položka} few{{count} položky} other{{count} položek}}",
+  "@gardenInventorySummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gardenAlertsSummary": "{count, plural, =1{1 upozornění} few{{count} upozornění} other{{count} upozornění}}",
+  "@gardenAlertsSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationMinutes": "{minutes} min",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "{hours} h",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} h {minutes} min",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "taskDurationLabel": "Odhad doby",
+  "taskDurationNone": "Neuvedeno",
+  "taskToolsLabel": "Nářadí",
+  "taskToolsHint": "Přidej nářadí, např. rýč",
+  "taskToolAdd": "Přidat nářadí",
+  "taskToolRemove": "Odebrat {name}",
+  "@taskToolRemove": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taskMaterialsLabel": "Materiál ze skladu",
+  "taskMaterialAdd": "Přidat materiál",
+  "taskMaterialRemove": "Odebrat {name}",
+  "@taskMaterialRemove": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taskMaterialItemLabel": "Položka skladu",
+  "taskMaterialQtyLabel": "Množství",
+  "taskMaterialNoInventory": "Ve skladu zatím nic není. Přidej položky v záložce Zahrada → Sklad.",
+  "taskMaterialQty": "{name}: {qty}",
+  "@taskMaterialQty": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "taskMaterialMissing": "Neznámá položka",
+  "weekendTitle": "Víkend na chalupě",
+  "weekendTooltip": "Víkend na chalupě",
+  "weekendAvailable": "Kolik máš času: {hours} h",
+  "@weekendAvailable": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "weekendSummary": "{count, plural, =0{Nic se nevejde} =1{Stihneš 1 úkol} few{Stihneš {count} úkoly} other{Stihneš {count} úkolů}} ({time})",
+  "@weekendSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "weekendNothing": "Na příští týden nic otevřeného nemáš. Užij si chalupu.",
+  "weekendTakeAlong": "Vezmi s sebou",
+  "weekendLeftOver": "Nevejde se",
+  "weekendEstimated": "odhad",
+  "weekendHint": "Úkoly na řadě do týdne, nejdřív zpožděné. Doba bez odhadu se počítá jako 30 min.",
+  "activityHarvestLabel": "Sklizeno",
+  "activityCostLabel": "Náklady v Kč (nepovinné)",
+  "activityHarvestValue": "Sklizeno {qty}",
+  "@activityHarvestValue": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "activityCostValue": "Náklady {amount} Kč",
+  "@activityCostValue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonTitle": "Tvoje sezóna {year}",
+  "@seasonTitle": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "seasonCardBody": "Zima je čas ohlédnout se. Kolik jsi toho letos zapsal(a) a sklidil(a)?",
+  "seasonCardAction": "Ukázat sezónu",
+  "seasonEmpty": "V tomhle roce zatím nic zapsaného.",
+  "seasonActivities": "záznamů",
+  "seasonActiveDays": "dní na zahradě",
+  "seasonHarvestTitle": "Sklizeň",
+  "seasonHarvestNone": "Sklizeň s množstvím zatím nezapsaná.",
+  "seasonCostTitle": "Náklady",
+  "seasonTopZones": "Nejvíc práce",
+  "seasonPhotos": "Fotky sezóny",
+  "seasonOpen": "Přehled sezóny",
+  "dashboardInventoryAlerts": "{count, plural, =1{Hlídač zásob: 1 upozornění} few{Hlídač zásob: {count} upozornění} other{Hlídač zásob: {count} upozornění}}",
+  "@dashboardInventoryAlerts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

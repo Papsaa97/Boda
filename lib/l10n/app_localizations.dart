@@ -1467,6 +1467,984 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'a {count} další'**
   String notificationDigestMore(int count);
+
+  /// No description provided for @zoneEditTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Upravit zónu'**
+  String get zoneEditTitle;
+
+  /// No description provided for @zoneEdit.
+  ///
+  /// In cs, this message translates to:
+  /// **'Upravit'**
+  String get zoneEdit;
+
+  /// No description provided for @zoneNameLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Název'**
+  String get zoneNameLabel;
+
+  /// No description provided for @zoneAreaLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výměra (m²)'**
+  String get zoneAreaLabel;
+
+  /// No description provided for @zoneAreaHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'např. 20'**
+  String get zoneAreaHint;
+
+  /// No description provided for @zoneAreaHelper.
+  ///
+  /// In cs, this message translates to:
+  /// **'Stačí změřit pásmem: délka × šířka.'**
+  String get zoneAreaHelper;
+
+  /// No description provided for @zonePhLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'pH půdy'**
+  String get zonePhLabel;
+
+  /// No description provided for @zonePhHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'např. 6,5'**
+  String get zonePhHint;
+
+  /// No description provided for @zonePhMeasuredLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Změřeno'**
+  String get zonePhMeasuredLabel;
+
+  /// No description provided for @zonePhMeasuredNone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kdy jsi pH měřil(a)?'**
+  String get zonePhMeasuredNone;
+
+  /// No description provided for @zoneSoilLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Půda'**
+  String get zoneSoilLabel;
+
+  /// No description provided for @zoneSunLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Oslunění'**
+  String get zoneSunLabel;
+
+  /// No description provided for @zoneIrrigationLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Závlaha'**
+  String get zoneIrrigationLabel;
+
+  /// No description provided for @zoneCoveredLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Krytá zóna'**
+  String get zoneCoveredLabel;
+
+  /// No description provided for @zoneCoveredHelp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Skleník nebo fóliovník'**
+  String get zoneCoveredHelp;
+
+  /// No description provided for @zoneNotSet.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nevyplněno'**
+  String get zoneNotSet;
+
+  /// No description provided for @zoneNumberInvalid.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej číslo, třeba 12,5'**
+  String get zoneNumberInvalid;
+
+  /// No description provided for @zoneAreaOutOfRange.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výměra musí být mezi 0 a 100 000 m²'**
+  String get zoneAreaOutOfRange;
+
+  /// No description provided for @zonePhOutOfRange.
+  ///
+  /// In cs, this message translates to:
+  /// **'pH bývá mezi 3 a 10'**
+  String get zonePhOutOfRange;
+
+  /// No description provided for @zoneSoilSandy.
+  ///
+  /// In cs, this message translates to:
+  /// **'Písčitá'**
+  String get zoneSoilSandy;
+
+  /// No description provided for @zoneSoilLoamy.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hlinitá'**
+  String get zoneSoilLoamy;
+
+  /// No description provided for @zoneSoilClay.
+  ///
+  /// In cs, this message translates to:
+  /// **'Jílovitá'**
+  String get zoneSoilClay;
+
+  /// No description provided for @zoneSoilUnknown.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nevím'**
+  String get zoneSoilUnknown;
+
+  /// No description provided for @zoneSunFull.
+  ///
+  /// In cs, this message translates to:
+  /// **'Plné slunce (6 h a víc)'**
+  String get zoneSunFull;
+
+  /// No description provided for @zoneSunPartShade.
+  ///
+  /// In cs, this message translates to:
+  /// **'Polostín (3–6 h)'**
+  String get zoneSunPartShade;
+
+  /// No description provided for @zoneSunShade.
+  ///
+  /// In cs, this message translates to:
+  /// **'Stín (méně než 3 h)'**
+  String get zoneSunShade;
+
+  /// No description provided for @zoneIrrigationNone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Žádná'**
+  String get zoneIrrigationNone;
+
+  /// No description provided for @zoneIrrigationManual.
+  ///
+  /// In cs, this message translates to:
+  /// **'Konev nebo hadice'**
+  String get zoneIrrigationManual;
+
+  /// No description provided for @zoneIrrigationDrip.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kapková'**
+  String get zoneIrrigationDrip;
+
+  /// No description provided for @zoneIrrigationSprinkler.
+  ///
+  /// In cs, this message translates to:
+  /// **'Postřikovač'**
+  String get zoneIrrigationSprinkler;
+
+  /// No description provided for @zonePropertiesTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vlastnosti'**
+  String get zonePropertiesTitle;
+
+  /// No description provided for @zonePropertiesEmpty.
+  ///
+  /// In cs, this message translates to:
+  /// **'Doplň výměru a půdu. Bóďa pak spočítá dávky přesně pro tuhle zónu.'**
+  String get zonePropertiesEmpty;
+
+  /// No description provided for @zoneAreaValue.
+  ///
+  /// In cs, this message translates to:
+  /// **'{area} m²'**
+  String zoneAreaValue(String area);
+
+  /// No description provided for @zonePhValue.
+  ///
+  /// In cs, this message translates to:
+  /// **'pH {ph}'**
+  String zonePhValue(String ph);
+
+  /// No description provided for @zonePhValueDated.
+  ///
+  /// In cs, this message translates to:
+  /// **'pH {ph} ({date})'**
+  String zonePhValueDated(String ph, String date);
+
+  /// No description provided for @zoneRecentActivities.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poslední záznamy'**
+  String get zoneRecentActivities;
+
+  /// No description provided for @zoneNoActivities.
+  ///
+  /// In cs, this message translates to:
+  /// **'V téhle zóně zatím nic zapsaného.'**
+  String get zoneNoActivities;
+
+  /// No description provided for @zoneCoveredYes.
+  ///
+  /// In cs, this message translates to:
+  /// **'Krytá (skleník, fóliovník)'**
+  String get zoneCoveredYes;
+
+  /// No description provided for @inventoryTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sklad'**
+  String get inventoryTitle;
+
+  /// No description provided for @inventoryEmptyTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sklad je zatím prázdný'**
+  String get inventoryEmptyTitle;
+
+  /// No description provided for @inventoryEmptyBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zapiš osiva, hnojiva, přípravky a nářadí, co máš doma. Bóďa pak radí s tím, co máš, a hlídá, co dochází.'**
+  String get inventoryEmptyBody;
+
+  /// No description provided for @inventoryAdd.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidat do skladu'**
+  String get inventoryAdd;
+
+  /// No description provided for @inventoryNewTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nová položka'**
+  String get inventoryNewTitle;
+
+  /// No description provided for @inventoryEditTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Upravit položku'**
+  String get inventoryEditTitle;
+
+  /// No description provided for @inventoryCategoryLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kategorie'**
+  String get inventoryCategoryLabel;
+
+  /// No description provided for @inventoryCategorySeed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Osiva'**
+  String get inventoryCategorySeed;
+
+  /// No description provided for @inventoryCategoryFertilizer.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hnojiva'**
+  String get inventoryCategoryFertilizer;
+
+  /// No description provided for @inventoryCategoryPlantProtection.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přípravky na ochranu rostlin'**
+  String get inventoryCategoryPlantProtection;
+
+  /// No description provided for @inventoryCategoryTool.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nářadí'**
+  String get inventoryCategoryTool;
+
+  /// No description provided for @inventoryCategoryOther.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ostatní'**
+  String get inventoryCategoryOther;
+
+  /// No description provided for @inventoryNameLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Název'**
+  String get inventoryNameLabel;
+
+  /// No description provided for @inventoryNameRequired.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej název'**
+  String get inventoryNameRequired;
+
+  /// No description provided for @inventoryUnitLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Jednotka'**
+  String get inventoryUnitLabel;
+
+  /// No description provided for @inventoryStockLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Množství doma'**
+  String get inventoryStockLabel;
+
+  /// No description provided for @inventoryThresholdLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Upozornit, když klesne na'**
+  String get inventoryThresholdLabel;
+
+  /// No description provided for @inventoryThresholdHelper.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nech prázdné, když hlídat nechceš.'**
+  String get inventoryThresholdHelper;
+
+  /// No description provided for @inventoryUnitG.
+  ///
+  /// In cs, this message translates to:
+  /// **'g'**
+  String get inventoryUnitG;
+
+  /// No description provided for @inventoryUnitKg.
+  ///
+  /// In cs, this message translates to:
+  /// **'kg'**
+  String get inventoryUnitKg;
+
+  /// No description provided for @inventoryUnitMl.
+  ///
+  /// In cs, this message translates to:
+  /// **'ml'**
+  String get inventoryUnitMl;
+
+  /// No description provided for @inventoryUnitL.
+  ///
+  /// In cs, this message translates to:
+  /// **'l'**
+  String get inventoryUnitL;
+
+  /// No description provided for @inventoryUnitKs.
+  ///
+  /// In cs, this message translates to:
+  /// **'ks'**
+  String get inventoryUnitKs;
+
+  /// No description provided for @inventoryUnitPack.
+  ///
+  /// In cs, this message translates to:
+  /// **'bal.'**
+  String get inventoryUnitPack;
+
+  /// No description provided for @inventorySpeciesLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Druh (např. rajče)'**
+  String get inventorySpeciesLabel;
+
+  /// No description provided for @inventoryVarietyLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odrůda'**
+  String get inventoryVarietyLabel;
+
+  /// No description provided for @inventoryLotLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Šarže'**
+  String get inventoryLotLabel;
+
+  /// No description provided for @inventoryBestBeforeLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Spotřebovat do'**
+  String get inventoryBestBeforeLabel;
+
+  /// No description provided for @inventoryDateNone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nezadáno'**
+  String get inventoryDateNone;
+
+  /// No description provided for @inventoryNpkLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Živiny N-P-K (%)'**
+  String get inventoryNpkLabel;
+
+  /// No description provided for @inventoryNLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'N'**
+  String get inventoryNLabel;
+
+  /// No description provided for @inventoryPLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'P'**
+  String get inventoryPLabel;
+
+  /// No description provided for @inventoryKLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'K'**
+  String get inventoryKLabel;
+
+  /// No description provided for @inventoryFormLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Forma'**
+  String get inventoryFormLabel;
+
+  /// No description provided for @inventoryFormGranular.
+  ///
+  /// In cs, this message translates to:
+  /// **'Granule'**
+  String get inventoryFormGranular;
+
+  /// No description provided for @inventoryFormLiquid.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tekuté'**
+  String get inventoryFormLiquid;
+
+  /// No description provided for @inventoryFormPowder.
+  ///
+  /// In cs, this message translates to:
+  /// **'Prášek'**
+  String get inventoryFormPowder;
+
+  /// No description provided for @inventoryFormOrganic.
+  ///
+  /// In cs, this message translates to:
+  /// **'Organické'**
+  String get inventoryFormOrganic;
+
+  /// No description provided for @inventoryDoseLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Dávka na 1 m² podle obalu'**
+  String get inventoryDoseLabel;
+
+  /// No description provided for @inventoryDoseHelper.
+  ///
+  /// In cs, this message translates to:
+  /// **'Opiš z obalu. Z tohohle čísla Bóďa počítá množství na zónu.'**
+  String get inventoryDoseHelper;
+
+  /// No description provided for @inventoryLabelWarning.
+  ///
+  /// In cs, this message translates to:
+  /// **'Údaje opiš přesně z etikety. Bóďa doporučí jen přípravek povolený pro neprofesionální uživatele a dávku nikdy neodhaduje.'**
+  String get inventoryLabelWarning;
+
+  /// No description provided for @inventoryActiveSubstanceLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Účinná látka'**
+  String get inventoryActiveSubstanceLabel;
+
+  /// No description provided for @inventoryAuthorizationLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Číslo povolení'**
+  String get inventoryAuthorizationLabel;
+
+  /// No description provided for @inventoryPhiLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ochranná lhůta do sklizně (dny)'**
+  String get inventoryPhiLabel;
+
+  /// No description provided for @inventoryNonProfessionalLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Povoleno pro neprofesionální uživatele'**
+  String get inventoryNonProfessionalLabel;
+
+  /// No description provided for @inventoryConditionLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Stav'**
+  String get inventoryConditionLabel;
+
+  /// No description provided for @inventoryConditionGood.
+  ///
+  /// In cs, this message translates to:
+  /// **'V pořádku'**
+  String get inventoryConditionGood;
+
+  /// No description provided for @inventoryConditionNeedsService.
+  ///
+  /// In cs, this message translates to:
+  /// **'Potřebuje servis'**
+  String get inventoryConditionNeedsService;
+
+  /// No description provided for @inventoryConditionBroken.
+  ///
+  /// In cs, this message translates to:
+  /// **'Rozbité'**
+  String get inventoryConditionBroken;
+
+  /// No description provided for @inventoryServiceIntervalLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Servis každých (dní)'**
+  String get inventoryServiceIntervalLabel;
+
+  /// No description provided for @inventoryLastServiceLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poslední servis'**
+  String get inventoryLastServiceLabel;
+
+  /// No description provided for @inventoryNumberInvalid.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej kladné číslo'**
+  String get inventoryNumberInvalid;
+
+  /// No description provided for @inventoryDeleteTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat položku?'**
+  String get inventoryDeleteTitle;
+
+  /// No description provided for @inventoryDeleteBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} zmizí ze skladu.'**
+  String inventoryDeleteBody(String name);
+
+  /// No description provided for @inventoryDeleted.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} smazáno'**
+  String inventoryDeleted(String name);
+
+  /// No description provided for @inventorySaveFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sklad se nepodařilo uložit.'**
+  String get inventorySaveFailed;
+
+  /// No description provided for @inventoryStock.
+  ///
+  /// In cs, this message translates to:
+  /// **'{qty} {unit}'**
+  String inventoryStock(String qty, String unit);
+
+  /// No description provided for @inventoryPhi.
+  ///
+  /// In cs, this message translates to:
+  /// **'ochranná lhůta {count, plural, =1{1 den} few{{count} dny} other{{count} dní}}'**
+  String inventoryPhi(int count);
+
+  /// No description provided for @inventoryBestBefore.
+  ///
+  /// In cs, this message translates to:
+  /// **'do {date}'**
+  String inventoryBestBefore(String date);
+
+  /// No description provided for @inventoryAlertsTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hlídač zásob'**
+  String get inventoryAlertsTitle;
+
+  /// No description provided for @inventoryAlertLowStock.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name}: dochází ({qty})'**
+  String inventoryAlertLowStock(String name, String qty);
+
+  /// No description provided for @inventoryAlertSeedExpired.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name}: osivo je po datu ({date})'**
+  String inventoryAlertSeedExpired(String name, String date);
+
+  /// No description provided for @inventoryAlertSeedExpiringSoon.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name}: osivo vydrží do {date}'**
+  String inventoryAlertSeedExpiringSoon(String name, String date);
+
+  /// No description provided for @inventoryAlertToolService.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name}: čas na servis'**
+  String inventoryAlertToolService(String name);
+
+  /// No description provided for @inventoryToShoppingList.
+  ///
+  /// In cs, this message translates to:
+  /// **'Na nákupní seznam'**
+  String get inventoryToShoppingList;
+
+  /// No description provided for @inventoryAddedToShopping.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} je na nákupním seznamu'**
+  String inventoryAddedToShopping(String name);
+
+  /// No description provided for @shoppingTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nákupní seznam'**
+  String get shoppingTitle;
+
+  /// No description provided for @shoppingEmptyTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nic nechybí'**
+  String get shoppingEmptyTitle;
+
+  /// No description provided for @shoppingEmptyBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sem přidáš, co koupit. Plní ho i Bóďa a hlídač zásob.'**
+  String get shoppingEmptyBody;
+
+  /// No description provided for @shoppingAdd.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidat na seznam'**
+  String get shoppingAdd;
+
+  /// No description provided for @shoppingNameLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Co koupit'**
+  String get shoppingNameLabel;
+
+  /// No description provided for @shoppingQtyLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Množství (nepovinné)'**
+  String get shoppingQtyLabel;
+
+  /// No description provided for @shoppingClearDone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat koupené'**
+  String get shoppingClearDone;
+
+  /// No description provided for @shoppingRestocked.
+  ///
+  /// In cs, this message translates to:
+  /// **'Do skladu přidáno: {name} +{qty}'**
+  String shoppingRestocked(String name, String qty);
+
+  /// No description provided for @shoppingFromBoda.
+  ///
+  /// In cs, this message translates to:
+  /// **'od Bódi'**
+  String get shoppingFromBoda;
+
+  /// No description provided for @shoppingFromLowStock.
+  ///
+  /// In cs, this message translates to:
+  /// **'dochází'**
+  String get shoppingFromLowStock;
+
+  /// No description provided for @shoppingCount.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =0{prázdný} =1{1 položka} few{{count} položky} other{{count} položek}}'**
+  String shoppingCount(int count);
+
+  /// No description provided for @navGarden.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahrada'**
+  String get navGarden;
+
+  /// No description provided for @gardenZonesSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zóny'**
+  String get gardenZonesSection;
+
+  /// No description provided for @gardenInventoryCard.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sklad'**
+  String get gardenInventoryCard;
+
+  /// No description provided for @gardenInventorySummary.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =0{Zatím prázdný} =1{1 položka} few{{count} položky} other{{count} položek}}'**
+  String gardenInventorySummary(int count);
+
+  /// No description provided for @gardenAlertsSummary.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =1{1 upozornění} few{{count} upozornění} other{{count} upozornění}}'**
+  String gardenAlertsSummary(int count);
+
+  /// No description provided for @durationMinutes.
+  ///
+  /// In cs, this message translates to:
+  /// **'{minutes} min'**
+  String durationMinutes(int minutes);
+
+  /// No description provided for @durationHours.
+  ///
+  /// In cs, this message translates to:
+  /// **'{hours} h'**
+  String durationHours(int hours);
+
+  /// No description provided for @durationHoursMinutes.
+  ///
+  /// In cs, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String durationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @taskDurationLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odhad doby'**
+  String get taskDurationLabel;
+
+  /// No description provided for @taskDurationNone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Neuvedeno'**
+  String get taskDurationNone;
+
+  /// No description provided for @taskToolsLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nářadí'**
+  String get taskToolsLabel;
+
+  /// No description provided for @taskToolsHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidej nářadí, např. rýč'**
+  String get taskToolsHint;
+
+  /// No description provided for @taskToolAdd.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidat nářadí'**
+  String get taskToolAdd;
+
+  /// No description provided for @taskToolRemove.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odebrat {name}'**
+  String taskToolRemove(String name);
+
+  /// No description provided for @taskMaterialsLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Materiál ze skladu'**
+  String get taskMaterialsLabel;
+
+  /// No description provided for @taskMaterialAdd.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidat materiál'**
+  String get taskMaterialAdd;
+
+  /// No description provided for @taskMaterialRemove.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odebrat {name}'**
+  String taskMaterialRemove(String name);
+
+  /// No description provided for @taskMaterialItemLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Položka skladu'**
+  String get taskMaterialItemLabel;
+
+  /// No description provided for @taskMaterialQtyLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Množství'**
+  String get taskMaterialQtyLabel;
+
+  /// No description provided for @taskMaterialNoInventory.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ve skladu zatím nic není. Přidej položky v záložce Zahrada → Sklad.'**
+  String get taskMaterialNoInventory;
+
+  /// No description provided for @taskMaterialQty.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name}: {qty}'**
+  String taskMaterialQty(String name, String qty);
+
+  /// No description provided for @taskMaterialMissing.
+  ///
+  /// In cs, this message translates to:
+  /// **'Neznámá položka'**
+  String get taskMaterialMissing;
+
+  /// No description provided for @weekendTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Víkend na chalupě'**
+  String get weekendTitle;
+
+  /// No description provided for @weekendTooltip.
+  ///
+  /// In cs, this message translates to:
+  /// **'Víkend na chalupě'**
+  String get weekendTooltip;
+
+  /// No description provided for @weekendAvailable.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kolik máš času: {hours} h'**
+  String weekendAvailable(int hours);
+
+  /// No description provided for @weekendSummary.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =0{Nic se nevejde} =1{Stihneš 1 úkol} few{Stihneš {count} úkoly} other{Stihneš {count} úkolů}} ({time})'**
+  String weekendSummary(int count, String time);
+
+  /// No description provided for @weekendNothing.
+  ///
+  /// In cs, this message translates to:
+  /// **'Na příští týden nic otevřeného nemáš. Užij si chalupu.'**
+  String get weekendNothing;
+
+  /// No description provided for @weekendTakeAlong.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vezmi s sebou'**
+  String get weekendTakeAlong;
+
+  /// No description provided for @weekendLeftOver.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nevejde se'**
+  String get weekendLeftOver;
+
+  /// No description provided for @weekendEstimated.
+  ///
+  /// In cs, this message translates to:
+  /// **'odhad'**
+  String get weekendEstimated;
+
+  /// No description provided for @weekendHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Úkoly na řadě do týdne, nejdřív zpožděné. Doba bez odhadu se počítá jako 30 min.'**
+  String get weekendHint;
+
+  /// No description provided for @activityHarvestLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sklizeno'**
+  String get activityHarvestLabel;
+
+  /// No description provided for @activityCostLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Náklady v Kč (nepovinné)'**
+  String get activityCostLabel;
+
+  /// No description provided for @activityHarvestValue.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sklizeno {qty}'**
+  String activityHarvestValue(String qty);
+
+  /// No description provided for @activityCostValue.
+  ///
+  /// In cs, this message translates to:
+  /// **'Náklady {amount} Kč'**
+  String activityCostValue(String amount);
+
+  /// No description provided for @seasonTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tvoje sezóna {year}'**
+  String seasonTitle(int year);
+
+  /// No description provided for @seasonCardBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zima je čas ohlédnout se. Kolik jsi toho letos zapsal(a) a sklidil(a)?'**
+  String get seasonCardBody;
+
+  /// No description provided for @seasonCardAction.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ukázat sezónu'**
+  String get seasonCardAction;
+
+  /// No description provided for @seasonEmpty.
+  ///
+  /// In cs, this message translates to:
+  /// **'V tomhle roce zatím nic zapsaného.'**
+  String get seasonEmpty;
+
+  /// No description provided for @seasonActivities.
+  ///
+  /// In cs, this message translates to:
+  /// **'záznamů'**
+  String get seasonActivities;
+
+  /// No description provided for @seasonActiveDays.
+  ///
+  /// In cs, this message translates to:
+  /// **'dní na zahradě'**
+  String get seasonActiveDays;
+
+  /// No description provided for @seasonHarvestTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sklizeň'**
+  String get seasonHarvestTitle;
+
+  /// No description provided for @seasonHarvestNone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sklizeň s množstvím zatím nezapsaná.'**
+  String get seasonHarvestNone;
+
+  /// No description provided for @seasonCostTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Náklady'**
+  String get seasonCostTitle;
+
+  /// No description provided for @seasonTopZones.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nejvíc práce'**
+  String get seasonTopZones;
+
+  /// No description provided for @seasonPhotos.
+  ///
+  /// In cs, this message translates to:
+  /// **'Fotky sezóny'**
+  String get seasonPhotos;
+
+  /// No description provided for @seasonOpen.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přehled sezóny'**
+  String get seasonOpen;
+
+  /// No description provided for @dashboardInventoryAlerts.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =1{Hlídač zásob: 1 upozornění} few{Hlídač zásob: {count} upozornění} other{Hlídač zásob: {count} upozornění}}'**
+  String dashboardInventoryAlerts(int count);
 }
 
 class _AppLocalizationsDelegate

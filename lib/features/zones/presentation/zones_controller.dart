@@ -44,17 +44,12 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
     });
   }
 
-  /// Změní název a druh zóny. Vrací důvod, když název neprojde kontrolou.
-  Future<ZoneNameError?> editZone(
-    String id, {
-    required String name,
-    required ZoneType type,
-  }) async {
-    final error = validateZoneName(name, _current, exceptId: id);
+  /// Uloží zónu včetně vlastností (formulář zóny, 1.0). Vrací důvod,
+  /// když název neprojde kontrolou.
+  Future<ZoneNameError?> saveZone(ZoneEntity zone) async {
+    final error = validateZoneName(zone.name, _current, exceptId: zone.id);
     if (error != null) return error;
-    final zone = _byId(id);
-    if (zone == null) return null;
-    await _save(zone.copyWith(name: name.trim(), type: type));
+    await _save(zone.copyWith(name: zone.name.trim()));
     return null;
   }
 

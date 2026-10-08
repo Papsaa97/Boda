@@ -11,7 +11,7 @@ Mobilní aplikace, která vede **deník a digitální model zahrady** a nad ním
 | **MVP 0.1 – Offline deník** | ✅ implementováno |
 | **MVP 0.2 – Spolehlivý deník** (export/import, úkoly, rychlý zápis) | ✅ implementováno, k testerům do konce února 2027 |
 | Sezóna 2027 – validace „vydrží lidé zapisovat?“ | ○ |
-| MVP 1.0 – Chytrý parťák (účet, synchronizace, Bóďa) | ○ |
+| MVP 1.0 – Chytrý parťák (účet, synchronizace, Bóďa) | ◐ rozpracováno: zahrada, sklad a úkoly s materiálem hotové (DECLOG D50) |
 | MVP 1.1 – 2D plátno, V2, V3 | ○ |
 
 Celá roadmapa s definicí hotovo je ve [specifikaci, kap. 4](docs/SPECIFIKACE.md#4-roadmapa-a-rozsah-fází).
@@ -43,6 +43,9 @@ všechno, co je potřeba, aby se na deník dalo spolehnout celou sezónu.
 * ✅ **Zóny:** typ zóny, přejmenování, archivace (historie zůstane), smazání prázdné zóny.
 * ✅ **Záloha:** export do ZIP (data + fotky) a import „nahradit vše“; formát je popsaný v [docs/FORMAT_EXPORTU.md](docs/FORMAT_EXPORTU.md). Připomínka zálohy po 30 dnech.
 * ✅ **Nastavení:** světlý, tmavý nebo systémový motiv, tiché hodiny, ranní přehled, statistiky pro testery.
+* ✅ **Zahrada (1.0):** vlastnosti zón (výměra, půda, pH, oslunění, závlaha, krytí), sklad osiv, hnojiv, přípravků a nářadí s hlídačem zásob, nákupní seznam.
+* ✅ **Úkoly v plném rozsahu (1.0):** odhad doby, nářadí, materiál ze skladu, režim „víkend na chalupě“.
+* ✅ **Sklizeň a náklady** u záznamu, **přehled sezóny** v zimě.
 * ✅ **Offline-first:** data i fotky zůstávají na zařízení (SQLite přes Drift + složka aplikace). Žádný backend. Data z verze 0.1 se při prvním spuštění jednorázově převedou.
 
 Na webu funguje vše kromě fotek, zálohy a připomínek (prohlížeč nemá trvalé úložiště souborů ani plánované notifikace).
@@ -53,6 +56,7 @@ Na webu funguje vše kromě fotek, zálohy a připomínek (prohlížeč nemá tr
   * `features/activity` – záznamy deníku
   * `features/zones` – zóny
   * `features/tasks` – úkoly, opakování, plán připomínek
+  * `features/inventory` – sklad a nákupní seznam
   * `features/backup` – export a import ZIP
   * `features/settings`, `features/stats` – nastavení a statistiky pro testery
   * `features/dashboard` – „Co dnes?“ a tipy od Bódi

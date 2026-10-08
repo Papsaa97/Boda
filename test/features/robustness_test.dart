@@ -48,7 +48,7 @@ void main() {
 
       await tester.tap(find.text('Deník'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Zóny'));
+      await tester.tap(find.text('Zahrada'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Deník'));
       await tester.pumpAndSettle();

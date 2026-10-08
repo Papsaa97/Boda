@@ -28,3 +28,23 @@ String zoneTypeLabel(AppLocalizations l, ZoneType type) => switch (type) {
   ZoneType.structure => l.zoneTypeStructure,
   ZoneType.other => l.zoneTypeOther,
 };
+
+String soilTextureLabel(AppLocalizations l, SoilTexture v) => switch (v) {
+  SoilTexture.sandy => l.zoneSoilSandy,
+  SoilTexture.loamy => l.zoneSoilLoamy,
+  SoilTexture.clay => l.zoneSoilClay,
+  SoilTexture.unknown => l.zoneSoilUnknown,
+};
+
+String sunExposureLabel(AppLocalizations l, SunExposure v) => switch (v) {
+  SunExposure.fullSun => l.zoneSunFull,
+  SunExposure.partShade => l.zoneSunPartShade,
+  SunExposure.shade => l.zoneSunShade,
+};
+
+String irrigationLabel(AppLocalizations l, Irrigation v) => switch (v) {
+  Irrigation.none => l.zoneIrrigationNone,
+  Irrigation.manual => l.zoneIrrigationManual,
+  Irrigation.drip => l.zoneIrrigationDrip,
+  Irrigation.sprinkler => l.zoneIrrigationSprinkler,
+};
