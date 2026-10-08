@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/text/numbers.dart';
@@ -47,6 +49,44 @@ class PlanFrame {
 
   Pt toMeters(Offset o) =>
       Pt(o.dx / pixelsPerMeter + origin.x, o.dy / pixelsPerMeter + origin.y);
+}
+
+/// Zvětšení a posun plátna, aby byl nakreslený plán po otevření celý
+/// uprostřed okna. Bez bodů vrací null (prázdné plátno zůstane v rohu).
+Matrix4? fitPlanToView(
+  PlanFrame frame,
+  List<Pt> points,
+  Size viewport, {
+  double margin = 16,
+  double minScale = 0.2,
+  double maxScale = 3,
+}) {
+  if (points.isEmpty || viewport.isEmpty) return null;
+  final px = [for (final p in points) frame.toPx(p)];
+  var left = px.first.dx, right = left, top = px.first.dy, bottom = top;
+  for (final o in px) {
+    if (o.dx < left) left = o.dx;
+    if (o.dx > right) right = o.dx;
+    if (o.dy < top) top = o.dy;
+    if (o.dy > bottom) bottom = o.dy;
+  }
+  // Aspoň 2 m, aby jeden bod nebo úsečka nezvětšily plátno do extrému.
+  const minExtent = 2 * pixelsPerMeter;
+  final width = math.max(right - left, minExtent);
+  final height = math.max(bottom - top, minExtent);
+  final availW = math.max(viewport.width - 2 * margin, 1.0);
+  final availH = math.max(viewport.height - 2 * margin, 1.0);
+  final scale = math
+      .min(availW / width, availH / height)
+      .clamp(minScale, maxScale)
+      .toDouble();
+  final cx = (left + right) / 2;
+  final cy = (top + bottom) / 2;
+  return Matrix4.diagonal3Values(scale, scale, 1)..setTranslationRaw(
+    viewport.width / 2 - cx * scale,
+    viewport.height / 2 - cy * scale,
+    0,
+  );
 }
 
 /// Barva zóny podle druhu.
