@@ -21,28 +21,46 @@ enum IncidentSource {
 
 /// Možná příčina z diagnostiky (FR-V2): vždy „možná“, bez čísla jistoty.
 class IncidentCandidate extends Equatable {
-  const IncidentCandidate({required this.label, this.reason});
+  const IncidentCandidate({
+    required this.label,
+    this.reason,
+    this.check,
+    this.care,
+  });
 
   final String label;
 
   /// Proč to model tipuje (co na fotce viděl).
   final String? reason;
 
-  Map<String, Object?> toJson() => {'label': label, 'reason': ?reason};
+  /// Čím tip ověřit.
+  final String? check;
+
+  /// Šetrný postup bez chemie (FR-B3).
+  final String? care;
+
+  Map<String, Object?> toJson() => {
+    'label': label,
+    'reason': ?reason,
+    'check': ?check,
+    'care': ?care,
+  };
 
   static IncidentCandidate? fromJson(Object? json) {
     if (json is! Map) return null;
     final label = json['label'];
     if (label is! String || label.trim().isEmpty) return null;
-    final reason = json['reason'];
+    String? text(Object? v) => v is String && v.trim().isNotEmpty ? v : null;
     return IncidentCandidate(
       label: label,
-      reason: reason is String ? reason : null,
+      reason: text(json['reason']),
+      check: text(json['check']),
+      care: text(json['care']),
     );
   }
 
   @override
-  List<Object?> get props => [label, reason];
+  List<Object?> get props => [label, reason, check, care];
 }
 
 /// Karta incidentu (FR-V3): problém v zóně, fotky, plán řešení
@@ -85,6 +103,8 @@ class Incident extends Equatable {
   Incident copyWith({
     String? zoneId,
     String? label,
+    IncidentSource? source,
+    List<IncidentCandidate>? candidates,
     String? Function()? planBio,
     String? Function()? planChem,
     IncidentStatus? status,
@@ -94,8 +114,8 @@ class Incident extends Equatable {
     id: id,
     zoneId: zoneId ?? this.zoneId,
     label: label ?? this.label,
-    source: source,
-    candidates: candidates,
+    source: source ?? this.source,
+    candidates: candidates ?? this.candidates,
     planBio: planBio == null ? this.planBio : planBio(),
     planChem: planChem == null ? this.planChem : planChem(),
     status: status ?? this.status,

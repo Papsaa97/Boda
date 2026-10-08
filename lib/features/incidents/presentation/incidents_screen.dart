@@ -14,7 +14,9 @@ import '../../tasks/domain/task_entity.dart';
 import '../../tasks/presentation/task_ui.dart';
 import '../../tasks/presentation/tasks_controller.dart';
 import '../../zones/presentation/zones_controller.dart';
+import '../domain/diagnosis.dart';
 import '../domain/incident.dart';
+import 'diagnosis_controller.dart';
 import 'incidents_controller.dart';
 
 /// Nejvýš fotek u jednoho incidentu (stejně jako u záznamu).
@@ -135,6 +137,9 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
     for (final p in widget.initial?.photos ?? const <PhotoRef>[])
       _PhotoItem.saved(p),
   ];
+  late IncidentSource _source = widget.initial?.source ?? IncidentSource.user;
+  late List<IncidentCandidate> _candidates =
+      widget.initial?.candidates ?? const [];
   bool _saving = false;
 
   @override
@@ -177,6 +182,87 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
     setState(() => _photos = [..._photos, _PhotoItem.picked(picked)]);
   }
 
+  Future<Uint8List?> _photoBytes(_PhotoItem item) async {
+    final picked = item.picked;
+    if (picked != null) return picked.readAsBytes();
+    final path = ref.read(photoStorageProvider).resolve(item.saved!.path);
+    if (path == null || !File(path).existsSync()) return null;
+    // Fotka má po zmenšení stovky kB, synchronní čtení nevadí.
+    return File(path).readAsBytesSync();
+  }
+
+  /// Diagnostika z první fotky (FR-V1, FR-V2): souhlas, tip, volba.
+  Future<void> _diagnose(AppLocalizations l) async {
+    final controller = ref.read(diagnosisControllerProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    if (!controller.hasConsent) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l.diagnosisConsentTitle),
+          content: Text(l.diagnosisConsentBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l.commonCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l.diagnosisConsentAgree),
+            ),
+          ],
+        ),
+      );
+      if (ok != true) return;
+      await controller.grantConsent();
+    }
+    final bytes = await _photoBytes(_photos.first);
+    if (!mounted) return;
+    final zoneType = ref
+        .read(activeZonesProvider)
+        .where((z) => z.id == _zoneId)
+        .firstOrNull
+        ?.type
+        .name;
+    DiagnosisResult result;
+    try {
+      if (bytes == null) {
+        throw const DiagnosisException(DiagnosisFailure.badImage);
+      }
+      result = await controller.diagnose(
+        bytes,
+        zoneType: zoneType,
+        note: _label.text,
+      );
+    } on DiagnosisException catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(diagnosisFailureText(l, e.failure))),
+      );
+      return;
+    }
+    if (!mounted) return;
+    if (result.unclear) {
+      messenger.showSnackBar(SnackBar(content: Text(l.diagnosisUnclear)));
+      return;
+    }
+    setState(() {
+      _source = IncidentSource.model;
+      _candidates = result.candidates;
+    });
+    final chosen = await showModalBottomSheet<IncidentCandidate>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _DiagnosisSheet(candidates: result.candidates),
+    );
+    if (chosen == null || !mounted) return;
+    setState(() {
+      _label.text = chosen.label;
+      if (_bio.text.trim().isEmpty && chosen.care != null) {
+        _bio.text = chosen.care!;
+      }
+    });
+  }
+
   Future<void> _submit() async {
     final form = _formKey.currentState;
     final zoneId = _zoneId;
@@ -212,6 +298,8 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
         planBio: _bio.text,
         planChem: _chem.text,
         photos: photos,
+        source: _source,
+        candidates: _candidates,
         checkTitle: (day) => l.incidentCheckTask(day, label),
       );
     } else {
@@ -219,6 +307,8 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
         initial.copyWith(
           zoneId: zoneId,
           label: label,
+          source: _source,
+          candidates: _candidates,
           planBio: () => _bio.text,
           planChem: () => _chem.text,
           photos: photos,
@@ -242,6 +332,8 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
     final l = AppLocalizations.of(context);
     final zones = ref.watch(activeZonesProvider);
     final zoneIds = {for (final z in zones) z.id};
+    final diagnosisAvailable = ref.watch(diagnosisBackendProvider).available;
+    final diagnosing = ref.watch(diagnosisControllerProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -333,6 +425,27 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
                   ),
               ],
             ),
+            if (!kIsWeb && diagnosisAvailable && _photos.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: diagnosing ? null : () => _diagnose(l),
+                icon: diagnosing
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.auto_awesome_outlined),
+                label: Text(
+                  diagnosing ? l.diagnosisRunning : l.diagnosisButton,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                l.diagnosisButtonHelper,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
             const SizedBox(height: 16),
             TextFormField(
               controller: _bio,
@@ -367,6 +480,79 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
               icon: const Icon(Icons.check),
               label: Text(l.commonSave),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+String diagnosisFailureText(AppLocalizations l, DiagnosisFailure f) =>
+    switch (f) {
+      DiagnosisFailure.unavailable => l.diagnosisUnavailable,
+      DiagnosisFailure.notSignedIn => l.diagnosisNotSignedIn,
+      DiagnosisFailure.notPremium => l.diagnosisNotPremium,
+      DiagnosisFailure.noConsent => l.diagnosisNoConsent,
+      DiagnosisFailure.limitReached => l.diagnosisLimitReached,
+      DiagnosisFailure.badImage => l.diagnosisBadImage,
+      DiagnosisFailure.offline => l.diagnosisOffline,
+      DiagnosisFailure.failed => l.diagnosisFailed,
+    };
+
+/// Možné příčiny z diagnostiky (FR-V2): vždy „možná“, bez čísel jistoty.
+class _DiagnosisSheet extends StatelessWidget {
+  const _DiagnosisSheet({required this.candidates});
+
+  final List<IncidentCandidate> candidates;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(16),
+          children: [
+            Text(l.diagnosisResultTitle, style: theme.textTheme.titleLarge),
+            const SizedBox(height: 8),
+            Text(l.diagnosisDisclaimer, style: theme.textTheme.bodySmall),
+            for (final c in candidates)
+              Card(
+                margin: const EdgeInsets.only(top: 12),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(c.label, style: theme.textTheme.titleMedium),
+                      if (c.reason != null) ...[
+                        const SizedBox(height: 4),
+                        Text(c.reason!),
+                      ],
+                      if (c.check != null) ...[
+                        const SizedBox(height: 4),
+                        Text(l.diagnosisCheck(c.check!)),
+                      ],
+                      if (c.care != null) ...[
+                        const SizedBox(height: 4),
+                        Text(l.diagnosisCare(c.care!)),
+                      ],
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(c),
+                          child: Text(l.diagnosisUse),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),

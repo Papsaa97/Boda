@@ -1599,5 +1599,123 @@
       }
     }
   },
-  "weatherCardRainExpected": "Zálivka může počkat: do zítřka má pršet"
+  "weatherCardRainExpected": "Zálivka může počkat: do zítřka má pršet",
+  "diagnosisButton": "Zkusit poznat z fotky",
+  "diagnosisButtonHelper": "Bóďa tipne 1 až 3 možné příčiny. Premium, počítá se do měsíčního limitu dotazů.",
+  "diagnosisRunning": "Bóďa si fotku prohlíží…",
+  "diagnosisConsentTitle": "Poslat fotku k diagnóze?",
+  "diagnosisConsentBody": "První fotka se odešle poskytovateli umělé inteligence přes náš server. Před odesláním z ní odstraníme polohu a další údaje z fotoaparátu. Fotka se u nás neukládá a souhlas můžeš kdykoli odvolat v Nastavení, v části Souhlasy.",
+  "diagnosisConsentAgree": "Souhlasím a poslat",
+  "diagnosisResultTitle": "Možná jde o…",
+  "diagnosisDisclaimer": "Je to jen tip, ne jistá diagnóza. Ověř ho podle popisu, a když si nevíš rady, zeptej se v zahradnictví.",
+  "diagnosisCheck": "Ověř: {text}",
+  "@diagnosisCheck": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosisCare": "Šetrně: {text}",
+  "@diagnosisCare": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosisUse": "Použít",
+  "diagnosisUnclear": "Z fotky nejde nic spolehlivě poznat. Zkus ji vyfotit zblízka a na světle.",
+  "diagnosisUnavailable": "Diagnostika potřebuje připojení k serveru, které tahle verze aplikace nemá.",
+  "diagnosisNotSignedIn": "Pro diagnostiku se přihlas v Nastavení, v části Účet.",
+  "diagnosisNotPremium": "Diagnostika z fotek je v Premium.",
+  "diagnosisNoConsent": "Bez souhlasu s odesláním fotek diagnostika nejde.",
+  "diagnosisLimitReached": "Tento měsíc už je limit dotazů vyčerpaný.",
+  "diagnosisBadImage": "Tuhle fotku nejde poslat. Zkus jinou, nebo ji vyfoť znovu.",
+  "diagnosisOffline": "Bez připojení. Zkus to, až budeš online.",
+  "diagnosisFailed": "Diagnostika se teď nepovedla. Zkus to později.",
+  "consentsPhoto": "Diagnostika z fotek",
+  "consentsPhotoOn": "Souhlas od {date}",
+  "@consentsPhotoOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "consentsPhotoOff": "Bez souhlasu",
+  "consentsPhotoHelp": "Fotka problému se odešle poskytovateli umělé inteligence. Polohu a údaje z fotoaparátu před odesláním odstraníme.",
+  "sharingTitle": "Sdílení zahrady",
+  "sharingTileSubtitle": "Pozvi rodinu, ať zapisujete do jedné zahrady",
+  "sharingIntro": "Členové vidí a zapisují všechno v zahradě: zóny, deník, úkoly, sklad i plán. Změny se mezi telefony přenesou synchronizací.",
+  "sharingMembers": "Členové",
+  "sharingRoleOwner": "Vlastník",
+  "sharingRoleEditor": "Člen",
+  "sharingRoleViewer": "Jen čtení",
+  "sharingYou": "{name} (ty)",
+  "@sharingYou": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sharingNotSynced": "Zahrada ještě není nahraná na server. Počkej na synchronizaci a zkus to znovu.",
+  "sharingInvite": "Pozvat člena",
+  "sharingInviteHelp": "Pozvat může vlastník s Premium. Kód platí 7 dní a jde použít jednou.",
+  "sharingInviteCode": "Kód pozvánky",
+  "sharingInviteValid": "Platí do {date}",
+  "@sharingInviteValid": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sharingInviteShare": "Poslat kód",
+  "sharingInviteShareText": "Připoj se k mé zahradě v aplikaci Zahradník Bóďa: v Nastavení otevři Účet, Sdílení zahrady a zadej kód {code}. Kód platí do {date}.",
+  "@sharingInviteShareText": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sharingJoin": "Připojit se ke sdílené zahradě",
+  "sharingJoinHelp": "Máš kód od někoho z rodiny? Zadej ho tady.",
+  "sharingJoinCode": "Kód (8 znaků)",
+  "sharingJoinInvalid": "Kód má 8 písmen a číslic, například ABCD-EFGH.",
+  "sharingJoinConfirmTitle": "Připojit se ke sdílené zahradě?",
+  "sharingJoinConfirmBody": "Data v tomto telefonu nahradí sdílená zahrada. Tvoje dosavadní zahrada zůstane v účtu, změny z telefonu se před přepnutím odešlou.",
+  "sharingJoinConfirm": "Připojit se",
+  "sharingJoinAlready": "Do téhle zahrady už patříš.",
+  "sharingRemove": "Odebrat",
+  "sharingRemoveTitle": "Odebrat člena?",
+  "sharingRemoveBody": "{name} přestane vidět zahradu a nebude do ní moct zapisovat.",
+  "@sharingRemoveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sharingRemoved": "Člen odebrán",
+  "sharingLeave": "Opustit sdílenou zahradu",
+  "sharingLeaveTitle": "Opustit sdílenou zahradu?",
+  "sharingLeaveBody": "Zahrada z tohoto telefonu zmizí a začneš s novou prázdnou zahradou. Ostatním členům zůstane.",
+  "sharingLeaveConfirm": "Opustit",
+  "sharingNewGardenName": "Moje zahrada",
+  "sharingUnavailable": "Sdílení potřebuje připojení k serveru, které tahle verze aplikace nemá.",
+  "sharingNotSignedIn": "Pro sdílení se nejdřív přihlas.",
+  "sharingNotPremium": "Pozvat člena může vlastník s Premium.",
+  "sharingNotOwner": "Tohle může jen vlastník zahrady.",
+  "sharingInvalidCode": "Kód neplatí. Možná už vypršel nebo byl použitý; požádej o nový.",
+  "sharingOffline": "Bez připojení. Zkus to, až budeš online.",
+  "sharingFailed": "Nepovedlo se to. Zkus to znovu.",
+  "accountLostAccessTitle": "Sdílená zahrada už není dostupná",
+  "accountLostAccessBody": "Vlastník tě ze zahrady odebral, nebo ji přestal sdílet. Data v telefonu zůstala, ale nebudou se synchronizovat.",
+  "accountLostAccessStart": "Začít vlastní zahradu"
 }

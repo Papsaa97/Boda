@@ -22,6 +22,7 @@ class ConsentsScreen extends ConsumerWidget {
     final now = ref.read(clockProvider);
     final ai = settings.aiConsentAt;
     final analytics = settings.analyticsConsentAt;
+    final photo = settings.photoConsentAt;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.consentsTitle)),
@@ -56,6 +57,19 @@ class ConsentsScreen extends ConsumerWidget {
             value: analytics != null,
             onChanged: (on) => controller.update(
               (s) => s.copyWith(analyticsConsentAt: () => on ? now() : null),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.local_florist_outlined),
+            title: Text(l.consentsPhoto),
+            subtitle: Text(
+              '${photo == null ? l.consentsPhotoOff : l.consentsPhotoOn(formatDate(photo))}\n'
+              '${l.consentsPhotoHelp}',
+            ),
+            isThreeLine: true,
+            value: photo != null,
+            onChanged: (on) => controller.update(
+              (s) => s.copyWith(photoConsentAt: () => on ? now() : null),
             ),
           ),
           Padding(

@@ -3,9 +3,18 @@
 
 export type LlmRole = "user" | "assistant";
 
+/** Obrázek ve zprávě uživatele (diagnostika z fotky, FR-V1). */
+export interface LlmImage {
+  mediaType: "image/jpeg";
+  /** Obsah v base64 (bez prefixu data:). */
+  data: string;
+}
+
 export interface LlmMessage {
   role: LlmRole;
   text: string;
+  /** Obrázky před textem; jen u zprávy uživatele. */
+  images?: LlmImage[];
 }
 
 export interface LlmRequest {

@@ -4239,6 +4239,402 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Zálivka může počkat: do zítřka má pršet'**
   String get weatherCardRainExpected;
+
+  /// No description provided for @diagnosisButton.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zkusit poznat z fotky'**
+  String get diagnosisButton;
+
+  /// No description provided for @diagnosisButtonHelper.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa tipne 1 až 3 možné příčiny. Premium, počítá se do měsíčního limitu dotazů.'**
+  String get diagnosisButtonHelper;
+
+  /// No description provided for @diagnosisRunning.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa si fotku prohlíží…'**
+  String get diagnosisRunning;
+
+  /// No description provided for @diagnosisConsentTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poslat fotku k diagnóze?'**
+  String get diagnosisConsentTitle;
+
+  /// No description provided for @diagnosisConsentBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'První fotka se odešle poskytovateli umělé inteligence přes náš server. Před odesláním z ní odstraníme polohu a další údaje z fotoaparátu. Fotka se u nás neukládá a souhlas můžeš kdykoli odvolat v Nastavení, v části Souhlasy.'**
+  String get diagnosisConsentBody;
+
+  /// No description provided for @diagnosisConsentAgree.
+  ///
+  /// In cs, this message translates to:
+  /// **'Souhlasím a poslat'**
+  String get diagnosisConsentAgree;
+
+  /// No description provided for @diagnosisResultTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Možná jde o…'**
+  String get diagnosisResultTitle;
+
+  /// No description provided for @diagnosisDisclaimer.
+  ///
+  /// In cs, this message translates to:
+  /// **'Je to jen tip, ne jistá diagnóza. Ověř ho podle popisu, a když si nevíš rady, zeptej se v zahradnictví.'**
+  String get diagnosisDisclaimer;
+
+  /// No description provided for @diagnosisCheck.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ověř: {text}'**
+  String diagnosisCheck(String text);
+
+  /// No description provided for @diagnosisCare.
+  ///
+  /// In cs, this message translates to:
+  /// **'Šetrně: {text}'**
+  String diagnosisCare(String text);
+
+  /// No description provided for @diagnosisUse.
+  ///
+  /// In cs, this message translates to:
+  /// **'Použít'**
+  String get diagnosisUse;
+
+  /// No description provided for @diagnosisUnclear.
+  ///
+  /// In cs, this message translates to:
+  /// **'Z fotky nejde nic spolehlivě poznat. Zkus ji vyfotit zblízka a na světle.'**
+  String get diagnosisUnclear;
+
+  /// No description provided for @diagnosisUnavailable.
+  ///
+  /// In cs, this message translates to:
+  /// **'Diagnostika potřebuje připojení k serveru, které tahle verze aplikace nemá.'**
+  String get diagnosisUnavailable;
+
+  /// No description provided for @diagnosisNotSignedIn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pro diagnostiku se přihlas v Nastavení, v části Účet.'**
+  String get diagnosisNotSignedIn;
+
+  /// No description provided for @diagnosisNotPremium.
+  ///
+  /// In cs, this message translates to:
+  /// **'Diagnostika z fotek je v Premium.'**
+  String get diagnosisNotPremium;
+
+  /// No description provided for @diagnosisNoConsent.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez souhlasu s odesláním fotek diagnostika nejde.'**
+  String get diagnosisNoConsent;
+
+  /// No description provided for @diagnosisLimitReached.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tento měsíc už je limit dotazů vyčerpaný.'**
+  String get diagnosisLimitReached;
+
+  /// No description provided for @diagnosisBadImage.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tuhle fotku nejde poslat. Zkus jinou, nebo ji vyfoť znovu.'**
+  String get diagnosisBadImage;
+
+  /// No description provided for @diagnosisOffline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez připojení. Zkus to, až budeš online.'**
+  String get diagnosisOffline;
+
+  /// No description provided for @diagnosisFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Diagnostika se teď nepovedla. Zkus to později.'**
+  String get diagnosisFailed;
+
+  /// No description provided for @consentsPhoto.
+  ///
+  /// In cs, this message translates to:
+  /// **'Diagnostika z fotek'**
+  String get consentsPhoto;
+
+  /// No description provided for @consentsPhotoOn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Souhlas od {date}'**
+  String consentsPhotoOn(String date);
+
+  /// No description provided for @consentsPhotoOff.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez souhlasu'**
+  String get consentsPhotoOff;
+
+  /// No description provided for @consentsPhotoHelp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Fotka problému se odešle poskytovateli umělé inteligence. Polohu a údaje z fotoaparátu před odesláním odstraníme.'**
+  String get consentsPhotoHelp;
+
+  /// No description provided for @sharingTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sdílení zahrady'**
+  String get sharingTitle;
+
+  /// No description provided for @sharingTileSubtitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pozvi rodinu, ať zapisujete do jedné zahrady'**
+  String get sharingTileSubtitle;
+
+  /// No description provided for @sharingIntro.
+  ///
+  /// In cs, this message translates to:
+  /// **'Členové vidí a zapisují všechno v zahradě: zóny, deník, úkoly, sklad i plán. Změny se mezi telefony přenesou synchronizací.'**
+  String get sharingIntro;
+
+  /// No description provided for @sharingMembers.
+  ///
+  /// In cs, this message translates to:
+  /// **'Členové'**
+  String get sharingMembers;
+
+  /// No description provided for @sharingRoleOwner.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vlastník'**
+  String get sharingRoleOwner;
+
+  /// No description provided for @sharingRoleEditor.
+  ///
+  /// In cs, this message translates to:
+  /// **'Člen'**
+  String get sharingRoleEditor;
+
+  /// No description provided for @sharingRoleViewer.
+  ///
+  /// In cs, this message translates to:
+  /// **'Jen čtení'**
+  String get sharingRoleViewer;
+
+  /// No description provided for @sharingYou.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} (ty)'**
+  String sharingYou(String name);
+
+  /// No description provided for @sharingNotSynced.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahrada ještě není nahraná na server. Počkej na synchronizaci a zkus to znovu.'**
+  String get sharingNotSynced;
+
+  /// No description provided for @sharingInvite.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pozvat člena'**
+  String get sharingInvite;
+
+  /// No description provided for @sharingInviteHelp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pozvat může vlastník s Premium. Kód platí 7 dní a jde použít jednou.'**
+  String get sharingInviteHelp;
+
+  /// No description provided for @sharingInviteCode.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kód pozvánky'**
+  String get sharingInviteCode;
+
+  /// No description provided for @sharingInviteValid.
+  ///
+  /// In cs, this message translates to:
+  /// **'Platí do {date}'**
+  String sharingInviteValid(String date);
+
+  /// No description provided for @sharingInviteShare.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poslat kód'**
+  String get sharingInviteShare;
+
+  /// No description provided for @sharingInviteShareText.
+  ///
+  /// In cs, this message translates to:
+  /// **'Připoj se k mé zahradě v aplikaci Zahradník Bóďa: v Nastavení otevři Účet, Sdílení zahrady a zadej kód {code}. Kód platí do {date}.'**
+  String sharingInviteShareText(String code, String date);
+
+  /// No description provided for @sharingJoin.
+  ///
+  /// In cs, this message translates to:
+  /// **'Připojit se ke sdílené zahradě'**
+  String get sharingJoin;
+
+  /// No description provided for @sharingJoinHelp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Máš kód od někoho z rodiny? Zadej ho tady.'**
+  String get sharingJoinHelp;
+
+  /// No description provided for @sharingJoinCode.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kód (8 znaků)'**
+  String get sharingJoinCode;
+
+  /// No description provided for @sharingJoinInvalid.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kód má 8 písmen a číslic, například ABCD-EFGH.'**
+  String get sharingJoinInvalid;
+
+  /// No description provided for @sharingJoinConfirmTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Připojit se ke sdílené zahradě?'**
+  String get sharingJoinConfirmTitle;
+
+  /// No description provided for @sharingJoinConfirmBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Data v tomto telefonu nahradí sdílená zahrada. Tvoje dosavadní zahrada zůstane v účtu, změny z telefonu se před přepnutím odešlou.'**
+  String get sharingJoinConfirmBody;
+
+  /// No description provided for @sharingJoinConfirm.
+  ///
+  /// In cs, this message translates to:
+  /// **'Připojit se'**
+  String get sharingJoinConfirm;
+
+  /// No description provided for @sharingJoinAlready.
+  ///
+  /// In cs, this message translates to:
+  /// **'Do téhle zahrady už patříš.'**
+  String get sharingJoinAlready;
+
+  /// No description provided for @sharingRemove.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odebrat'**
+  String get sharingRemove;
+
+  /// No description provided for @sharingRemoveTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odebrat člena?'**
+  String get sharingRemoveTitle;
+
+  /// No description provided for @sharingRemoveBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} přestane vidět zahradu a nebude do ní moct zapisovat.'**
+  String sharingRemoveBody(String name);
+
+  /// No description provided for @sharingRemoved.
+  ///
+  /// In cs, this message translates to:
+  /// **'Člen odebrán'**
+  String get sharingRemoved;
+
+  /// No description provided for @sharingLeave.
+  ///
+  /// In cs, this message translates to:
+  /// **'Opustit sdílenou zahradu'**
+  String get sharingLeave;
+
+  /// No description provided for @sharingLeaveTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Opustit sdílenou zahradu?'**
+  String get sharingLeaveTitle;
+
+  /// No description provided for @sharingLeaveBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahrada z tohoto telefonu zmizí a začneš s novou prázdnou zahradou. Ostatním členům zůstane.'**
+  String get sharingLeaveBody;
+
+  /// No description provided for @sharingLeaveConfirm.
+  ///
+  /// In cs, this message translates to:
+  /// **'Opustit'**
+  String get sharingLeaveConfirm;
+
+  /// No description provided for @sharingNewGardenName.
+  ///
+  /// In cs, this message translates to:
+  /// **'Moje zahrada'**
+  String get sharingNewGardenName;
+
+  /// No description provided for @sharingUnavailable.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sdílení potřebuje připojení k serveru, které tahle verze aplikace nemá.'**
+  String get sharingUnavailable;
+
+  /// No description provided for @sharingNotSignedIn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pro sdílení se nejdřív přihlas.'**
+  String get sharingNotSignedIn;
+
+  /// No description provided for @sharingNotPremium.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pozvat člena může vlastník s Premium.'**
+  String get sharingNotPremium;
+
+  /// No description provided for @sharingNotOwner.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tohle může jen vlastník zahrady.'**
+  String get sharingNotOwner;
+
+  /// No description provided for @sharingInvalidCode.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kód neplatí. Možná už vypršel nebo byl použitý; požádej o nový.'**
+  String get sharingInvalidCode;
+
+  /// No description provided for @sharingOffline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez připojení. Zkus to, až budeš online.'**
+  String get sharingOffline;
+
+  /// No description provided for @sharingFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nepovedlo se to. Zkus to znovu.'**
+  String get sharingFailed;
+
+  /// No description provided for @accountLostAccessTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sdílená zahrada už není dostupná'**
+  String get accountLostAccessTitle;
+
+  /// No description provided for @accountLostAccessBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vlastník tě ze zahrady odebral, nebo ji přestal sdílet. Data v telefonu zůstala, ale nebudou se synchronizovat.'**
+  String get accountLostAccessBody;
+
+  /// No description provided for @accountLostAccessStart.
+  ///
+  /// In cs, this message translates to:
+  /// **'Začít vlastní zahradu'**
+  String get accountLostAccessStart;
 }
 
 class _AppLocalizationsDelegate

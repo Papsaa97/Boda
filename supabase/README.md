@@ -77,6 +77,7 @@ neukáže, kalendář prací funguje dál.
 ```bash
 supabase functions deploy boda-chat
 supabase functions deploy weather
+supabase functions deploy diagnose
 supabase functions deploy delete-account
 supabase functions deploy revenuecat-webhook --no-verify-jwt
 ```
@@ -124,7 +125,7 @@ Ověření: v RevenueCat tlačítko *Send test event* → odpověď 200.
   (a upozornění e-mailem při 50 % a 80 %). Bóďa navíc hlídá limity na uživatele
   (Free 10 dotazů měsíčně, Premium 300).
 - U poskytovatele LLM ověřit smlouvu o zpracování (DPA), zpracování v EU a
-  že data nejdou na trénink.
+  že data (i fotky pro diagnostiku) nejdou na trénink.
 
 ## Rozhraní funkcí (pro aplikaci)
 
@@ -138,6 +139,21 @@ Chyby: 400 `bad_request`, 401 `unauthorized`, 405, 429 `limit_reached` (+ `usage
 502 `upstream`, 503 `not_configured`, 500 `internal`.
 Do modelu jdou jen povolená pole kontextu (viz `functions/boda-chat/context.ts`),
 název zahrady, jména a e-maily ne.
+
+**`POST /functions/v1/diagnose`** – přihlášený uživatel s Premium a souhlasem
+`consents.photoUpload` v profilu.
+Požadavek: `{"image": "<JPEG v base64, max 3 MB, bez EXIF>", "zoneType": "vegetable"|…, "note": "..."}`.
+Odpověď 200: `{"unclear": false, "candidates": [{"label", "reason", "check", "care"}], "usage": {"used", "limit", "plan"}}`
+(nejvýš 3 kandidáti, bez chemie a dávek). Čerpá ze stejného limitu jako Bóďa.
+Chyby: 400 `bad_request` / `bad_image` / `metadata_present`, 401, 402 `premium_required`,
+403 `consent_required`, 405, 429 `limit_reached`, 502 `upstream` (dotaz se vrátí),
+503 `not_configured`. Fotka se nikde neukládá.
+
+**Sdílení zahrady** – RPC (ne funkce): `create_garden_invite(p_garden_id)` →
+`{code, expires_at}` (jen vlastník s Premium; chyby `not_owner`, `premium_required`),
+`accept_garden_invite(p_code)` → id zahrady (chyba `invalid_invite`),
+`garden_member_list(p_garden_id)` → členové s rolí, jménem a e-mailem (jen pro členy).
+Odebrání člena je `delete` z `garden_members` (vlastník kohokoli kromě sebe, člen sebe).
 
 **`POST /functions/v1/delete-account`** – přihlášený uživatel; smaže jeho účet.
 Zahrady s dalšími členy předá (nejdéle přítomný editor, jinak jiný člen), ostatní

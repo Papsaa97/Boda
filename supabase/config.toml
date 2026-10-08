@@ -112,6 +112,9 @@ verify_jwt = true
 [functions.weather]
 verify_jwt = true
 
+[functions.diagnose]
+verify_jwt = true
+
 [functions.revenuecat-webhook]
 verify_jwt = false
 

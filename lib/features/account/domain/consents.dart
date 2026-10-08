@@ -11,7 +11,8 @@ const privacyPolicyUrl = String.fromEnvironment(
 );
 
 /// Souhlasy pro `profiles.consents` na serveru (spec 8.1, kap. 9):
-/// `{aiProcessing: {granted, at}, analytics: {granted, at}, policyVersion}`.
+/// `{aiProcessing: {granted, at}, analytics: {granted, at},
+/// photoUpload: {granted, at}, policyVersion}`.
 ///
 /// Odvolaný souhlas má `granted: false` a čas odvolání [changedAt].
 Map<String, Object?> consentsJson(
@@ -25,6 +26,7 @@ Map<String, Object?> consentsJson(
   return {
     'aiProcessing': entry(settings.aiConsentAt),
     'analytics': entry(settings.analyticsConsentAt),
+    'photoUpload': entry(settings.photoConsentAt),
     'policyVersion': privacyPolicyVersion,
   };
 }

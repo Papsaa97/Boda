@@ -49,6 +49,6 @@ jobs:
         with:
           deno-version: v2.x
       - name: Kontrola typů
-        run: deno check boda-chat/index.ts revenuecat-webhook/index.ts delete-account/index.ts weather/index.ts
+        run: deno check boda-chat/index.ts revenuecat-webhook/index.ts delete-account/index.ts weather/index.ts diagnose/index.ts
       - name: Unit testy
         run: deno test --allow-env

@@ -25,6 +25,12 @@ class PairingConflict extends Pairing {
   final String remoteGardenId;
 }
 
+/// Zahrada v telefonu na serveru byla, ale účet k ní už nemá přístup
+/// (vlastník uživatele ze sdílené zahrady odebral, DECLOG D89).
+class PairingLost extends Pairing {
+  const PairingLost();
+}
+
 /// Výsledek jednoho kola synchronizace.
 class SyncReport {
   const SyncReport({required this.pairing, this.pushed = 0, this.pulled = 0});
@@ -65,8 +71,13 @@ class SyncEngine {
   /// Jedno kolo: spárovat, odeslat, stáhnout, dotáhnout chybějící fotky.
   Future<SyncReport> sync() async {
     final pairing = await pair();
-    if (pairing is PairingConflict) return SyncReport(pairing: pairing);
+    if (pairing is! Paired) return SyncReport(pairing: pairing);
     final pushed = await push();
+    // Po úspěšném odeslání je zahrada na serveru (řádek zahrady jde ve
+    // frontě se spárováním).
+    if (await readState('onServer') != gardenId) {
+      await writeState('onServer', gardenId);
+    }
     final pulled = await pull();
     await downloadMissingPhotos();
     return SyncReport(pairing: pairing, pushed: pushed, pulled: pulled);
@@ -75,12 +86,24 @@ class SyncEngine {
   /// Spáruje zahradu v telefonu s účtem. Do prázdného účtu nahraje
   /// všechno, co v telefonu je.
   Future<Pairing> pair() async {
-    if (await readState('paired') == gardenId) return const Paired();
+    final paired = await readState('paired') == gardenId;
     final remoteIds = await remote.gardenIds();
     if (remoteIds.contains(gardenId)) {
-      await _enqueueAll();
-      await writeState('paired', gardenId);
+      if (!paired) {
+        await _enqueueAll();
+        await writeState('paired', gardenId);
+      }
+      if (await readState('onServer') != gardenId) {
+        await writeState('onServer', gardenId);
+      }
       return const Paired();
+    }
+    if (paired) {
+      // Na serveru byla a účet ji už nevidí: přístup skončil. Jinak se
+      // jen ještě nenahrála (první odeslání selhalo).
+      return await readState('onServer') == gardenId
+          ? const PairingLost()
+          : const Paired();
     }
     if (remoteIds.isEmpty) {
       await _enqueueAll();
@@ -93,9 +116,13 @@ class SyncEngine {
   /// Odhlášení: telefon zapomene spárování a razítka stahování. Data
   /// i fronta změn zůstanou.
   Future<void> forget() async {
-    await (db.delete(
-      db.syncState,
-    )..where((s) => s.name.equals('paired') | s.name.like('pulled:%'))).go();
+    await (db.delete(db.syncState)..where(
+          (s) =>
+              s.name.equals('paired') |
+              s.name.equals('onServer') |
+              s.name.like('pulled:%'),
+        ))
+        .go();
   }
 
   /// Všechny řádky do fronty (první spárování: data z doby před účtem).
@@ -302,7 +329,20 @@ class SyncEngine {
   /// Nahradí data v telefonu zahradou z účtu (DECLOG D70): smaže
   /// synchronizovaná data a frontu, přejmenuje zahradu na [remoteGardenId].
   /// Pak je potřeba aplikaci znovu načíst (nové id zahrady) a stáhnout data.
-  Future<void> adoptRemoteGarden(String remoteGardenId) async {
+  Future<void> adoptRemoteGarden(String remoteGardenId) =>
+      _replaceGarden(remoteGardenId, adopted: true);
+
+  /// Začne v telefonu novou prázdnou zahradu [newGardenId] (po odchodu
+  /// nebo odebrání ze sdílené zahrady, DECLOG D89). Další synchronizace
+  /// ji spáruje s účtem jako každou jinou.
+  Future<void> startNewGarden(String newGardenId, {required String name}) =>
+      _replaceGarden(newGardenId, adopted: false, name: name);
+
+  Future<void> _replaceGarden(
+    String id, {
+    required bool adopted,
+    String name = 'Moje zahrada',
+  }) async {
     await db.transaction(() async {
       await db.customStatement('PRAGMA defer_foreign_keys = ON');
       await writeState('applying', '1');
@@ -310,26 +350,35 @@ class SyncEngine {
         await db.customStatement('DELETE FROM "${t.name}"');
       }
       await db.delete(db.syncOutbox).go();
-      await (db.delete(db.syncState)
-            ..where((s) => s.name.like('pulled:%') | s.name.like('uploaded:%')))
+      await (db.delete(db.syncState)..where(
+            (s) =>
+                s.name.like('pulled:%') |
+                s.name.like('uploaded:%') |
+                s.name.equals('paired') |
+                s.name.equals('onServer'),
+          ))
           .go();
       final now = clock().toUtc();
       await db
           .into(db.gardens)
           .insert(
             GardensCompanion.insert(
-              id: remoteGardenId,
-              name: 'Moje zahrada',
-              // Starý čas: jméno zahrady ze serveru při stažení vyhraje.
-              createdAt: DateTime.utc(2000),
-              updatedAt: DateTime.utc(2000),
+              id: id,
+              name: name,
+              // Převzatá zahrada: starý čas, jméno ze serveru při stažení
+              // vyhraje.
+              createdAt: adopted ? DateTime.utc(2000) : now,
+              updatedAt: adopted ? DateTime.utc(2000) : now,
             ),
           );
       await (db.delete(
         db.syncState,
       )..where((s) => s.name.equals('applying'))).go();
-      await writeState('paired', remoteGardenId);
-      await writeState('adoptedAt', now.toIso8601String());
+      if (adopted) {
+        await writeState('paired', id);
+        await writeState('onServer', id);
+        await writeState('adoptedAt', now.toIso8601String());
+      }
     });
   }
 

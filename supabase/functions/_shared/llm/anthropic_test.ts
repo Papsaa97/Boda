@@ -16,6 +16,21 @@ Deno.test("buildAnthropicBody uses the configured model", () => {
   );
 });
 
+Deno.test("buildAnthropicBody puts images before the text", () => {
+  const body = buildAnthropicBody(MODEL, {
+    system: "S",
+    messages: [{ role: "user", text: "Q", images: [{ mediaType: "image/jpeg", data: "AAAA" }] }],
+    maxTokens: 500,
+  });
+  assertEquals(body.messages, [{
+    role: "user",
+    content: [
+      { type: "image", source: { type: "base64", media_type: "image/jpeg", data: "AAAA" } },
+      { type: "text", text: "Q" },
+    ],
+  }]);
+});
+
 Deno.test("parseAnthropicResponse joins text blocks and ignores others", () => {
   assertEquals(
     parseAnthropicResponse({
