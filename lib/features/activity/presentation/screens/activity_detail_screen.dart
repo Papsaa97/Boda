@@ -9,6 +9,7 @@ import '../../../zones/presentation/zones_controller.dart';
 import '../controllers/activity_controller.dart';
 import '../widgets/activity_photo.dart';
 import 'activity_form_screen.dart';
+import '../../../zones/presentation/zone_icons.dart';
 
 /// Detail jednoho záznamu s úpravou a smazáním.
 class ActivityDetailScreen extends ConsumerWidget {
@@ -42,9 +43,17 @@ class ActivityDetailScreen extends ConsumerWidget {
         .map((a) => a.imagePath)
         .firstOrNull;
 
+    final photos = ref.read(photoStorageProvider);
     await ref.read(activityControllerProvider.notifier).deleteActivity(activityId);
-    await ref.read(photoStorageProvider).delete(imagePath);
-    if (context.mounted) Navigator.of(context).pop();
+    if (!context.mounted) return;
+    if (ref.read(activityControllerProvider).hasError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Záznam se nepodařilo smazat.')),
+      );
+      return;
+    }
+    Navigator.of(context).pop();
+    await photos.delete(imagePath);
   }
 
   @override
@@ -105,7 +114,7 @@ class ActivityDetailScreen extends ConsumerWidget {
                 label: Text(formatDateTime(activity.date)),
               ),
               Chip(
-                avatar: const Icon(Icons.grass, size: 18),
+                avatar: Icon(zoneIcon(activity.zoneId), size: 18),
                 label: Text(zoneName),
               ),
             ],

@@ -72,11 +72,13 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
   Future<void> _pickDateTime() async {
     FocusScope.of(context).unfocus();
 
+    // Deník zapisuje, co už se stalo, takže budoucí dny nenabízíme.
+    final now = ref.read(clockProvider)();
     final datePicked = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: _date.isAfter(now) ? _date : now,
     );
     if (datePicked == null || !mounted) return;
 
@@ -150,7 +152,16 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     var imagePath = _savedImagePath;
     final picked = _pickedImage;
     if (picked != null) {
-      imagePath = await photos.persist(picked);
+      try {
+        imagePath = await photos.persist(picked);
+      } catch (_) {
+        if (!mounted) return;
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Fotku se nepodařilo uložit.')),
+        );
+        return;
+      }
     }
 
     final title = _titleController.text.trim();
@@ -179,6 +190,9 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
 
     if (!mounted) return;
     if (ref.read(activityControllerProvider).hasError) {
+      // Kopie nové fotky by po neúspěšném uložení zůstala viset.
+      if (picked != null) await photos.delete(imagePath);
+      if (!mounted) return;
       setState(() => _saving = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Záznam se nepodařilo uložit.')),
@@ -226,6 +240,12 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
                 return null;
               },
             ),
+            if (!_isEdit) ...[
+              const SizedBox(height: 8),
+              _TitleSuggestions(
+                onPick: (title) => setState(() => _titleController.text = title),
+              ),
+            ],
             const SizedBox(height: 16),
             TextFormField(
               controller: _dateController,
@@ -303,5 +323,49 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
         ],
       ),
     ];
+  }
+}
+
+/// Nejčastější práce na zahradě pro rychlý zápis jedním ťuknutím.
+const commonActivityTitles = [
+  'Zálivka',
+  'Pletí',
+  'Hnojení',
+  'Výsev',
+  'Výsadba',
+  'Sklizeň',
+  'Řez',
+  'Sekání trávy',
+  'Postřik',
+  'Mulčování',
+];
+
+/// Návrhy názvu: nejdřív naposledy použité, pak běžné práce.
+class _TitleSuggestions extends ConsumerWidget {
+  const _TitleSuggestions({required this.onPick});
+
+  final ValueChanged<String> onPick;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activities = ref.watch(activityControllerProvider).value ?? const [];
+    final seen = <String>{};
+    final suggestions = <String>[];
+    for (final title in [
+      ...activities.map((a) => a.title).take(20),
+      ...commonActivityTitles,
+    ]) {
+      if (seen.add(title.toLowerCase())) suggestions.add(title);
+      if (suggestions.length == 8) break;
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 4,
+      children: [
+        for (final title in suggestions)
+          ActionChip(label: Text(title), onPressed: () => onPick(title)),
+      ],
+    );
   }
 }

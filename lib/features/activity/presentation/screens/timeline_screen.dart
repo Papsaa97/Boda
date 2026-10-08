@@ -5,22 +5,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/di/providers.dart';
 import '../../../../core/formatting/dates.dart';
+import '../../../zones/domain/zone_entity.dart';
+import '../../../zones/presentation/zones_controller.dart';
 import '../../domain/activity_entity.dart';
 import '../controllers/activity_controller.dart';
 import '../widgets/activity_tile.dart';
 
-/// Časová osa: všechny záznamy od nejnovějšího, seskupené po dnech.
-class TimelineScreen extends ConsumerWidget {
+/// Časová osa: všechny záznamy od nejnovějšího, seskupené po dnech,
+/// s volitelným filtrem podle zóny.
+class TimelineScreen extends ConsumerStatefulWidget {
   const TimelineScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TimelineScreen> createState() => _TimelineScreenState();
+}
+
+class _TimelineScreenState extends ConsumerState<TimelineScreen> {
+  /// Id vybrané zóny, nebo null pro všechny záznamy.
+  String? _zoneFilter;
+
+  @override
+  Widget build(BuildContext context) {
     final activitiesAsync = ref.watch(activityControllerProvider);
+    final zones = ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[];
     final now = ref.watch(clockProvider)();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Deník')),
       body: activitiesAsync.when(
+        skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(
           child: Text('Chyba při načítání deníku: $error'),
@@ -29,12 +42,45 @@ class TimelineScreen extends ConsumerWidget {
           if (activities.isEmpty) {
             return const _EmptyTimeline();
           }
-          final groups = _groupByDay(activities);
+
+          // Filtr nabízí jen zóny, ve kterých něco je.
+          final usedZoneIds = activities.map((a) => a.zoneId).toSet();
+          final filterZones = zones.where((z) => usedZoneIds.contains(z.id)).toList();
+          final filter = usedZoneIds.contains(_zoneFilter) ? _zoneFilter : null;
+          final visible = filter == null
+              ? activities
+              : activities.where((a) => a.zoneId == filter).toList();
+          final groups = _groupByDay(visible);
+
           return ListView.builder(
             padding: const EdgeInsets.only(bottom: 96),
-            itemCount: groups.length,
+            itemCount: groups.length + 1,
             itemBuilder: (context, index) {
-              final group = groups[index];
+              if (index == 0) {
+                if (filterZones.length < 2) return const SizedBox.shrink();
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      ChoiceChip(
+                        label: const Text('Vše'),
+                        selected: filter == null,
+                        onSelected: (_) => setState(() => _zoneFilter = null),
+                      ),
+                      for (final zone in filterZones) ...[
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          label: Text(zone.name),
+                          selected: filter == zone.id,
+                          onSelected: (_) => setState(() => _zoneFilter = zone.id),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              }
+              final group = groups[index - 1];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
