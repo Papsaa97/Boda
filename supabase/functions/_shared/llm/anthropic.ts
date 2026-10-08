@@ -35,7 +35,18 @@ export function buildAnthropicBody(model: string, request: LlmRequest): Record<s
     model,
     max_tokens: request.maxTokens,
     system: request.system,
-    messages: request.messages.map((m) => ({ role: m.role, content: m.text })),
+    messages: request.messages.map((m) => ({
+      role: m.role,
+      content: m.images?.length
+        ? [
+          ...m.images.map((img) => ({
+            type: "image",
+            source: { type: "base64", media_type: img.mediaType, data: img.data },
+          })),
+          { type: "text", text: m.text },
+        ]
+        : m.text,
+    })),
   };
 }
 

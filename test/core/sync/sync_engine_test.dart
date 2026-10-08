@@ -122,6 +122,29 @@ void main() {
     );
   }
 
+  test('a removed member is told and can start a fresh garden', () async {
+    await seed(a);
+    expect((await a.engine(server).sync()).pairing, isA<Paired>());
+
+    server.hiddenGardens.add('garden-a');
+    expect((await a.engine(server).sync()).pairing, isA<PairingLost>());
+
+    await a.engine(server).startNewGarden('garden-new', name: 'Moje zahrada');
+    a.gardenId = 'garden-new';
+    expect((await a.db.select(a.db.gardens).get()).single.id, 'garden-new');
+    expect(await a.zones.getAllZones(), isEmpty);
+    expect(await a.outbox(), 0);
+
+    expect((await a.engine(server).sync()).pairing, isA<Paired>());
+    expect(server.table('gardens').keys, contains('garden-new'));
+  });
+
+  test('a garden that never reached the server is not lost', () async {
+    expect(await a.engine(server).pair(), isA<Paired>());
+    // Odeslání se nepovedlo, zahrada na serveru není.
+    expect(await a.engine(server).pair(), isA<Paired>());
+  });
+
   test('local changes are queued by triggers, one entry per row', () async {
     await seed(a);
     await a.zones.saveZone(zone.copyWith(name: 'Zelenina JV'));

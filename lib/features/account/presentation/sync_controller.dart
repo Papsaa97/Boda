@@ -7,8 +7,10 @@ import '../../../core/sync/sync_engine.dart';
 import '../../../core/sync/sync_remote.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../assistant/presentation/assistant_controller.dart';
+import '../../incidents/presentation/incidents_controller.dart';
 import '../../inventory/presentation/inventory_controller.dart';
 import '../../tasks/presentation/tasks_controller.dart';
+import '../../weather/presentation/weather_controller.dart';
 import '../../zones/presentation/zones_controller.dart';
 import '../domain/auth_service.dart';
 
@@ -22,6 +24,7 @@ class SyncStatus extends Equatable {
     this.lastSyncAt,
     this.problem,
     this.conflictGardenId,
+    this.lostAccess = false,
   });
 
   final bool running;
@@ -31,8 +34,18 @@ class SyncStatus extends Equatable {
   /// Účet už má jinou zahradu; čeká se na volbu uživatele (DECLOG D70).
   final String? conflictGardenId;
 
+  /// Účet už k zahradě v telefonu nemá přístup (odebrání ze sdílené
+  /// zahrady, DECLOG D89); čeká se na volbu uživatele.
+  final bool lostAccess;
+
   @override
-  List<Object?> get props => [running, lastSyncAt, problem, conflictGardenId];
+  List<Object?> get props => [
+    running,
+    lastSyncAt,
+    problem,
+    conflictGardenId,
+    lostAccess,
+  ];
 }
 
 /// Spouští synchronizaci: po přihlášení, při startu a návratu do
@@ -82,6 +95,7 @@ class SyncController extends Notifier<SyncStatus> {
         conflictGardenId: pairing is PairingConflict
             ? pairing.remoteGardenId
             : null,
+        lostAccess: pairing is PairingLost,
       );
       if (report.pulled > 0) _reload();
     } on SyncException catch (e) {
@@ -101,20 +115,49 @@ class SyncController extends Notifier<SyncStatus> {
   /// Nahradí data v telefonu zahradou z účtu a aplikaci znovu načte.
   Future<void> adoptAccountGarden() async {
     final remoteId = state.conflictGardenId;
+    if (remoteId == null) return;
+    await adoptGarden(remoteId);
+  }
+
+  /// Nahradí data v telefonu zahradou [remoteId] (z účtu nebo sdílenou)
+  /// a aplikaci znovu načte. Vrací false, když převzetí selhalo.
+  Future<bool> adoptGarden(String remoteId) async {
     final engine = _engine();
-    if (remoteId == null || engine == null) return;
-    state = SyncStatus(running: true, conflictGardenId: remoteId);
+    if (engine == null) return false;
+    final before = state;
+    state = SyncStatus(
+      running: true,
+      conflictGardenId: before.conflictGardenId,
+    );
     try {
       await engine.adoptRemoteGarden(remoteId);
     } on Exception catch (e) {
       debugPrint('Převzetí zahrady selhalo: $e');
       state = SyncStatus(
         problem: SyncProblem.failed,
-        conflictGardenId: remoteId,
+        conflictGardenId: before.conflictGardenId,
+        lostAccess: before.lostAccess,
       );
-      return;
+      return false;
     }
     ref.read(restartAppProvider)();
+    return true;
+  }
+
+  /// Začne v telefonu novou prázdnou zahradu (po odchodu nebo odebrání
+  /// ze sdílené zahrady) a aplikaci znovu načte.
+  Future<bool> startOwnGarden(String name) async {
+    final engine = _engine();
+    if (engine == null) return false;
+    try {
+      await engine.startNewGarden(ref.read(newIdProvider)(), name: name);
+    } on Exception catch (e) {
+      debugPrint('Novou zahradu se nepodařilo založit: $e');
+      state = SyncStatus(problem: SyncProblem.failed, lostAccess: true);
+      return false;
+    }
+    ref.read(restartAppProvider)();
+    return true;
   }
 
   /// Obrazovky načtou data znovu (stažené změny).
@@ -125,7 +168,9 @@ class SyncController extends Notifier<SyncStatus> {
       ..invalidate(tasksControllerProvider)
       ..invalidate(inventoryControllerProvider)
       ..invalidate(shoppingControllerProvider)
-      ..invalidate(assistantControllerProvider);
+      ..invalidate(assistantControllerProvider)
+      ..invalidate(incidentsControllerProvider)
+      ..invalidate(weatherControllerProvider);
   }
 }
 

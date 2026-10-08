@@ -18,6 +18,8 @@ import '../../features/assistant/domain/assistant_backend.dart';
 import '../../features/assistant/domain/assistant_message.dart';
 import '../../features/activity/domain/activity_repository.dart';
 import '../../features/incidents/data/drift_incident_repository.dart';
+import '../../features/incidents/data/supabase_diagnosis_backend.dart';
+import '../../features/incidents/domain/diagnosis.dart';
 import '../../features/incidents/domain/incident.dart';
 import '../../features/inventory/data/drift_inventory_repository.dart';
 import '../../features/inventory/domain/inventory_repository.dart';
@@ -25,6 +27,8 @@ import '../../features/premium/data/supabase_entitlement_repository.dart';
 import '../../features/premium/domain/premium.dart';
 import '../../features/settings/domain/settings_repository.dart';
 import '../../features/settings/presentation/settings_controller.dart';
+import '../../features/sharing/data/supabase_sharing_remote.dart';
+import '../../features/sharing/domain/sharing.dart';
 import '../../features/tasks/data/drift_task_repository.dart';
 import '../../features/tasks/domain/task_repository.dart';
 import '../../features/weather/data/drift_garden_site_repository.dart';
@@ -230,6 +234,20 @@ final weatherSourceProvider = Provider<WeatherSource>((ref) {
   return client == null
       ? const UnavailableWeatherSource()
       : SupabaseWeatherSource(client);
+});
+
+/// Diagnostika z fotky (V2, Premium): bez backendu nedostupná.
+final diagnosisBackendProvider = Provider<DiagnosisBackend>((ref) {
+  final client = ref.watch(supabaseClientProvider);
+  return client == null
+      ? const UnavailableDiagnosisBackend()
+      : SupabaseDiagnosisBackend(client);
+});
+
+/// Sdílení zahrady (V2); null bez backendu.
+final sharingRemoteProvider = Provider<SharingRemote?>((ref) {
+  final client = ref.watch(supabaseClientProvider);
+  return client == null ? null : SupabaseSharingRemote(client);
 });
 
 /// Poloha telefonu pro „Použít polohu telefonu“.

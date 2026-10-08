@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../sharing/presentation/sharing_screen.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../l10n/app_localizations.dart';
@@ -265,6 +266,34 @@ class _SignedIn extends ConsumerWidget {
               ),
             ),
           ),
+        if (sync.lostAccess)
+          Card(
+            margin: const EdgeInsets.all(16),
+            color: scheme.errorContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l.accountLostAccessTitle,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(l.accountLostAccessBody),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: sync.running
+                        ? null
+                        : () => ref
+                              .read(syncControllerProvider.notifier)
+                              .startOwnGarden(l.sharingNewGardenName),
+                    child: Text(l.accountLostAccessStart),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ListTile(
           leading: const Icon(Icons.sync),
           title: Text(sync.running ? l.accountSyncRunning : l.accountSyncNow),
@@ -278,6 +307,15 @@ class _SignedIn extends ConsumerWidget {
           }),
           enabled: !sync.running,
           onTap: () => ref.read(syncControllerProvider.notifier).syncNow(),
+        ),
+        ListTile(
+          leading: const Icon(Icons.group_outlined),
+          title: Text(l.sharingTitle),
+          subtitle: Text(l.sharingTileSubtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const SharingScreen())),
         ),
         const Divider(),
         ListTile(

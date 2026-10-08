@@ -2571,4 +2571,237 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get weatherCardRainExpected =>
       'Zálivka může počkat: do zítřka má pršet';
+
+  @override
+  String get diagnosisButton => 'Zkusit poznat z fotky';
+
+  @override
+  String get diagnosisButtonHelper =>
+      'Bóďa tipne 1 až 3 možné příčiny. Premium, počítá se do měsíčního limitu dotazů.';
+
+  @override
+  String get diagnosisRunning => 'Bóďa si fotku prohlíží…';
+
+  @override
+  String get diagnosisConsentTitle => 'Poslat fotku k diagnóze?';
+
+  @override
+  String get diagnosisConsentBody =>
+      'První fotka se odešle poskytovateli umělé inteligence přes náš server. Před odesláním z ní odstraníme polohu a další údaje z fotoaparátu. Fotka se u nás neukládá a souhlas můžeš kdykoli odvolat v Nastavení, v části Souhlasy.';
+
+  @override
+  String get diagnosisConsentAgree => 'Souhlasím a poslat';
+
+  @override
+  String get diagnosisResultTitle => 'Možná jde o…';
+
+  @override
+  String get diagnosisDisclaimer =>
+      'Je to jen tip, ne jistá diagnóza. Ověř ho podle popisu, a když si nevíš rady, zeptej se v zahradnictví.';
+
+  @override
+  String diagnosisCheck(String text) {
+    return 'Ověř: $text';
+  }
+
+  @override
+  String diagnosisCare(String text) {
+    return 'Šetrně: $text';
+  }
+
+  @override
+  String get diagnosisUse => 'Použít';
+
+  @override
+  String get diagnosisUnclear =>
+      'Z fotky nejde nic spolehlivě poznat. Zkus ji vyfotit zblízka a na světle.';
+
+  @override
+  String get diagnosisUnavailable =>
+      'Diagnostika potřebuje připojení k serveru, které tahle verze aplikace nemá.';
+
+  @override
+  String get diagnosisNotSignedIn =>
+      'Pro diagnostiku se přihlas v Nastavení, v části Účet.';
+
+  @override
+  String get diagnosisNotPremium => 'Diagnostika z fotek je v Premium.';
+
+  @override
+  String get diagnosisNoConsent =>
+      'Bez souhlasu s odesláním fotek diagnostika nejde.';
+
+  @override
+  String get diagnosisLimitReached =>
+      'Tento měsíc už je limit dotazů vyčerpaný.';
+
+  @override
+  String get diagnosisBadImage =>
+      'Tuhle fotku nejde poslat. Zkus jinou, nebo ji vyfoť znovu.';
+
+  @override
+  String get diagnosisOffline => 'Bez připojení. Zkus to, až budeš online.';
+
+  @override
+  String get diagnosisFailed =>
+      'Diagnostika se teď nepovedla. Zkus to později.';
+
+  @override
+  String get consentsPhoto => 'Diagnostika z fotek';
+
+  @override
+  String consentsPhotoOn(String date) {
+    return 'Souhlas od $date';
+  }
+
+  @override
+  String get consentsPhotoOff => 'Bez souhlasu';
+
+  @override
+  String get consentsPhotoHelp =>
+      'Fotka problému se odešle poskytovateli umělé inteligence. Polohu a údaje z fotoaparátu před odesláním odstraníme.';
+
+  @override
+  String get sharingTitle => 'Sdílení zahrady';
+
+  @override
+  String get sharingTileSubtitle =>
+      'Pozvi rodinu, ať zapisujete do jedné zahrady';
+
+  @override
+  String get sharingIntro =>
+      'Členové vidí a zapisují všechno v zahradě: zóny, deník, úkoly, sklad i plán. Změny se mezi telefony přenesou synchronizací.';
+
+  @override
+  String get sharingMembers => 'Členové';
+
+  @override
+  String get sharingRoleOwner => 'Vlastník';
+
+  @override
+  String get sharingRoleEditor => 'Člen';
+
+  @override
+  String get sharingRoleViewer => 'Jen čtení';
+
+  @override
+  String sharingYou(String name) {
+    return '$name (ty)';
+  }
+
+  @override
+  String get sharingNotSynced =>
+      'Zahrada ještě není nahraná na server. Počkej na synchronizaci a zkus to znovu.';
+
+  @override
+  String get sharingInvite => 'Pozvat člena';
+
+  @override
+  String get sharingInviteHelp =>
+      'Pozvat může vlastník s Premium. Kód platí 7 dní a jde použít jednou.';
+
+  @override
+  String get sharingInviteCode => 'Kód pozvánky';
+
+  @override
+  String sharingInviteValid(String date) {
+    return 'Platí do $date';
+  }
+
+  @override
+  String get sharingInviteShare => 'Poslat kód';
+
+  @override
+  String sharingInviteShareText(String code, String date) {
+    return 'Připoj se k mé zahradě v aplikaci Zahradník Bóďa: v Nastavení otevři Účet, Sdílení zahrady a zadej kód $code. Kód platí do $date.';
+  }
+
+  @override
+  String get sharingJoin => 'Připojit se ke sdílené zahradě';
+
+  @override
+  String get sharingJoinHelp => 'Máš kód od někoho z rodiny? Zadej ho tady.';
+
+  @override
+  String get sharingJoinCode => 'Kód (8 znaků)';
+
+  @override
+  String get sharingJoinInvalid =>
+      'Kód má 8 písmen a číslic, například ABCD-EFGH.';
+
+  @override
+  String get sharingJoinConfirmTitle => 'Připojit se ke sdílené zahradě?';
+
+  @override
+  String get sharingJoinConfirmBody =>
+      'Data v tomto telefonu nahradí sdílená zahrada. Tvoje dosavadní zahrada zůstane v účtu, změny z telefonu se před přepnutím odešlou.';
+
+  @override
+  String get sharingJoinConfirm => 'Připojit se';
+
+  @override
+  String get sharingJoinAlready => 'Do téhle zahrady už patříš.';
+
+  @override
+  String get sharingRemove => 'Odebrat';
+
+  @override
+  String get sharingRemoveTitle => 'Odebrat člena?';
+
+  @override
+  String sharingRemoveBody(String name) {
+    return '$name přestane vidět zahradu a nebude do ní moct zapisovat.';
+  }
+
+  @override
+  String get sharingRemoved => 'Člen odebrán';
+
+  @override
+  String get sharingLeave => 'Opustit sdílenou zahradu';
+
+  @override
+  String get sharingLeaveTitle => 'Opustit sdílenou zahradu?';
+
+  @override
+  String get sharingLeaveBody =>
+      'Zahrada z tohoto telefonu zmizí a začneš s novou prázdnou zahradou. Ostatním členům zůstane.';
+
+  @override
+  String get sharingLeaveConfirm => 'Opustit';
+
+  @override
+  String get sharingNewGardenName => 'Moje zahrada';
+
+  @override
+  String get sharingUnavailable =>
+      'Sdílení potřebuje připojení k serveru, které tahle verze aplikace nemá.';
+
+  @override
+  String get sharingNotSignedIn => 'Pro sdílení se nejdřív přihlas.';
+
+  @override
+  String get sharingNotPremium => 'Pozvat člena může vlastník s Premium.';
+
+  @override
+  String get sharingNotOwner => 'Tohle může jen vlastník zahrady.';
+
+  @override
+  String get sharingInvalidCode =>
+      'Kód neplatí. Možná už vypršel nebo byl použitý; požádej o nový.';
+
+  @override
+  String get sharingOffline => 'Bez připojení. Zkus to, až budeš online.';
+
+  @override
+  String get sharingFailed => 'Nepovedlo se to. Zkus to znovu.';
+
+  @override
+  String get accountLostAccessTitle => 'Sdílená zahrada už není dostupná';
+
+  @override
+  String get accountLostAccessBody =>
+      'Vlastník tě ze zahrady odebral, nebo ji přestal sdílet. Data v telefonu zůstala, ale nebudou se synchronizovat.';
+
+  @override
+  String get accountLostAccessStart => 'Začít vlastní zahradu';
 }

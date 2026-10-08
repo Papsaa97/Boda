@@ -12,6 +12,9 @@ class FakeSyncRemote implements SyncRemote {
   /// Bez připojení: všechna volání selžou.
   bool offline = false;
 
+  /// Zahrady, ke kterým účet ztratil přístup (odebrání ze sdílení).
+  final Set<String> hiddenGardens = {};
+
   void _check() {
     if (offline) throw const SyncException('offline', offline: true);
   }
@@ -29,7 +32,8 @@ class FakeSyncRemote implements SyncRemote {
     _check();
     return [
       for (final g in table('gardens').values)
-        if (g['deleted_at'] == null) g['id']! as String,
+        if (g['deleted_at'] == null && !hiddenGardens.contains(g['id']))
+          g['id']! as String,
     ];
   }
 
