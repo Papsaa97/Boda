@@ -457,3 +457,9 @@ Dopad: karta na „Dnes“ se skryje přihlášenému uživateli; `settingsPriva
 **D100. Export deníku do CSV (FR-E4) se středníkem, desetinnou čárkou a BOM.**
 Proč: FR-E4 je ve fázi 1.0, ale v aplikaci chyběl. Český Excel i Google Tabulky s českým nastavením čekají středník a desetinnou čárku; bez BOM Excel rozbije diakritiku.
 Dopad: `lib/features/backup/domain/diary_csv.dart` (čistý Dart, test), v Nastavení pod zálohou „Exportovat deník do tabulky“, soubor jde přes systémové sdílení stejně jako ZIP záloha. Sloupce: datum, čas, zóna, typ práce, název, poznámka, sklizeň, jednotka, náklady, počet fotek.
+
+## 2026-10-08 – Příprava vydání
+
+**D101. Vlastní ikona a úvodní obrazovka: lístek v tyrkysové, zdroj jako SVG v `assets/brand/`.**
+Proč: aplikace měla výchozí logo Flutteru a bílou úvodní obrazovku, s tím ji obchody nevezmou. Značka má být jednoduchá, čitelná v 48 px a sedět k barvám motivu (kap. 10.2).
+Dopad: Android má adaptivní ikonu (popředí + barva pozadí) a úvodní obrazovku s barvou podle motivu, iOS všechny velikosti `AppIcon` a `LaunchImage`, web ikony a favicon. Namespace Androidu a balíček `MainActivity` jsou `cz.zahradnikboda.app` jako `applicationId` (D35), `CFBundleName` je „Zahradník Bóďa“. Soubory 512×512 a 1024×1024 pro obchody jsou v `assets/brand/`.
