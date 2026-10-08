@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
+import '../../../core/telemetry/telemetry.dart';
 import '../domain/task_actions.dart';
 import '../domain/task_entity.dart';
 
@@ -62,7 +63,13 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
       if (next != null) await repo.saveTask(next);
       return [...list.where((t) => t.id != id), closure.closed, ?next];
     });
-    return state.hasError ? null : closure;
+    if (state.hasError) return null;
+    if (status == TaskStatus.done) {
+      ref.read(analyticsProvider).track(AnalyticsEvent.taskCompleted, {
+        'source': task.source.name,
+      });
+    }
+    return closure;
   }
 
   /// Vrátí uzavřený úkol mezi otevřené.

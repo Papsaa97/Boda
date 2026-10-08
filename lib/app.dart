@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/time/today.dart';
+import 'features/account/presentation/consent_sync.dart';
 import 'features/account/presentation/sync_controller.dart';
 import 'features/activity/presentation/screens/activity_form_screen.dart';
 import 'features/activity/presentation/screens/timeline_screen.dart';
@@ -53,7 +54,9 @@ class AppRoot extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     // Synchronizace běží i během onboardingu: druhý telefon se přihlásí
     // a převezme zahradu z účtu (DECLOG D70).
-    ref.listen(syncControllerProvider, (_, _) {});
+    ref
+      ..listen(syncControllerProvider, (_, _) {})
+      ..listen(consentSyncProvider, (_, _) {});
     final zones = ref.watch(zonesControllerProvider);
     return zones.when(
       skipError: true,

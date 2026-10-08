@@ -7,7 +7,10 @@ import '../../../core/formatting/dates.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/di/providers.dart';
 import '../../account/presentation/account_screen.dart';
+import '../../account/presentation/consents_screen.dart';
 import '../../backup/presentation/backup_actions.dart';
+import '../../premium/presentation/paywall_screen.dart';
+import '../../premium/presentation/premium_controller.dart';
 import '../../stats/presentation/stats_screen.dart';
 import '../domain/app_settings.dart';
 import 'settings_controller.dart';
@@ -57,7 +60,6 @@ class SettingsScreen extends ConsumerWidget {
 
     final lastExport = settings.lastExportAt;
     final user = ref.watch(currentUserProvider).value;
-    final consentAt = settings.aiConsentAt;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.settingsTitle)),
@@ -141,20 +143,27 @@ class SettingsScreen extends ConsumerWidget {
               context,
             ).push(MaterialPageRoute(builder: (_) => const AccountScreen())),
           ),
-          SwitchListTile(
-            secondary: const Icon(Icons.auto_awesome_outlined),
-            title: Text(l.settingsAiConsent),
+          ListTile(
+            leading: const Icon(Icons.workspace_premium_outlined),
+            title: Text(l.premiumTile),
             subtitle: Text(
-              consentAt == null
-                  ? l.settingsAiConsentOff
-                  : l.settingsAiConsentOn(formatDate(consentAt)),
-            ),
-            value: consentAt != null,
-            onChanged: (on) => controller.update(
-              (s) => s.copyWith(
-                aiConsentAt: () => on ? ref.read(clockProvider)() : null,
+              planLabel(
+                l,
+                ref.watch(premiumControllerProvider),
+                ref.read(clockProvider)(),
               ),
             ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
+          ),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: Text(l.consentsTile),
+            subtitle: Text(l.consentsTileSubtitle),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const ConsentsScreen())),
           ),
           if (kIsWeb)
             ListTile(

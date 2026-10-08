@@ -38,6 +38,9 @@ class AppSettings extends Equatable {
   /// modelem (kap. 9); null = nesouhlasil nebo souhlas odvolal.
   final DateTime? aiConsentAt;
 
+  /// Kdy uživatel souhlasil s anonymní analytikou (kap. 9); null = ne.
+  final DateTime? analyticsConsentAt;
+
   const AppSettings({
     this.theme = ThemePreference.system,
     this.quietStart = 21 * 60,
@@ -46,6 +49,7 @@ class AppSettings extends Equatable {
     this.lastExportAt,
     this.lastZoneId,
     this.aiConsentAt,
+    this.analyticsConsentAt,
   });
 
   AppSettings copyWith({
@@ -56,6 +60,7 @@ class AppSettings extends Equatable {
     DateTime? lastExportAt,
     String? lastZoneId,
     DateTime? Function()? aiConsentAt,
+    DateTime? Function()? analyticsConsentAt,
   }) {
     return AppSettings(
       theme: theme ?? this.theme,
@@ -65,6 +70,9 @@ class AppSettings extends Equatable {
       lastExportAt: lastExportAt ?? this.lastExportAt,
       lastZoneId: lastZoneId ?? this.lastZoneId,
       aiConsentAt: aiConsentAt == null ? this.aiConsentAt : aiConsentAt(),
+      analyticsConsentAt: analyticsConsentAt == null
+          ? this.analyticsConsentAt
+          : analyticsConsentAt(),
     );
   }
 
@@ -77,5 +85,6 @@ class AppSettings extends Equatable {
     lastExportAt,
     lastZoneId,
     aiConsentAt,
+    analyticsConsentAt,
   ];
 }

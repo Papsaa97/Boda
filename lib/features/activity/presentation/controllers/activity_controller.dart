@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/activity_entity.dart';
 import '../../domain/activity_type.dart';
 import '../../../../core/di/providers.dart';
+import '../../../../core/telemetry/telemetry.dart';
 
 /// Controller spravující seznam aktivit.
 ///
@@ -51,7 +52,12 @@ class ActivityController extends AsyncNotifier<List<ActivityEntity>> {
       await ref.read(activityRepositoryProvider).addActivity(newActivity);
       return _sorted([...previous, newActivity]);
     });
-    return state.hasError ? null : newActivity;
+    if (state.hasError) return null;
+    ref.read(analyticsProvider).track(AnalyticsEvent.activityLogged, {
+      'type': type.name,
+      'photos': photos.length,
+    });
+    return newActivity;
   }
 
   Future<void> updateActivity(ActivityEntity activity) async {

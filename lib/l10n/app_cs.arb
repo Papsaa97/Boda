@@ -1079,5 +1079,100 @@
     }
   },
   "settingsAiConsentOff": "Bez souhlasu (Bóďa odpovídá jen v ukázkovém režimu)",
-  "onboardingHaveAccount": "Už mám účet, přihlásit se"
+  "onboardingHaveAccount": "Už mám účet, přihlásit se",
+  "consentsTitle": "Souhlasy a soukromí",
+  "consentsTile": "Souhlasy a soukromí",
+  "consentsTileSubtitle": "Co odesíláme a s čím jsi souhlasil(a)",
+  "consentsIntro": "Deník funguje i bez souhlasů a data zůstávají v telefonu. Každý souhlas je zvlášť a jde kdykoli odvolat.",
+  "consentsAiHelp": "Dotaz a vybraná data ze zahrady jdou přes náš server jazykovému modelu. Bez souhlasu odpovídá Bóďa jen v ukázkovém režimu.",
+  "consentsAnalytics": "Anonymní statistiky používání",
+  "consentsAnalyticsHelp": "Kolik záznamů a úkolů vzniká a které funkce se používají, bez textů, fotek a polohy. Pomáhá rozhodnout, co zlepšit.",
+  "consentsAnalyticsOn": "Souhlas udělen {date}",
+  "@consentsAnalyticsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "consentsAnalyticsOff": "Bez souhlasu, nic se neodesílá",
+  "consentsSync": "S účtem se souhlasy uloží i k účtu (verze zásad {version}).",
+  "@consentsSync": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "consentsPolicy": "Zásady ochrany soukromí",
+  "premiumTitle": "Premium",
+  "premiumTile": "Premium",
+  "premiumTileFree": "Tarif Free",
+  "premiumTilePremium": "Tarif Premium",
+  "premiumTilePremiumUntil": "Tarif Premium do {date}",
+  "@premiumTilePremiumUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumTileUnknown": "Tarif se nepodařilo ověřit",
+  "premiumHeadline": "Bóďa naplno",
+  "premiumIntro": "Deník, zóny, úkoly a záloha zůstávají vždy zdarma. Premium přidává chytrost navíc.",
+  "premiumCurrentFree": "Teď máš Free.",
+  "premiumCurrentPremium": "Máš Premium. Díky!",
+  "premiumColumnFree": "Free",
+  "premiumColumnPremium": "Premium",
+  "premiumRowDiary": "Deník, zóny, úkoly, sklad, export",
+  "premiumRowGardens": "Zahrady",
+  "premiumRowPhotos": "Fotky v cloudu",
+  "premiumRowBoda": "Dotazy na Bóďu",
+  "premiumRowV2": "Počasí, diagnostika z fotek, sdílení (V2)",
+  "premiumUnlimited": "bez omezení",
+  "premiumYes": "ano",
+  "premiumNo": "ne",
+  "premiumFreeGardens": "1",
+  "premiumFreePhotos": "200",
+  "premiumFreeBoda": "10 měsíčně",
+  "premiumPremiumBoda": "300 měsíčně",
+  "premiumYearly": "Ročně",
+  "premiumMonthly": "Měsíčně",
+  "premiumPerYear": "{price} za rok",
+  "@premiumPerYear": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumPerMonth": "{price} za měsíc",
+  "@premiumPerMonth": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumBestValue": "Výhodnější",
+  "premiumTrial": "{days, plural, =1{1 den zdarma} few{{days} dny zdarma} other{{days} dní zdarma}}",
+  "@premiumTrial": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumBuy": "Vyzkoušet Premium",
+  "premiumRestore": "Obnovit nákupy",
+  "premiumNotYet": "Předplatné spustíme na začátku sezóny 2028. Do té doby máš všechno z Free.",
+  "premiumSignInFirst": "Předplatné patří k účtu. Nejdřív se přihlas.",
+  "premiumSignIn": "Přihlásit se",
+  "premiumRenewal": "Předplatné se obnovuje automaticky; zrušit jde kdykoli v obchodě (Google Play, App Store).",
+  "premiumThanks": "Premium je aktivní.",
+  "premiumPending": "Platba čeká na potvrzení obchodu. Premium se zapne, až projde.",
+  "premiumRestored": "Nákupy obnovené.",
+  "premiumFailed": "Nákup se nepovedl. Zkus to prosím znovu.",
+  "premiumOffline": "Bez připojení. Zkus to, až budeš online.",
+  "assistantLimitPremium": "Víc dotazů s Premium"
 }
