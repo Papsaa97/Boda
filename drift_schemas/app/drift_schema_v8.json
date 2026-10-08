@@ -1,0 +1,3753 @@
+{
+  "_meta": {
+    "description": "This file contains a serialized version of schema entities for drift.",
+    "version": "1.3.0"
+  },
+  "options": {
+    "store_date_time_values_as_text": true
+  },
+  "entities": [
+    {
+      "id": 0,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "sync_outbox",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "seq",
+            "getter_name": "seq",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": "NOT NULL PRIMARY KEY AUTOINCREMENT",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "auto-increment"
+            ]
+          },
+          {
+            "name": "entity",
+            "getter_name": "entity",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "row_key",
+            "getter_name": "rowKey",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+          "UNIQUE(entity, row_key)"
+        ],
+        "unique_keys": [
+          [
+            "entity",
+            "row_key"
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "sync_state",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL PRIMARY KEY",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "primary-key"
+            ]
+          },
+          {
+            "name": "value",
+            "getter_name": "value",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": []
+      }
+    },
+    {
+      "id": 2,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "gardens",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "bounds",
+            "getter_name": "bounds",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "location_lat",
+            "getter_name": "locationLat",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "location_lng",
+            "getter_name": "locationLng",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "altitude_m",
+            "getter_name": "altitudeM",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "references": [
+        2,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 2,
+        "references_in_body": [
+          2,
+          1,
+          0
+        ],
+        "name": "gardens_outbox_insert",
+        "sql": "CREATE TRIGGER gardens_outbox_insert AFTER INSERT ON gardens\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 4,
+      "references": [
+        2,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 2,
+        "references_in_body": [
+          2,
+          1,
+          0
+        ],
+        "name": "gardens_outbox_update",
+        "sql": "CREATE TRIGGER gardens_outbox_update AFTER UPDATE ON gardens\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 5,
+      "references": [
+        2,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 2,
+        "references_in_body": [
+          2,
+          1,
+          0
+        ],
+        "name": "gardens_outbox_delete",
+        "sql": "CREATE TRIGGER gardens_outbox_delete AFTER DELETE ON gardens\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 6,
+      "references": [
+        2
+      ],
+      "type": "table",
+      "data": {
+        "name": "zones",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "type",
+            "getter_name": "type",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'other\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "archived",
+            "getter_name": "archived",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "CHECK (\"archived\" IN (0, 1))",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "CHECK (\"archived\" IN (0, 1))"
+            },
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "sort_order",
+            "getter_name": "sortOrder",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "area_m2",
+            "getter_name": "areaM2",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "soil_texture",
+            "getter_name": "soilTexture",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "ph",
+            "getter_name": "ph",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "ph_measured_at",
+            "getter_name": "phMeasuredAt",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "sun_exposure",
+            "getter_name": "sunExposure",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "irrigation",
+            "getter_name": "irrigation",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "covered",
+            "getter_name": "covered",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "CHECK (\"covered\" IN (0, 1))",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "CHECK (\"covered\" IN (0, 1))"
+            },
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "polygon",
+            "getter_name": "polygon",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "layer",
+            "getter_name": "layer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "references": [
+        6,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 6,
+        "references_in_body": [
+          6,
+          1,
+          0
+        ],
+        "name": "zones_outbox_insert",
+        "sql": "CREATE TRIGGER zones_outbox_insert AFTER INSERT ON zones\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 8,
+      "references": [
+        6,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 6,
+        "references_in_body": [
+          6,
+          1,
+          0
+        ],
+        "name": "zones_outbox_update",
+        "sql": "CREATE TRIGGER zones_outbox_update AFTER UPDATE ON zones\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 9,
+      "references": [
+        6,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 6,
+        "references_in_body": [
+          6,
+          1,
+          0
+        ],
+        "name": "zones_outbox_delete",
+        "sql": "CREATE TRIGGER zones_outbox_delete AFTER DELETE ON zones\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 10,
+      "references": [
+        2
+      ],
+      "type": "table",
+      "data": {
+        "name": "inventory_items",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "category",
+            "getter_name": "category",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "unit",
+            "getter_name": "unit",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "stock_qty",
+            "getter_name": "stockQty",
+            "moor_type": "double",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('0.0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "low_stock_threshold",
+            "getter_name": "lowStockThreshold",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "details",
+            "getter_name": "details",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "references": [
+        10,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 10,
+        "references_in_body": [
+          10,
+          1,
+          0
+        ],
+        "name": "inventory_items_outbox_insert",
+        "sql": "CREATE TRIGGER inventory_items_outbox_insert AFTER INSERT ON inventory_items\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 12,
+      "references": [
+        10,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 10,
+        "references_in_body": [
+          10,
+          1,
+          0
+        ],
+        "name": "inventory_items_outbox_update",
+        "sql": "CREATE TRIGGER inventory_items_outbox_update AFTER UPDATE ON inventory_items\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 13,
+      "references": [
+        10,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 10,
+        "references_in_body": [
+          10,
+          1,
+          0
+        ],
+        "name": "inventory_items_outbox_delete",
+        "sql": "CREATE TRIGGER inventory_items_outbox_delete AFTER DELETE ON inventory_items\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 14,
+      "references": [
+        2,
+        6
+      ],
+      "type": "table",
+      "data": {
+        "name": "incidents",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "zone_id",
+            "getter_name": "zoneId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES zones (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES zones (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "zones",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "label",
+            "getter_name": "label",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "source",
+            "getter_name": "source",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'user\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "candidates",
+            "getter_name": "candidates",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "plan_bio",
+            "getter_name": "planBio",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "plan_chem",
+            "getter_name": "planChem",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "status",
+            "getter_name": "status",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'open\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "references": [
+        2,
+        6,
+        14
+      ],
+      "type": "table",
+      "data": {
+        "name": "tasks",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "title",
+            "getter_name": "title",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "zone_id",
+            "getter_name": "zoneId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES zones (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES zones (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "zones",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "due",
+            "getter_name": "due",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "remind_at",
+            "getter_name": "remindAt",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "rrule",
+            "getter_name": "rrule",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "snoozed_until",
+            "getter_name": "snoozedUntil",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "status",
+            "getter_name": "status",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'open\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "notes",
+            "getter_name": "notes",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "completed_at",
+            "getter_name": "completedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "completed_activity_id",
+            "getter_name": "completedActivityId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "source",
+            "getter_name": "source",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'user\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "duration_est_min",
+            "getter_name": "durationEstMin",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "tools",
+            "getter_name": "tools",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "incident_id",
+            "getter_name": "incidentId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES incidents (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES incidents (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "incidents",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "references": [
+        15,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 15,
+        "references_in_body": [
+          15,
+          1,
+          0
+        ],
+        "name": "tasks_outbox_insert",
+        "sql": "CREATE TRIGGER tasks_outbox_insert AFTER INSERT ON tasks\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 17,
+      "references": [
+        15,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 15,
+        "references_in_body": [
+          15,
+          1,
+          0
+        ],
+        "name": "tasks_outbox_update",
+        "sql": "CREATE TRIGGER tasks_outbox_update AFTER UPDATE ON tasks\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 18,
+      "references": [
+        15,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 15,
+        "references_in_body": [
+          15,
+          1,
+          0
+        ],
+        "name": "tasks_outbox_delete",
+        "sql": "CREATE TRIGGER tasks_outbox_delete AFTER DELETE ON tasks\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 19,
+      "references": [
+        2,
+        6
+      ],
+      "type": "table",
+      "data": {
+        "name": "activities",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "zone_id",
+            "getter_name": "zoneId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES zones (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES zones (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "zones",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "type",
+            "getter_name": "type",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "title",
+            "getter_name": "title",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "occurred_at",
+            "getter_name": "occurredAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "occurred_tz",
+            "getter_name": "occurredTz",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "notes",
+            "getter_name": "notes",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "harvest_qty",
+            "getter_name": "harvestQty",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "harvest_unit",
+            "getter_name": "harvestUnit",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "cost_czk",
+            "getter_name": "costCzk",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "task_id",
+            "getter_name": "taskId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "references": [
+        19,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 19,
+        "references_in_body": [
+          19,
+          1,
+          0
+        ],
+        "name": "activities_outbox_insert",
+        "sql": "CREATE TRIGGER activities_outbox_insert AFTER INSERT ON activities\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 21,
+      "references": [
+        19,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 19,
+        "references_in_body": [
+          19,
+          1,
+          0
+        ],
+        "name": "activities_outbox_update",
+        "sql": "CREATE TRIGGER activities_outbox_update AFTER UPDATE ON activities\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 22,
+      "references": [
+        19,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 19,
+        "references_in_body": [
+          19,
+          1,
+          0
+        ],
+        "name": "activities_outbox_delete",
+        "sql": "CREATE TRIGGER activities_outbox_delete AFTER DELETE ON activities\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 23,
+      "references": [
+        2,
+        19,
+        14
+      ],
+      "type": "table",
+      "data": {
+        "name": "photos",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "activity_id",
+            "getter_name": "activityId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES activities (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES activities (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "activities",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "incident_id",
+            "getter_name": "incidentId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES incidents (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES incidents (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "incidents",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "local_path",
+            "getter_name": "localPath",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "position",
+            "getter_name": "position",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "references": [
+        23,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 23,
+        "references_in_body": [
+          23,
+          1,
+          0
+        ],
+        "name": "photos_outbox_insert",
+        "sql": "CREATE TRIGGER photos_outbox_insert AFTER INSERT ON photos\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 25,
+      "references": [
+        23,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 23,
+        "references_in_body": [
+          23,
+          1,
+          0
+        ],
+        "name": "photos_outbox_update",
+        "sql": "CREATE TRIGGER photos_outbox_update AFTER UPDATE ON photos\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 26,
+      "references": [
+        23,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 23,
+        "references_in_body": [
+          23,
+          1,
+          0
+        ],
+        "name": "photos_outbox_delete",
+        "sql": "CREATE TRIGGER photos_outbox_delete AFTER DELETE ON photos\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 27,
+      "references": [
+        15,
+        10,
+        2
+      ],
+      "type": "table",
+      "data": {
+        "name": "task_materials",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "task_id",
+            "getter_name": "taskId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES tasks (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES tasks (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "tasks",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "item_id",
+            "getter_name": "itemId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES inventory_items (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES inventory_items (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "inventory_items",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "qty",
+            "getter_name": "qty",
+            "moor_type": "double",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "unit",
+            "getter_name": "unit",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "task_id",
+          "item_id"
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "references": [
+        27,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 27,
+        "references_in_body": [
+          27,
+          1,
+          0
+        ],
+        "name": "task_materials_outbox_insert",
+        "sql": "CREATE TRIGGER task_materials_outbox_insert AFTER INSERT ON task_materials\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = NEW.task_id || '|' || NEW.item_id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', NEW.task_id || '|' || NEW.item_id);\nEND;"
+      }
+    },
+    {
+      "id": 29,
+      "references": [
+        27,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 27,
+        "references_in_body": [
+          27,
+          1,
+          0
+        ],
+        "name": "task_materials_outbox_update",
+        "sql": "CREATE TRIGGER task_materials_outbox_update AFTER UPDATE ON task_materials\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = NEW.task_id || '|' || NEW.item_id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', NEW.task_id || '|' || NEW.item_id);\nEND;"
+      }
+    },
+    {
+      "id": 30,
+      "references": [
+        27,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 27,
+        "references_in_body": [
+          27,
+          1,
+          0
+        ],
+        "name": "task_materials_outbox_delete",
+        "sql": "CREATE TRIGGER task_materials_outbox_delete AFTER DELETE ON task_materials\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = OLD.task_id || '|' || OLD.item_id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', OLD.task_id || '|' || OLD.item_id);\nEND;"
+      }
+    },
+    {
+      "id": 31,
+      "references": [
+        19,
+        10,
+        2
+      ],
+      "type": "table",
+      "data": {
+        "name": "activity_materials",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "activity_id",
+            "getter_name": "activityId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES activities (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES activities (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "activities",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "item_id",
+            "getter_name": "itemId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES inventory_items (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES inventory_items (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "inventory_items",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "qty",
+            "getter_name": "qty",
+            "moor_type": "double",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "unit",
+            "getter_name": "unit",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "activity_id",
+          "item_id"
+        ]
+      }
+    },
+    {
+      "id": 32,
+      "references": [
+        31,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 31,
+        "references_in_body": [
+          31,
+          1,
+          0
+        ],
+        "name": "activity_materials_outbox_insert",
+        "sql": "CREATE TRIGGER activity_materials_outbox_insert AFTER INSERT ON activity_materials\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = NEW.activity_id || '|' || NEW.item_id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', NEW.activity_id || '|' || NEW.item_id);\nEND;"
+      }
+    },
+    {
+      "id": 33,
+      "references": [
+        31,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 31,
+        "references_in_body": [
+          31,
+          1,
+          0
+        ],
+        "name": "activity_materials_outbox_update",
+        "sql": "CREATE TRIGGER activity_materials_outbox_update AFTER UPDATE ON activity_materials\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = NEW.activity_id || '|' || NEW.item_id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', NEW.activity_id || '|' || NEW.item_id);\nEND;"
+      }
+    },
+    {
+      "id": 34,
+      "references": [
+        31,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 31,
+        "references_in_body": [
+          31,
+          1,
+          0
+        ],
+        "name": "activity_materials_outbox_delete",
+        "sql": "CREATE TRIGGER activity_materials_outbox_delete AFTER DELETE ON activity_materials\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = OLD.activity_id || '|' || OLD.item_id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', OLD.activity_id || '|' || OLD.item_id);\nEND;"
+      }
+    },
+    {
+      "id": 35,
+      "references": [
+        2,
+        10
+      ],
+      "type": "table",
+      "data": {
+        "name": "shopping_items",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "qty",
+            "getter_name": "qty",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "unit",
+            "getter_name": "unit",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "item_id",
+            "getter_name": "itemId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES inventory_items (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES inventory_items (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "inventory_items",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "done",
+            "getter_name": "done",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "CHECK (\"done\" IN (0, 1))",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "CHECK (\"done\" IN (0, 1))"
+            },
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "source",
+            "getter_name": "source",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'user\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 36,
+      "references": [
+        35,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 35,
+        "references_in_body": [
+          35,
+          1,
+          0
+        ],
+        "name": "shopping_items_outbox_insert",
+        "sql": "CREATE TRIGGER shopping_items_outbox_insert AFTER INSERT ON shopping_items\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 37,
+      "references": [
+        35,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 35,
+        "references_in_body": [
+          35,
+          1,
+          0
+        ],
+        "name": "shopping_items_outbox_update",
+        "sql": "CREATE TRIGGER shopping_items_outbox_update AFTER UPDATE ON shopping_items\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 38,
+      "references": [
+        35,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 35,
+        "references_in_body": [
+          35,
+          1,
+          0
+        ],
+        "name": "shopping_items_outbox_delete",
+        "sql": "CREATE TRIGGER shopping_items_outbox_delete AFTER DELETE ON shopping_items\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 39,
+      "references": [
+        2
+      ],
+      "type": "table",
+      "data": {
+        "name": "assistant_threads",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "title",
+            "getter_name": "title",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 40,
+      "references": [
+        39,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 39,
+        "references_in_body": [
+          39,
+          1,
+          0
+        ],
+        "name": "assistant_threads_outbox_insert",
+        "sql": "CREATE TRIGGER assistant_threads_outbox_insert AFTER INSERT ON assistant_threads\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 41,
+      "references": [
+        39,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 39,
+        "references_in_body": [
+          39,
+          1,
+          0
+        ],
+        "name": "assistant_threads_outbox_update",
+        "sql": "CREATE TRIGGER assistant_threads_outbox_update AFTER UPDATE ON assistant_threads\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 42,
+      "references": [
+        39,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 39,
+        "references_in_body": [
+          39,
+          1,
+          0
+        ],
+        "name": "assistant_threads_outbox_delete",
+        "sql": "CREATE TRIGGER assistant_threads_outbox_delete AFTER DELETE ON assistant_threads\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 43,
+      "references": [
+        39
+      ],
+      "type": "table",
+      "data": {
+        "name": "assistant_messages",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "thread_id",
+            "getter_name": "threadId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES assistant_threads (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES assistant_threads (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "assistant_threads",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "role",
+            "getter_name": "role",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "body",
+            "getter_name": "body",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "context_summary",
+            "getter_name": "contextSummary",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "status",
+            "getter_name": "status",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'sent\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "feedback",
+            "getter_name": "feedback",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "feedback_comment",
+            "getter_name": "feedbackComment",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 44,
+      "references": [
+        43,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 43,
+        "references_in_body": [
+          43,
+          1,
+          0
+        ],
+        "name": "assistant_messages_outbox_insert",
+        "sql": "CREATE TRIGGER assistant_messages_outbox_insert AFTER INSERT ON assistant_messages\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 45,
+      "references": [
+        43,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 43,
+        "references_in_body": [
+          43,
+          1,
+          0
+        ],
+        "name": "assistant_messages_outbox_update",
+        "sql": "CREATE TRIGGER assistant_messages_outbox_update AFTER UPDATE ON assistant_messages\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 46,
+      "references": [
+        43,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 43,
+        "references_in_body": [
+          43,
+          1,
+          0
+        ],
+        "name": "assistant_messages_outbox_delete",
+        "sql": "CREATE TRIGGER assistant_messages_outbox_delete AFTER DELETE ON assistant_messages\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 47,
+      "references": [
+        14,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 14,
+        "references_in_body": [
+          14,
+          1,
+          0
+        ],
+        "name": "incidents_outbox_insert",
+        "sql": "CREATE TRIGGER incidents_outbox_insert AFTER INSERT ON incidents\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 48,
+      "references": [
+        14,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 14,
+        "references_in_body": [
+          14,
+          1,
+          0
+        ],
+        "name": "incidents_outbox_update",
+        "sql": "CREATE TRIGGER incidents_outbox_update AFTER UPDATE ON incidents\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 49,
+      "references": [
+        14,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 14,
+        "references_in_body": [
+          14,
+          1,
+          0
+        ],
+        "name": "incidents_outbox_delete",
+        "sql": "CREATE TRIGGER incidents_outbox_delete AFTER DELETE ON incidents\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 50,
+      "references": [
+        2,
+        10,
+        15
+      ],
+      "type": "table",
+      "data": {
+        "name": "inventory_movements",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "item_id",
+            "getter_name": "itemId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES inventory_items (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES inventory_items (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "inventory_items",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "qty_delta",
+            "getter_name": "qtyDelta",
+            "moor_type": "double",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "reason",
+            "getter_name": "reason",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "task_id",
+            "getter_name": "taskId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES tasks (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES tasks (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "tasks",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "at",
+            "getter_name": "at",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 51,
+      "references": [
+        50,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 50,
+        "references_in_body": [
+          50,
+          1,
+          0
+        ],
+        "name": "inventory_movements_outbox_insert",
+        "sql": "CREATE TRIGGER inventory_movements_outbox_insert AFTER INSERT ON inventory_movements\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 52,
+      "references": [
+        50,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 50,
+        "references_in_body": [
+          50,
+          1,
+          0
+        ],
+        "name": "inventory_movements_outbox_update",
+        "sql": "CREATE TRIGGER inventory_movements_outbox_update AFTER UPDATE ON inventory_movements\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 53,
+      "references": [
+        50,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 50,
+        "references_in_body": [
+          50,
+          1,
+          0
+        ],
+        "name": "inventory_movements_outbox_delete",
+        "sql": "CREATE TRIGGER inventory_movements_outbox_delete AFTER DELETE ON inventory_movements\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 54,
+      "references": [
+        2,
+        6
+      ],
+      "type": "table",
+      "data": {
+        "name": "builds",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "garden_id",
+            "getter_name": "gardenId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES gardens (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES gardens (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "gardens",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "zone_id",
+            "getter_name": "zoneId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES zones (id)",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES zones (id)"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "zones",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "template",
+            "getter_name": "template",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "params",
+            "getter_name": "params",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "prices",
+            "getter_name": "prices",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deleted_at",
+            "getter_name": "deletedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 55,
+      "references": [
+        54,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 54,
+        "references_in_body": [
+          54,
+          1,
+          0
+        ],
+        "name": "builds_outbox_insert",
+        "sql": "CREATE TRIGGER builds_outbox_insert AFTER INSERT ON builds\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 56,
+      "references": [
+        54,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 54,
+        "references_in_body": [
+          54,
+          1,
+          0
+        ],
+        "name": "builds_outbox_update",
+        "sql": "CREATE TRIGGER builds_outbox_update AFTER UPDATE ON builds\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = NEW.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', NEW.id);\nEND;"
+      }
+    },
+    {
+      "id": 57,
+      "references": [
+        54,
+        1,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 54,
+        "references_in_body": [
+          54,
+          1,
+          0
+        ],
+        "name": "builds_outbox_delete",
+        "sql": "CREATE TRIGGER builds_outbox_delete AFTER DELETE ON builds\n  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')\nBEGIN\n  DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = OLD.id;\n  INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', OLD.id);\nEND;"
+      }
+    },
+    {
+      "id": 58,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "app_settings",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "key",
+            "getter_name": "key",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "value",
+            "getter_name": "value",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "key"
+        ]
+      }
+    }
+  ],
+  "fixed_sql": [
+    {
+      "name": "sync_outbox",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"sync_outbox\" (\"seq\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"entity\" TEXT NOT NULL, \"row_key\" TEXT NOT NULL, UNIQUE(entity, row_key));"
+        }
+      ]
+    },
+    {
+      "name": "sync_state",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"sync_state\" (\"name\" TEXT NOT NULL PRIMARY KEY, \"value\" TEXT);"
+        }
+      ]
+    },
+    {
+      "name": "gardens",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"gardens\" (\"id\" TEXT NOT NULL, \"name\" TEXT NOT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"bounds\" TEXT NULL, \"location_lat\" REAL NULL, \"location_lng\" REAL NULL, \"altitude_m\" INTEGER NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "gardens_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER gardens_outbox_insert AFTER INSERT ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "gardens_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER gardens_outbox_update AFTER UPDATE ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "gardens_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER gardens_outbox_delete AFTER DELETE ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "zones",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"zones\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"name\" TEXT NOT NULL, \"type\" TEXT NOT NULL DEFAULT 'other', \"archived\" INTEGER NOT NULL DEFAULT 0 CHECK (\"archived\" IN (0, 1)), \"sort_order\" INTEGER NULL, \"area_m2\" REAL NULL, \"soil_texture\" TEXT NULL, \"ph\" REAL NULL, \"ph_measured_at\" TEXT NULL, \"sun_exposure\" TEXT NULL, \"irrigation\" TEXT NULL, \"covered\" INTEGER NOT NULL DEFAULT 0 CHECK (\"covered\" IN (0, 1)), \"polygon\" TEXT NULL, \"layer\" TEXT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "zones_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER zones_outbox_insert AFTER INSERT ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "zones_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER zones_outbox_update AFTER UPDATE ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "zones_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER zones_outbox_delete AFTER DELETE ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "inventory_items",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"inventory_items\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"category\" TEXT NOT NULL, \"name\" TEXT NOT NULL, \"unit\" TEXT NOT NULL, \"stock_qty\" REAL NOT NULL DEFAULT 0.0, \"low_stock_threshold\" REAL NULL, \"details\" TEXT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "inventory_items_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER inventory_items_outbox_insert AFTER INSERT ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "inventory_items_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER inventory_items_outbox_update AFTER UPDATE ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "inventory_items_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER inventory_items_outbox_delete AFTER DELETE ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "incidents",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"incidents\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"zone_id\" TEXT NOT NULL REFERENCES zones (id), \"label\" TEXT NOT NULL, \"source\" TEXT NOT NULL DEFAULT 'user', \"candidates\" TEXT NULL, \"plan_bio\" TEXT NULL, \"plan_chem\" TEXT NULL, \"status\" TEXT NOT NULL DEFAULT 'open', \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "tasks",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"tasks\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"title\" TEXT NOT NULL, \"zone_id\" TEXT NULL REFERENCES zones (id), \"due\" TEXT NOT NULL, \"remind_at\" INTEGER NULL, \"rrule\" TEXT NULL, \"snoozed_until\" TEXT NULL, \"status\" TEXT NOT NULL DEFAULT 'open', \"notes\" TEXT NULL, \"completed_at\" TEXT NULL, \"completed_activity_id\" TEXT NULL, \"source\" TEXT NOT NULL DEFAULT 'user', \"duration_est_min\" INTEGER NULL, \"tools\" TEXT NULL, \"incident_id\" TEXT NULL REFERENCES incidents (id), \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "tasks_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tasks_outbox_insert AFTER INSERT ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "tasks_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tasks_outbox_update AFTER UPDATE ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "tasks_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tasks_outbox_delete AFTER DELETE ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "activities",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"activities\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"zone_id\" TEXT NOT NULL REFERENCES zones (id), \"type\" TEXT NOT NULL, \"title\" TEXT NOT NULL, \"occurred_at\" TEXT NOT NULL, \"occurred_tz\" TEXT NOT NULL, \"notes\" TEXT NULL, \"harvest_qty\" REAL NULL, \"harvest_unit\" TEXT NULL, \"cost_czk\" REAL NULL, \"task_id\" TEXT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "activities_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER activities_outbox_insert AFTER INSERT ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "activities_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER activities_outbox_update AFTER UPDATE ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "activities_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER activities_outbox_delete AFTER DELETE ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "photos",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"photos\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"activity_id\" TEXT NULL REFERENCES activities (id), \"incident_id\" TEXT NULL REFERENCES incidents (id), \"local_path\" TEXT NOT NULL, \"position\" INTEGER NOT NULL DEFAULT 0, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "photos_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER photos_outbox_insert AFTER INSERT ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "photos_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER photos_outbox_update AFTER UPDATE ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "photos_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER photos_outbox_delete AFTER DELETE ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "task_materials",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"task_materials\" (\"task_id\" TEXT NOT NULL REFERENCES tasks (id), \"item_id\" TEXT NOT NULL REFERENCES inventory_items (id), \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"qty\" REAL NOT NULL, \"unit\" TEXT NOT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"task_id\", \"item_id\"));"
+        }
+      ]
+    },
+    {
+      "name": "task_materials_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER task_materials_outbox_insert AFTER INSERT ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = NEW.task_id || '|' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', NEW.task_id || '|' || NEW.item_id);END"
+        }
+      ]
+    },
+    {
+      "name": "task_materials_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER task_materials_outbox_update AFTER UPDATE ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = NEW.task_id || '|' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', NEW.task_id || '|' || NEW.item_id);END"
+        }
+      ]
+    },
+    {
+      "name": "task_materials_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER task_materials_outbox_delete AFTER DELETE ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = OLD.task_id || '|' || OLD.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', OLD.task_id || '|' || OLD.item_id);END"
+        }
+      ]
+    },
+    {
+      "name": "activity_materials",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"activity_materials\" (\"activity_id\" TEXT NOT NULL REFERENCES activities (id), \"item_id\" TEXT NOT NULL REFERENCES inventory_items (id), \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"qty\" REAL NOT NULL, \"unit\" TEXT NOT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"activity_id\", \"item_id\"));"
+        }
+      ]
+    },
+    {
+      "name": "activity_materials_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER activity_materials_outbox_insert AFTER INSERT ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = NEW.activity_id || '|' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', NEW.activity_id || '|' || NEW.item_id);END"
+        }
+      ]
+    },
+    {
+      "name": "activity_materials_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER activity_materials_outbox_update AFTER UPDATE ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = NEW.activity_id || '|' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', NEW.activity_id || '|' || NEW.item_id);END"
+        }
+      ]
+    },
+    {
+      "name": "activity_materials_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER activity_materials_outbox_delete AFTER DELETE ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = OLD.activity_id || '|' || OLD.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', OLD.activity_id || '|' || OLD.item_id);END"
+        }
+      ]
+    },
+    {
+      "name": "shopping_items",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"shopping_items\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"name\" TEXT NOT NULL, \"qty\" REAL NULL, \"unit\" TEXT NULL, \"item_id\" TEXT NULL REFERENCES inventory_items (id), \"done\" INTEGER NOT NULL DEFAULT 0 CHECK (\"done\" IN (0, 1)), \"source\" TEXT NOT NULL DEFAULT 'user', \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "shopping_items_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER shopping_items_outbox_insert AFTER INSERT ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "shopping_items_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER shopping_items_outbox_update AFTER UPDATE ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "shopping_items_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER shopping_items_outbox_delete AFTER DELETE ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "assistant_threads",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"assistant_threads\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NULL REFERENCES gardens (id), \"title\" TEXT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "assistant_threads_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER assistant_threads_outbox_insert AFTER INSERT ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "assistant_threads_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER assistant_threads_outbox_update AFTER UPDATE ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "assistant_threads_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER assistant_threads_outbox_delete AFTER DELETE ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "assistant_messages",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"assistant_messages\" (\"id\" TEXT NOT NULL, \"thread_id\" TEXT NOT NULL REFERENCES assistant_threads (id), \"role\" TEXT NOT NULL, \"body\" TEXT NOT NULL, \"context_summary\" TEXT NULL, \"status\" TEXT NOT NULL DEFAULT 'sent', \"feedback\" TEXT NULL, \"feedback_comment\" TEXT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "assistant_messages_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER assistant_messages_outbox_insert AFTER INSERT ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "assistant_messages_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER assistant_messages_outbox_update AFTER UPDATE ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "assistant_messages_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER assistant_messages_outbox_delete AFTER DELETE ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "incidents_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER incidents_outbox_insert AFTER INSERT ON incidents WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "incidents_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER incidents_outbox_update AFTER UPDATE ON incidents WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "incidents_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER incidents_outbox_delete AFTER DELETE ON incidents WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'incidents' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('incidents', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "inventory_movements",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"inventory_movements\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"item_id\" TEXT NOT NULL REFERENCES inventory_items (id), \"qty_delta\" REAL NOT NULL, \"reason\" TEXT NOT NULL, \"task_id\" TEXT NULL REFERENCES tasks (id), \"at\" TEXT NOT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "inventory_movements_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER inventory_movements_outbox_insert AFTER INSERT ON inventory_movements WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "inventory_movements_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER inventory_movements_outbox_update AFTER UPDATE ON inventory_movements WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "inventory_movements_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER inventory_movements_outbox_delete AFTER DELETE ON inventory_movements WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "builds",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"builds\" (\"id\" TEXT NOT NULL, \"garden_id\" TEXT NOT NULL REFERENCES gardens (id), \"zone_id\" TEXT NULL REFERENCES zones (id), \"template\" TEXT NOT NULL, \"name\" TEXT NOT NULL, \"params\" TEXT NOT NULL, \"prices\" TEXT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"deleted_at\" TEXT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "builds_outbox_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER builds_outbox_insert AFTER INSERT ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "builds_outbox_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER builds_outbox_update AFTER UPDATE ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', NEW.id);END"
+        }
+      ]
+    },
+    {
+      "name": "builds_outbox_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER builds_outbox_delete AFTER DELETE ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying') BEGIN DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', OLD.id);END"
+        }
+      ]
+    },
+    {
+      "name": "app_settings",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"app_settings\" (\"key\" TEXT NOT NULL, \"value\" TEXT NOT NULL, PRIMARY KEY (\"key\"));"
+        }
+      ]
+    }
+  ]
+}

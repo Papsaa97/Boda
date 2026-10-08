@@ -298,3 +298,24 @@ BEGIN
   DELETE FROM sync_outbox WHERE entity = 'inventory_movements' AND row_key = OLD.id;
   INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_movements', OLD.id);
 END;
+
+CREATE TRIGGER builds_outbox_insert AFTER INSERT ON builds
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', NEW.id);
+END;
+
+CREATE TRIGGER builds_outbox_update AFTER UPDATE ON builds
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', NEW.id);
+END;
+
+CREATE TRIGGER builds_outbox_delete AFTER DELETE ON builds
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'builds' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('builds', OLD.id);
+END;

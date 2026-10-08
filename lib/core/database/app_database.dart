@@ -271,6 +271,31 @@ class Incidents extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Parametrický návrh stavby (V3, spec 5.7): záhon, chodník, mostek,
+/// přístřešek. Výkres a výkaz se počítají z parametrů, neukládají se.
+@DataClassName('BuildRow')
+class Builds extends Table {
+  TextColumn get id => text()();
+  TextColumn get gardenId => text().references(Gardens, #id)();
+  TextColumn get zoneId => text().nullable().references(Zones, #id)();
+
+  /// `raised_bed`, `path`, `bridge`, `shelter`.
+  TextColumn get template => text()();
+  TextColumn get name => text()();
+
+  /// Parametry šablony jako JSON objekt.
+  TextColumn get params => text()();
+
+  /// Ceny zadané uživatelem (Kč za jednotku podle materiálu) jako JSON.
+  TextColumn get prices => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Nákupní seznam (z rad Bódi a z hlídače zásob).
 @DataClassName('ShoppingItemRow')
 class ShoppingItems extends Table {
@@ -365,6 +390,7 @@ class SettingEntries extends Table {
     ShoppingItems,
     InventoryMovements,
     Incidents,
+    Builds,
     AssistantThreads,
     AssistantMessages,
     SettingEntries,
@@ -375,7 +401,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -477,6 +503,17 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(schema.gardens, schema.gardens.locationLat);
         await m.addColumn(schema.gardens, schema.gardens.locationLng);
         await m.addColumn(schema.gardens, schema.gardens.altitudeM);
+      },
+      // V3: parametrické návrhy staveb.
+      from7To8: (m, schema) async {
+        await m.createTable(schema.builds);
+        for (final trigger in [
+          schema.buildsOutboxInsert,
+          schema.buildsOutboxUpdate,
+          schema.buildsOutboxDelete,
+        ]) {
+          await m.create(trigger);
+        }
       },
     ),
     beforeOpen: (details) async {

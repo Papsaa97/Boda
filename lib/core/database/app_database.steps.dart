@@ -3749,6 +3749,646 @@ i1.GeneratedColumn<int> _column_84(String aliasedName) =>
       type: i1.DriftSqlType.int,
       $customConstraints: 'NULL',
     );
+
+final class Schema8 extends i0.VersionedSchema {
+  Schema8({required super.database}) : super(version: 8);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    syncOutbox,
+    syncState,
+    gardens,
+    gardensOutboxInsert,
+    gardensOutboxUpdate,
+    gardensOutboxDelete,
+    zones,
+    zonesOutboxInsert,
+    zonesOutboxUpdate,
+    zonesOutboxDelete,
+    inventoryItems,
+    inventoryItemsOutboxInsert,
+    inventoryItemsOutboxUpdate,
+    inventoryItemsOutboxDelete,
+    incidents,
+    tasks,
+    tasksOutboxInsert,
+    tasksOutboxUpdate,
+    tasksOutboxDelete,
+    activities,
+    activitiesOutboxInsert,
+    activitiesOutboxUpdate,
+    activitiesOutboxDelete,
+    photos,
+    photosOutboxInsert,
+    photosOutboxUpdate,
+    photosOutboxDelete,
+    taskMaterials,
+    taskMaterialsOutboxInsert,
+    taskMaterialsOutboxUpdate,
+    taskMaterialsOutboxDelete,
+    activityMaterials,
+    activityMaterialsOutboxInsert,
+    activityMaterialsOutboxUpdate,
+    activityMaterialsOutboxDelete,
+    shoppingItems,
+    shoppingItemsOutboxInsert,
+    shoppingItemsOutboxUpdate,
+    shoppingItemsOutboxDelete,
+    assistantThreads,
+    assistantThreadsOutboxInsert,
+    assistantThreadsOutboxUpdate,
+    assistantThreadsOutboxDelete,
+    assistantMessages,
+    assistantMessagesOutboxInsert,
+    assistantMessagesOutboxUpdate,
+    assistantMessagesOutboxDelete,
+    incidentsOutboxInsert,
+    incidentsOutboxUpdate,
+    incidentsOutboxDelete,
+    inventoryMovements,
+    inventoryMovementsOutboxInsert,
+    inventoryMovementsOutboxUpdate,
+    inventoryMovementsOutboxDelete,
+    builds,
+    buildsOutboxInsert,
+    buildsOutboxUpdate,
+    buildsOutboxDelete,
+    appSettings,
+  ];
+  late final Shape12 syncOutbox = Shape12(
+    source: i0.VersionedTable(
+      entityName: 'sync_outbox',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['UNIQUE(entity, row_key)'],
+      columns: [_column_64, _column_65, _column_66],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape13 syncState = Shape13(
+    source: i0.VersionedTable(
+      entityName: 'sync_state',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_67, _column_68],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape21 gardens = Shape21(
+    source: i0.VersionedTable(
+      entityName: 'gardens',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_70,
+        _column_82,
+        _column_83,
+        _column_84,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger gardensOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER gardens_outbox_insert AFTER INSERT ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'gardens\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'gardens\', NEW.id);END',
+    'gardens_outbox_insert',
+  );
+  final i1.Trigger gardensOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER gardens_outbox_update AFTER UPDATE ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'gardens\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'gardens\', NEW.id);END',
+    'gardens_outbox_update',
+  );
+  final i1.Trigger gardensOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER gardens_outbox_delete AFTER DELETE ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'gardens\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'gardens\', OLD.id);END',
+    'gardens_outbox_delete',
+  );
+  late final Shape16 zones = Shape16(
+    source: i0.VersionedTable(
+      entityName: 'zones',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_1,
+        _column_5,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_71,
+        _column_72,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger zonesOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER zones_outbox_insert AFTER INSERT ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'zones\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'zones\', NEW.id);END',
+    'zones_outbox_insert',
+  );
+  final i1.Trigger zonesOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER zones_outbox_update AFTER UPDATE ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'zones\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'zones\', NEW.id);END',
+    'zones_outbox_update',
+  );
+  final i1.Trigger zonesOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER zones_outbox_delete AFTER DELETE ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'zones\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'zones\', OLD.id);END',
+    'zones_outbox_delete',
+  );
+  late final Shape5 inventoryItems = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'inventory_items',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_40,
+        _column_1,
+        _column_41,
+        _column_42,
+        _column_43,
+        _column_44,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger inventoryItemsOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER inventory_items_outbox_insert AFTER INSERT ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_items\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_items\', NEW.id);END',
+    'inventory_items_outbox_insert',
+  );
+  final i1.Trigger inventoryItemsOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER inventory_items_outbox_update AFTER UPDATE ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_items\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_items\', NEW.id);END',
+    'inventory_items_outbox_update',
+  );
+  final i1.Trigger inventoryItemsOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER inventory_items_outbox_delete AFTER DELETE ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_items\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_items\', OLD.id);END',
+    'inventory_items_outbox_delete',
+  );
+  late final Shape17 incidents = Shape17(
+    source: i0.VersionedTable(
+      entityName: 'incidents',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_16,
+        _column_73,
+        _column_37,
+        _column_74,
+        _column_75,
+        _column_76,
+        _column_34,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape18 tasks = Shape18(
+    source: i0.VersionedTable(
+      entityName: 'tasks',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_18,
+        _column_29,
+        _column_30,
+        _column_31,
+        _column_32,
+        _column_33,
+        _column_34,
+        _column_21,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_38,
+        _column_39,
+        _column_77,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger tasksOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER tasks_outbox_insert AFTER INSERT ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'tasks\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'tasks\', NEW.id);END',
+    'tasks_outbox_insert',
+  );
+  final i1.Trigger tasksOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER tasks_outbox_update AFTER UPDATE ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'tasks\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'tasks\', NEW.id);END',
+    'tasks_outbox_update',
+  );
+  final i1.Trigger tasksOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER tasks_outbox_delete AFTER DELETE ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'tasks\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'tasks\', OLD.id);END',
+    'tasks_outbox_delete',
+  );
+  late final Shape2 activities = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'activities',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_20,
+        _column_21,
+        _column_22,
+        _column_23,
+        _column_24,
+        _column_25,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger activitiesOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER activities_outbox_insert AFTER INSERT ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activities\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activities\', NEW.id);END',
+    'activities_outbox_insert',
+  );
+  final i1.Trigger activitiesOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER activities_outbox_update AFTER UPDATE ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activities\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activities\', NEW.id);END',
+    'activities_outbox_update',
+  );
+  final i1.Trigger activitiesOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER activities_outbox_delete AFTER DELETE ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activities\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activities\', OLD.id);END',
+    'activities_outbox_delete',
+  );
+  late final Shape19 photos = Shape19(
+    source: i0.VersionedTable(
+      entityName: 'photos',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_26,
+        _column_77,
+        _column_27,
+        _column_28,
+        _column_2,
+        _column_69,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger photosOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER photos_outbox_insert AFTER INSERT ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'photos\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'photos\', NEW.id);END',
+    'photos_outbox_insert',
+  );
+  final i1.Trigger photosOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER photos_outbox_update AFTER UPDATE ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'photos\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'photos\', NEW.id);END',
+    'photos_outbox_update',
+  );
+  final i1.Trigger photosOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER photos_outbox_delete AFTER DELETE ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'photos\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'photos\', OLD.id);END',
+    'photos_outbox_delete',
+  );
+  late final Shape6 taskMaterials = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'task_materials',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(task_id, item_id)'],
+      columns: [
+        _column_45,
+        _column_46,
+        _column_4,
+        _column_47,
+        _column_41,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger taskMaterialsOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER task_materials_outbox_insert AFTER INSERT ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'task_materials\' AND row_key = NEW.task_id || \'|\' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'task_materials\', NEW.task_id || \'|\' || NEW.item_id);END',
+    'task_materials_outbox_insert',
+  );
+  final i1.Trigger taskMaterialsOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER task_materials_outbox_update AFTER UPDATE ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'task_materials\' AND row_key = NEW.task_id || \'|\' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'task_materials\', NEW.task_id || \'|\' || NEW.item_id);END',
+    'task_materials_outbox_update',
+  );
+  final i1.Trigger taskMaterialsOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER task_materials_outbox_delete AFTER DELETE ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'task_materials\' AND row_key = OLD.task_id || \'|\' || OLD.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'task_materials\', OLD.task_id || \'|\' || OLD.item_id);END',
+    'task_materials_outbox_delete',
+  );
+  late final Shape7 activityMaterials = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'activity_materials',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(activity_id, item_id)'],
+      columns: [
+        _column_48,
+        _column_46,
+        _column_4,
+        _column_47,
+        _column_41,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger activityMaterialsOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER activity_materials_outbox_insert AFTER INSERT ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activity_materials\' AND row_key = NEW.activity_id || \'|\' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activity_materials\', NEW.activity_id || \'|\' || NEW.item_id);END',
+    'activity_materials_outbox_insert',
+  );
+  final i1.Trigger activityMaterialsOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER activity_materials_outbox_update AFTER UPDATE ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activity_materials\' AND row_key = NEW.activity_id || \'|\' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activity_materials\', NEW.activity_id || \'|\' || NEW.item_id);END',
+    'activity_materials_outbox_update',
+  );
+  final i1.Trigger activityMaterialsOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER activity_materials_outbox_delete AFTER DELETE ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activity_materials\' AND row_key = OLD.activity_id || \'|\' || OLD.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activity_materials\', OLD.activity_id || \'|\' || OLD.item_id);END',
+    'activity_materials_outbox_delete',
+  );
+  late final Shape8 shoppingItems = Shape8(
+    source: i0.VersionedTable(
+      entityName: 'shopping_items',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_1,
+        _column_49,
+        _column_50,
+        _column_51,
+        _column_52,
+        _column_37,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger shoppingItemsOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER shopping_items_outbox_insert AFTER INSERT ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'shopping_items\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'shopping_items\', NEW.id);END',
+    'shopping_items_outbox_insert',
+  );
+  final i1.Trigger shoppingItemsOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER shopping_items_outbox_update AFTER UPDATE ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'shopping_items\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'shopping_items\', NEW.id);END',
+    'shopping_items_outbox_update',
+  );
+  final i1.Trigger shoppingItemsOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER shopping_items_outbox_delete AFTER DELETE ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'shopping_items\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'shopping_items\', OLD.id);END',
+    'shopping_items_outbox_delete',
+  );
+  late final Shape10 assistantThreads = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'assistant_threads',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_55,
+        _column_56,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger assistantThreadsOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER assistant_threads_outbox_insert AFTER INSERT ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_threads\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_threads\', NEW.id);END',
+    'assistant_threads_outbox_insert',
+  );
+  final i1.Trigger assistantThreadsOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER assistant_threads_outbox_update AFTER UPDATE ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_threads\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_threads\', NEW.id);END',
+    'assistant_threads_outbox_update',
+  );
+  final i1.Trigger assistantThreadsOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER assistant_threads_outbox_delete AFTER DELETE ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_threads\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_threads\', OLD.id);END',
+    'assistant_threads_outbox_delete',
+  );
+  late final Shape11 assistantMessages = Shape11(
+    source: i0.VersionedTable(
+      entityName: 'assistant_messages',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_57,
+        _column_58,
+        _column_59,
+        _column_60,
+        _column_61,
+        _column_62,
+        _column_63,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger assistantMessagesOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER assistant_messages_outbox_insert AFTER INSERT ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_messages\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_messages\', NEW.id);END',
+    'assistant_messages_outbox_insert',
+  );
+  final i1.Trigger assistantMessagesOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER assistant_messages_outbox_update AFTER UPDATE ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_messages\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_messages\', NEW.id);END',
+    'assistant_messages_outbox_update',
+  );
+  final i1.Trigger assistantMessagesOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER assistant_messages_outbox_delete AFTER DELETE ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_messages\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_messages\', OLD.id);END',
+    'assistant_messages_outbox_delete',
+  );
+  final i1.Trigger incidentsOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER incidents_outbox_insert AFTER INSERT ON incidents WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'incidents\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'incidents\', NEW.id);END',
+    'incidents_outbox_insert',
+  );
+  final i1.Trigger incidentsOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER incidents_outbox_update AFTER UPDATE ON incidents WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'incidents\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'incidents\', NEW.id);END',
+    'incidents_outbox_update',
+  );
+  final i1.Trigger incidentsOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER incidents_outbox_delete AFTER DELETE ON incidents WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'incidents\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'incidents\', OLD.id);END',
+    'incidents_outbox_delete',
+  );
+  late final Shape20 inventoryMovements = Shape20(
+    source: i0.VersionedTable(
+      entityName: 'inventory_movements',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_46,
+        _column_78,
+        _column_79,
+        _column_80,
+        _column_81,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger inventoryMovementsOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER inventory_movements_outbox_insert AFTER INSERT ON inventory_movements WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_movements\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_movements\', NEW.id);END',
+    'inventory_movements_outbox_insert',
+  );
+  final i1.Trigger inventoryMovementsOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER inventory_movements_outbox_update AFTER UPDATE ON inventory_movements WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_movements\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_movements\', NEW.id);END',
+    'inventory_movements_outbox_update',
+  );
+  final i1.Trigger inventoryMovementsOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER inventory_movements_outbox_delete AFTER DELETE ON inventory_movements WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_movements\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_movements\', OLD.id);END',
+    'inventory_movements_outbox_delete',
+  );
+  late final Shape22 builds = Shape22(
+    source: i0.VersionedTable(
+      entityName: 'builds',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_4,
+        _column_29,
+        _column_85,
+        _column_1,
+        _column_86,
+        _column_87,
+        _column_2,
+        _column_3,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Trigger buildsOutboxInsert = i1.Trigger(
+    'CREATE TRIGGER builds_outbox_insert AFTER INSERT ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'builds\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'builds\', NEW.id);END',
+    'builds_outbox_insert',
+  );
+  final i1.Trigger buildsOutboxUpdate = i1.Trigger(
+    'CREATE TRIGGER builds_outbox_update AFTER UPDATE ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'builds\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'builds\', NEW.id);END',
+    'builds_outbox_update',
+  );
+  final i1.Trigger buildsOutboxDelete = i1.Trigger(
+    'CREATE TRIGGER builds_outbox_delete AFTER DELETE ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'builds\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'builds\', OLD.id);END',
+    'builds_outbox_delete',
+  );
+  late final Shape9 appSettings = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'app_settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY("key")'],
+      columns: [_column_53, _column_54],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+}
+
+class Shape22 extends i0.VersionedTable {
+  Shape22({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get gardenId =>
+      columnsByName['garden_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get zoneId =>
+      columnsByName['zone_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get template =>
+      columnsByName['template']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get params =>
+      columnsByName['params']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get prices =>
+      columnsByName['prices']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get deletedAt =>
+      columnsByName['deleted_at']! as i1.GeneratedColumn<String>;
+}
+
+i1.GeneratedColumn<String> _column_85(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'template',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_86(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'params',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_87(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'prices',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
@@ -3756,6 +4396,7 @@ i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
   required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
+  required Future<void> Function(i1.Migrator m, Schema8 schema) from7To8,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -3789,6 +4430,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from6To7(migrator, schema);
         return 7;
+      case 7:
+        final schema = Schema8(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from7To8(migrator, schema);
+        return 8;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -3802,6 +4448,7 @@ i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
   required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
+  required Future<void> Function(i1.Migrator m, Schema8 schema) from7To8,
 }) => i0.VersionedSchema.stepByStepHelper(
   step: migrationSteps(
     from1To2: from1To2,
@@ -3810,5 +4457,6 @@ i1.OnUpgrade stepByStep({
     from4To5: from4To5,
     from5To6: from5To6,
     from6To7: from6To7,
+    from7To8: from7To8,
   ),
 );

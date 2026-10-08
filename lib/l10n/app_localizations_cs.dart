@@ -2804,4 +2804,527 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get accountLostAccessStart => 'Začít vlastní zahradu';
+
+  @override
+  String get buildsTitle => 'Stavby';
+
+  @override
+  String get buildsCardSubtitle =>
+      'Záhony, chodníky, mostky a přístřešky s výkazem materiálu a rozpočtem';
+
+  @override
+  String get buildsEmpty =>
+      'Zatím žádný návrh. Vyber šablonu a uvidíš výkres, materiál i rozpočet.';
+
+  @override
+  String get buildsNew => 'Nový návrh';
+
+  @override
+  String get buildsChooseTemplate => 'Co chceš postavit?';
+
+  @override
+  String get buildsName => 'Název';
+
+  @override
+  String get buildsNameRequired => 'Zadej název';
+
+  @override
+  String get buildsZone => 'Zóna';
+
+  @override
+  String get buildsNoZone => 'Bez zóny';
+
+  @override
+  String get buildsParams => 'Parametry';
+
+  @override
+  String get buildsDrawingTop => 'Půdorys';
+
+  @override
+  String get buildsDrawingSection => 'Příčný řez';
+
+  @override
+  String get buildsChecks => 'Kontrola návrhu';
+
+  @override
+  String get buildsChecksOk => 'Návrh je v mezích orientačních limitů.';
+
+  @override
+  String get buildsMaterial => 'Výkaz materiálu';
+
+  @override
+  String buildsTotal(String total) {
+    return 'Celkem orientačně $total Kč';
+  }
+
+  @override
+  String get buildsPricesNote =>
+      'Ceny jsou orientační. Klepni na položku a zadej cenu ze svého obchodu.';
+
+  @override
+  String buildsPriceTitle(String material) {
+    return 'Cena: $material';
+  }
+
+  @override
+  String buildsPricePerUnit(String unit) {
+    return 'Kč za $unit';
+  }
+
+  @override
+  String get buildsPriceReset => 'Výchozí cena';
+
+  @override
+  String buildsLineTotal(String qty, String unit, String price) {
+    return '$qty $unit × $price Kč';
+  }
+
+  @override
+  String get buildsAddToShopping => 'Přidat na nákupní seznam';
+
+  @override
+  String buildsAddedToShopping(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Na nákupní seznam přibylo $count položek',
+      few: 'Na nákupní seznam přibyly $count položky',
+      one: 'Na nákupní seznam přibyla 1 položka',
+      zero: 'Všechno už na nákupním seznamu je',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get buildsDelete => 'Smazat návrh';
+
+  @override
+  String get buildsDeleteTitle => 'Smazat návrh?';
+
+  @override
+  String buildsDeleteBody(String name) {
+    return 'Návrh „$name“ zmizí ze seznamu.';
+  }
+
+  @override
+  String get buildsDeleted => 'Návrh smazán';
+
+  @override
+  String get buildsSaved => 'Návrh uložen';
+
+  @override
+  String buildsRangeError(String min, String max) {
+    return 'Zadej číslo od $min do $max';
+  }
+
+  @override
+  String get buildsDiscardTitle => 'Zahodit změny v návrhu?';
+
+  @override
+  String get buildsDiscardKeep => 'Pokračovat v úpravách';
+
+  @override
+  String get buildsDiscardConfirm => 'Zahodit';
+
+  @override
+  String get buildsDisclaimer =>
+      'Orientační návrh, nejde o autorizovaný statický výpočet.';
+
+  @override
+  String get buildsEngineer =>
+      'Konstrukce nese osoby nad stanovenou mez. Než začneš stavět, nech návrh posoudit statikem.';
+
+  @override
+  String buildsUpdated(String date) {
+    return 'Upraveno $date';
+  }
+
+  @override
+  String get buildsSnowHelp =>
+      'Podle mapy sněhových oblastí ČR: nížiny většinou I a II, vrchoviny III, hory IV a výš. Nad oblastí V nech přístřešek navrhnout statikem.';
+
+  @override
+  String get buildTemplateRaisedBed => 'Vyvýšený záhon';
+
+  @override
+  String get buildTemplatePath => 'Chodník';
+
+  @override
+  String get buildTemplateBridge => 'Mostek';
+
+  @override
+  String get buildTemplateShelter => 'Přístřešek';
+
+  @override
+  String get buildTemplateRaisedBedHint =>
+      'Prkna, sloupky, náplň a ochrana proti hryzcům';
+
+  @override
+  String get buildTemplatePathHint =>
+      'Štěrk, dlažba, nášlapy nebo kůra včetně podkladu';
+
+  @override
+  String get buildTemplateBridgeHint =>
+      'Lávka pro pěší přes jezírko nebo potok';
+
+  @override
+  String get buildTemplateShelterHint =>
+      'Pultová střecha na sloupcích, třeba na dřevo nebo kola';
+
+  @override
+  String get buildParamLength => 'Délka';
+
+  @override
+  String get buildParamWidth => 'Šířka';
+
+  @override
+  String get buildParamHeight => 'Výška';
+
+  @override
+  String get buildParamFrontHeight => 'Výška vpředu';
+
+  @override
+  String get buildParamBoardThickness => 'Tloušťka prken';
+
+  @override
+  String get buildParamMoleMesh => 'Pletivo proti hryzcům na dno';
+
+  @override
+  String get buildParamLiner => 'Fólie na vnitřní stěny';
+
+  @override
+  String get buildParamSurface => 'Povrch';
+
+  @override
+  String get buildParamEdging => 'Obrubník';
+
+  @override
+  String get buildParamSpan => 'Rozpětí';
+
+  @override
+  String get buildParamBeamSection => 'Průřez nosníků';
+
+  @override
+  String get buildParamBeamCount => 'Počet nosníků';
+
+  @override
+  String get buildParamDeckThickness => 'Tloušťka podlahových prken';
+
+  @override
+  String get buildParamHeightAbove => 'Výška nad hladinou nebo terénem';
+
+  @override
+  String get buildParamRailing => 'Zábradlí';
+
+  @override
+  String get buildParamDepth => 'Hloubka';
+
+  @override
+  String get buildParamRoofing => 'Krytina';
+
+  @override
+  String get buildParamRafterSection => 'Průřez krokví';
+
+  @override
+  String get buildParamPostSection => 'Průřez sloupků';
+
+  @override
+  String get buildParamSnowRegion => 'Sněhová oblast';
+
+  @override
+  String buildOptionMm(String mm) {
+    return '$mm mm';
+  }
+
+  @override
+  String buildOptionSection(String section) {
+    return '$section mm';
+  }
+
+  @override
+  String get buildOptionGravel => 'Štěrk';
+
+  @override
+  String get buildOptionPavers => 'Betonová dlažba';
+
+  @override
+  String get buildOptionStepping => 'Nášlapné kameny';
+
+  @override
+  String get buildOptionMulch => 'Kůra nebo štěpka';
+
+  @override
+  String get buildOptionPolycarbonate => 'Polykarbonát';
+
+  @override
+  String get buildOptionMetalSheet => 'Trapézový plech';
+
+  @override
+  String get buildUnitM => 'm';
+
+  @override
+  String get buildUnitM2 => 'm²';
+
+  @override
+  String get buildUnitM3 => 'm³';
+
+  @override
+  String get buildUnitT => 't';
+
+  @override
+  String get buildUnitPcs => 'ks';
+
+  @override
+  String get buildUnitL => 'l';
+
+  @override
+  String get buildMaterialBoard25 => 'Prkno modřín 25 × 145 mm';
+
+  @override
+  String get buildMaterialBoard32 => 'Prkno modřín 32 × 145 mm';
+
+  @override
+  String get buildMaterialBoard40 => 'Prkno modřín 40 × 145 mm';
+
+  @override
+  String get buildMaterialPost50 => 'Hranol 50 × 50 mm';
+
+  @override
+  String get buildMaterialPost70 => 'Hranol 70 × 70 mm';
+
+  @override
+  String get buildMaterialPost100 => 'Hranol 100 × 100 mm';
+
+  @override
+  String get buildMaterialPost120 => 'Hranol 120 × 120 mm';
+
+  @override
+  String buildMaterialBeam(String section) {
+    return 'Hranol KVH $section mm';
+  }
+
+  @override
+  String buildMaterialDeck(String mm) {
+    return 'Terasové prkno $mm mm';
+  }
+
+  @override
+  String get buildMaterialScrews => 'Vruty do dřeva, nerez';
+
+  @override
+  String get buildMaterialTieRod => 'Závitová tyč M10 s maticemi';
+
+  @override
+  String get buildMaterialMoleMesh => 'Pletivo proti hryzcům';
+
+  @override
+  String get buildMaterialLiner => 'Nopová fólie';
+
+  @override
+  String get buildMaterialFill => 'Náplň: zemina a kompost';
+
+  @override
+  String get buildMaterialWoodOil => 'Olej nebo lazura na dřevo';
+
+  @override
+  String get buildMaterialGravel032 => 'Štěrk 0–32 na podklad';
+
+  @override
+  String get buildMaterialChippings816 => 'Drť 8–16 na povrch';
+
+  @override
+  String get buildMaterialChippings48 => 'Drť 4–8 do lože';
+
+  @override
+  String get buildMaterialGeotextile => 'Geotextilie';
+
+  @override
+  String get buildMaterialPavers => 'Betonová dlažba 6 cm';
+
+  @override
+  String get buildMaterialSteppingStone => 'Nášlapný kámen 40 × 40 cm';
+
+  @override
+  String get buildMaterialMulch => 'Mulčovací kůra nebo štěpka';
+
+  @override
+  String get buildMaterialEdging => 'Zahradní obrubník';
+
+  @override
+  String get buildMaterialConcreteBag => 'Beton v pytli 25 kg';
+
+  @override
+  String get buildMaterialRailing => 'Zábradlí (sloupky a madlo)';
+
+  @override
+  String get buildMaterialPostAnchor => 'Kotevní patka sloupku';
+
+  @override
+  String get buildMaterialPolycarbonate => 'Polykarbonát dutinkový';
+
+  @override
+  String get buildMaterialMetalSheet => 'Trapézový plech';
+
+  @override
+  String get buildMaterialRoofScrews => 'Šrouby na krytinu s podložkou';
+
+  @override
+  String buildSummaryRows(int count, String height) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count řad prken',
+      few: '$count řady prken',
+      one: '1 řada prken',
+    );
+    return '$_temp0 po 145 mm, výška $height m';
+  }
+
+  @override
+  String buildSummaryFill(String volume) {
+    return 'Náplň $volume m³';
+  }
+
+  @override
+  String buildSummaryExcavation(String volume) {
+    return 'Výkop $volume m³';
+  }
+
+  @override
+  String buildSummaryBeam(int percent) {
+    return 'Nosníky využité na $percent %';
+  }
+
+  @override
+  String buildSummaryRafter(int percent) {
+    return 'Krokve využité na $percent %';
+  }
+
+  @override
+  String buildSummaryPosts(String spacing, String section) {
+    return 'Sloupky po $spacing m, vaznice $section mm';
+  }
+
+  @override
+  String buildSummaryRoof(String area, String height) {
+    return 'Střecha $area m², vzadu výška $height m';
+  }
+
+  @override
+  String buildFindingBedTooWide(String width) {
+    return 'Záhon široký $width m: do středu nedosáhneš. Záhon přístupný z obou stran má mít nejvýš 1,2 m, u zdi nejvýš 0,6 m.';
+  }
+
+  @override
+  String get buildFindingBedThinBoards =>
+      'Prkna 25 mm se u vyššího záhonu vyboulí pod tlakem zeminy. Zvol 32 nebo 40 mm.';
+
+  @override
+  String buildFindingBedMidPosts(int count, String spacing) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Přidáno $count mezisloupků',
+      few: 'Přidány $count mezisloupky',
+      one: 'Přidán 1 mezisloupek',
+    );
+    return '$_temp0, prkna mezi sloupky mají nejvýš $spacing m, ať se stěny neprohýbají.';
+  }
+
+  @override
+  String buildFindingBedTieRods(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Přidáno $count příčných rozpěr',
+      few: 'Přidány $count příčné rozpěry',
+      one: 'Přidána 1 příčná rozpěra',
+    );
+    return '$_temp0 proti roztlačení dlouhých stěn.';
+  }
+
+  @override
+  String get buildFindingBedTallFill =>
+      'Vysoký záhon: spodek naplň větvemi a hrubým kompostem, ušetříš substrát a záhon lépe odvodní.';
+
+  @override
+  String get buildFindingPathNarrow =>
+      'Chodník užší než 0,6 m: kolečko projede jen těsně.';
+
+  @override
+  String get buildFindingPathPaversNeedEdging =>
+      'Dlažba bez obrubníku se po krajích rozjede. Přidej obrubník.';
+
+  @override
+  String get buildFindingPathGravelEdging =>
+      'Štěrk bez obruby se rozhrnuje do trávníku a záhonů.';
+
+  @override
+  String get buildFindingPathSteppingWide =>
+      'Nášlapy jsou na šířku jednoho kroku. Pro širší chodník zvol štěrk nebo dlažbu.';
+
+  @override
+  String get buildFindingPathMulchTopUp =>
+      'Kůru nebo štěpku je potřeba po 2 až 3 letech doplnit.';
+
+  @override
+  String buildFindingBridgeBeamFails(int percent, String section) {
+    return 'Nosníky jsou přetížené ($percent % únosnosti nebo průhybu). Zvol průřez $section mm.';
+  }
+
+  @override
+  String buildFindingBridgeBeamFailsNoSection(int percent) {
+    return 'Nosníky jsou přetížené ($percent % únosnosti nebo průhybu). Přidej nosník nebo zkrať rozpětí.';
+  }
+
+  @override
+  String buildFindingBridgeSpanOverLimit(String meters) {
+    return 'Rozpětí nad $meters m bez podpory ve vodě: dřevěný mostek nech navrhnout statikem, nebo přidej podpěru uprostřed.';
+  }
+
+  @override
+  String buildFindingBridgeTooHigh(String meters) {
+    return 'Mostek výš než $meters m nad hladinou nebo terénem: pád je nebezpečný. Návrh nech posoudit statikem a počítej se zábradlím.';
+  }
+
+  @override
+  String get buildFindingBridgeNeedsRailing =>
+      'Mostek je víc než 0,5 m nad hladinou nebo terénem. Přidej zábradlí, hlavně kvůli dětem.';
+
+  @override
+  String get buildFindingBridgeNarrow =>
+      'Mostek užší než 0,6 m se špatně přechází. Doporučená šířka je aspoň 0,8 m.';
+
+  @override
+  String buildFindingBridgeDeckSpan(String beams) {
+    return 'Podlahová prkna by mezi nosníky měla moc velké pole. Zvol $beams nosníky nebo silnější prkna.';
+  }
+
+  @override
+  String buildFindingShelterRafterFails(int percent, String section) {
+    return 'Krokve neunesou sníh ($percent % únosnosti nebo průhybu). Zvol průřez $section mm.';
+  }
+
+  @override
+  String buildFindingShelterRafterFailsNoSection(int percent) {
+    return 'Krokve neunesou sníh ($percent % únosnosti nebo průhybu). Zmenši hloubku přístřešku nebo dej krokve hustěji.';
+  }
+
+  @override
+  String get buildFindingShelterHeaderFails =>
+      'Vaznice neunesou střechu se sněhem ani se sloupky po 1 m. Návrh nech posoudit statikem.';
+
+  @override
+  String buildFindingShelterHeaderPosts(String spacing) {
+    return 'Kvůli sněhu jsou sloupky blíž u sebe, po $spacing m.';
+  }
+
+  @override
+  String buildFindingShelterPermit(String area) {
+    return 'Stavba nad $area m² může potřebovat povolení. Ověř to na stavebním úřadě.';
+  }
+
+  @override
+  String get buildFindingShelterAnchoring =>
+      'Sloupky ukotvi do betonových patek: vítr umí lehkou střechu nadzvednout.';
 }

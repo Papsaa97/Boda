@@ -13,6 +13,9 @@ import 'package:zahradnik_boda/features/backup/data/backup_service.dart';
 import 'package:zahradnik_boda/features/backup/domain/backup_format.dart';
 import 'package:zahradnik_boda/features/canvas/data/drift_plan_repository.dart';
 import 'package:zahradnik_boda/features/canvas/domain/geometry.dart';
+import 'package:zahradnik_boda/features/builds/data/drift_build_repository.dart';
+import 'package:zahradnik_boda/features/builds/domain/build_design.dart';
+import 'package:zahradnik_boda/features/builds/domain/build_params.dart';
 import 'package:zahradnik_boda/features/incidents/data/drift_incident_repository.dart';
 import 'package:zahradnik_boda/features/incidents/domain/incident.dart';
 import 'package:zahradnik_boda/features/inventory/domain/stock_movement.dart';
@@ -66,6 +69,7 @@ class _Device {
   DriftPlanRepository get plan => DriftPlanRepository(db, gardenId, clock);
   DriftGardenSiteRepository get site =>
       DriftGardenSiteRepository(db, gardenId, clock);
+  DriftBuildRepository get builds => DriftBuildRepository(db, gardenId, clock);
   DriftIncidentRepository get incidents =>
       DriftIncidentRepository(db, gardenId, clock);
 
@@ -226,6 +230,15 @@ void main() {
       ),
       'a2',
     );
+    await d.builds.save(
+      BuildDesign(
+        id: 'b1',
+        name: 'Záhon u plotu',
+        zoneId: 'Z1',
+        values: BuildValues(BuildTemplate.raisedBed, const {'length': 3}),
+        prices: const {'board32': 80},
+      ),
+    );
   }
 
   test(
@@ -289,6 +302,11 @@ void main() {
       expect(File(photoPath).readAsBytesSync(), [1, 2, 3, 4]);
       expect(stray.existsSync(), isFalse);
 
+      final build = (await fresh.builds.getAll()).single;
+      expect(build.name, 'Záhon u plotu');
+      expect(build.zoneId, 'Z1');
+      expect(build.values.number('length'), 3);
+      expect(build.prices, {'board32': 80});
       final incident = (await fresh.incidents.getAll()).single;
       expect(incident.label, 'Mšice');
       expect(incident.candidates.single.label, 'Mšice maková');
@@ -344,7 +362,10 @@ void main() {
     final json =
         jsonDecode(utf8.decode(archive.find('data.json')!.content))
             as Map<String, Object?>;
-    expect(json['formatVersion'], 4);
+    expect(json['formatVersion'], 5);
+    final b1 = (json['builds'] as List).single as Map;
+    expect(b1['template'], 'raised_bed');
+    expect((b1['params'] as Map)['length'], 3);
     expect((json['garden'] as Map)['outline'], [
       [-1, -1],
       [20.5, -1],

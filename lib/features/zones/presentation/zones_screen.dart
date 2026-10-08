@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../weather/presentation/weather_screen.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
+import '../../builds/presentation/builds_screen.dart';
 import '../../canvas/presentation/canvas_screen.dart';
 import '../../incidents/presentation/incidents_controller.dart';
 import '../../incidents/presentation/incidents_screen.dart';
@@ -186,6 +187,7 @@ class ZonesScreen extends ConsumerWidget {
               for (final zone in active) tile(zone),
               const _PlanCard(),
               const _IncidentsCard(),
+              const _BuildsCard(),
               const WeatherEntryCard(),
               if (planned.isNotEmpty) ...[
                 Padding(
@@ -391,6 +393,28 @@ class _IncidentsCard extends ConsumerWidget {
         onTap: () => Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (_) => const IncidentsScreen())),
+      ),
+    );
+  }
+}
+
+/// Vstup na návrhy staveb (V3).
+class _BuildsCard extends StatelessWidget {
+  const _BuildsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: ListTile(
+        leading: const Icon(Icons.carpenter_outlined),
+        title: Text(l.buildsTitle),
+        subtitle: Text(l.buildsCardSubtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const BuildsScreen())),
       ),
     );
   }

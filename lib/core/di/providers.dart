@@ -17,6 +17,8 @@ import '../../features/assistant/data/supabase_assistant_backend.dart';
 import '../../features/assistant/domain/assistant_backend.dart';
 import '../../features/assistant/domain/assistant_message.dart';
 import '../../features/activity/domain/activity_repository.dart';
+import '../../features/builds/data/drift_build_repository.dart';
+import '../../features/builds/domain/build_design.dart';
 import '../../features/incidents/data/drift_incident_repository.dart';
 import '../../features/incidents/data/supabase_diagnosis_backend.dart';
 import '../../features/incidents/domain/diagnosis.dart';
@@ -108,6 +110,14 @@ final planRepositoryProvider = Provider<PlanRepository>(
 
 final incidentRepositoryProvider = Provider<IncidentRepository>(
   (ref) => DriftIncidentRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+final buildRepositoryProvider = Provider<BuildRepository>(
+  (ref) => DriftBuildRepository(
     ref.watch(databaseProvider),
     ref.watch(gardenIdProvider),
     ref.watch(clockProvider),

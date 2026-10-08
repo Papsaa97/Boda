@@ -12,6 +12,7 @@ import '../../activity/data/drift_activity_repository.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../canvas/data/drift_plan_repository.dart';
 import '../../canvas/domain/geometry.dart';
+import '../../builds/data/drift_build_repository.dart';
 import '../../incidents/data/drift_incident_repository.dart';
 import '../../inventory/data/drift_inventory_repository.dart';
 import '../../inventory/domain/shopping_item.dart';
@@ -86,6 +87,7 @@ class BackupService {
       _gardenId,
       _clock,
     ).movements();
+    final builds = await DriftBuildRepository(_db, _gardenId, _clock).getAll();
     final outline = await DriftPlanRepository(
       _db,
       _gardenId,
@@ -124,6 +126,7 @@ class BackupService {
           ),
       ],
       movements: movements,
+      builds: builds,
       inventory: inventory,
       shopping: shopping,
       activityMaterials: [
@@ -213,6 +216,7 @@ class BackupService {
       await _db.delete(_db.activities).go();
       await _db.delete(_db.tasks).go();
       await _db.delete(_db.incidents).go();
+      await _db.delete(_db.builds).go();
       await _db.delete(_db.inventoryItems).go();
       await _db.delete(_db.zones).go();
 
@@ -289,6 +293,14 @@ class BackupService {
                 if (restored[photo.id] case final path?)
                   PhotoRef(id: photo.id, path: path),
             ],
+          ),
+        );
+      }
+      final builds = DriftBuildRepository(_db, _gardenId, _clock);
+      for (final b in data.builds) {
+        await builds.save(
+          b.copyWith(
+            zoneId: () => zoneIds.contains(b.zoneId) ? b.zoneId : null,
           ),
         );
       }

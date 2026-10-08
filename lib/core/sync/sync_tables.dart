@@ -107,6 +107,10 @@ const syncTables = <SyncTable>[
   ),
   SyncTable('incidents', kinds: {..._times, 'candidates': SyncKind.json}),
   SyncTable(
+    'builds',
+    kinds: {..._times, 'params': SyncKind.jsonObject, 'prices': SyncKind.json},
+  ),
+  SyncTable(
     'inventory_items',
     kinds: {..._times, 'details': SyncKind.jsonObject},
   ),

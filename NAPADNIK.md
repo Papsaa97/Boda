@@ -39,3 +39,7 @@ Nápad sem patří, když je dobrý, ale nedokazuje žádnou z hypotéz aktuáln
 | 2026-10-08 | Claude | **Změny od rodiny v reálném čase** (Supabase Realtime) | Sdílená zahrada se teď mění při synchronizaci (DECLOG D89); okamžité promítnutí by se hodilo, až budou rodiny zapisovat současně. | čeká |
 | 2026-10-08 | Claude | **Člen jen pro čtení** ve sdílené zahradě | Role `viewer` je v databázi připravená, ale aplikace zatím zve jen členy se zápisem (DECLOG D89); hodí se pro sousedy nebo zahradníka na hlídání. | čeká |
 | 2026-10-08 | Claude | **Diagnóza z více fotek najednou** (list zblízka + celá rostlina) | Teď se posílá jedna fotka (DECLOG D88); víc záběrů zpřesní odhad, ale zvedne cenu dotazu. | čeká |
+| 2026-10-08 | Claude | **Stavba na plánu zahrady** (návrh jako tvar na plátně) | Návrh má teď jen zónu (DECLOG D90); na plánu by šel posunout a porovnat s okolím. | čeká |
+| 2026-10-08 | Claude | **Další šablony staveb** (kompostér, pergola, plot, skleník z polykarbonátu) | Rozšíření V3, až testeři řeknou, co staví nejčastěji. | čeká |
+| 2026-10-08 | Claude | **Ceny materiálu z obchodů** (ceníky stavebnin) | Výchozí ceny jsou orientační (DECLOG D90); aktuální ceník by zpřesnil rozpočet, ale potřebuje dohodu s obchodem. | čeká |
+| 2026-10-08 | Claude | **Návrh jako PDF** (výkres a výkaz do obchodu) | Do stavebnin se nosí papír; navazuje na tisk plánu zahrady. | čeká |

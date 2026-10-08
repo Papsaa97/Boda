@@ -5,6 +5,8 @@ import '../../../core/time/time_zone.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../activity/domain/activity_type.dart';
 import '../../canvas/domain/geometry.dart';
+import '../../builds/domain/build_design.dart';
+import '../../builds/domain/build_params.dart';
 import '../../incidents/domain/incident.dart';
 import '../../inventory/domain/inventory_item.dart';
 import '../../inventory/domain/shopping_item.dart';
@@ -19,7 +21,7 @@ import '../../zones/domain/zone_entity.dart';
 ///
 /// Při změně formátu verzi zvýšit, starší verze dál umět načíst
 /// v [decodeBackup] (FR-E2) a doplnit test.
-const backupFormatVersion = 4;
+const backupFormatVersion = 5;
 
 /// Složka s fotkami uvnitř ZIP souboru.
 const backupPhotoFolder = 'photos';
@@ -78,6 +80,7 @@ class BackupData {
     this.site = const GardenSite(),
     this.incidents = const [],
     this.movements = const [],
+    this.builds = const [],
   });
 
   final int formatVersion;
@@ -102,6 +105,9 @@ class BackupData {
   /// Od verze 4 formátu (V2): incidenty a pohyby na skladě.
   final List<Incident> incidents;
   final List<StockMovement> movements;
+
+  /// Od verze 5 formátu (V3): návrhy staveb.
+  final List<BuildDesign> builds;
 
   /// Všechny fotky, na které záznamy a incidenty odkazují.
   List<PhotoRef> get photos => [
@@ -263,6 +269,18 @@ Map<String, Object?> encodeBackup(BackupData data) {
           'at': _instant(m.at),
         },
     ],
+    'builds': [
+      for (final b in data.builds)
+        {
+          'id': b.id,
+          'name': b.name,
+          'template': b.template.key,
+          'zoneId': b.zoneId,
+          'params': b.values.toJson(),
+          'prices': b.prices,
+          'createdAt': b.createdAt == null ? null : _instant(b.createdAt!),
+        },
+    ],
     'photos': [
       for (final photo in photos)
         {'id': photo.id, 'file': backupPhotoPath(photo)},
@@ -279,9 +297,9 @@ BackupData decodeBackup(Map<String, Object?> json) {
   if (version > backupFormatVersion) {
     throw BackupException(BackupError.tooNew, 'formatVersion $version');
   }
-  // Verze 2 až 4 jen přidaly nepovinná pole (vlastnosti zón, sklad,
+  // Verze 2 až 5 jen přidaly nepovinná pole (vlastnosti zón, sklad,
   // nákupní seznam, sklizeň, materiál; plán zahrady; incidenty a pohyby
-  // na skladě), takže jeden dekodér čte všechny verze.
+  // na skladě; návrhy staveb), takže jeden dekodér čte všechny verze.
   try {
     return _decode(json);
   } on BackupException {
@@ -375,6 +393,21 @@ BackupData _decode(Map<String, Object?> json) {
           photos: photoRefs(i['photoIds']),
           createdAt: optInstant(i['createdAt']),
         ),
+    ],
+    builds: [
+      for (final b in list('builds'))
+        if (BuildTemplate.fromKey(b['template'] as String?) case final t?)
+          BuildDesign(
+            id: b['id'] as String,
+            name: b['name'] as String,
+            values: BuildValues(
+              t,
+              (b['params'] as Map?)?.cast<String, Object?>() ?? const {},
+            ),
+            zoneId: b['zoneId'] as String?,
+            prices: BuildDesign.pricesFromJson(b['prices']),
+            createdAt: optInstant(b['createdAt']),
+          ),
     ],
     movements: [
       for (final m in list('movements'))
