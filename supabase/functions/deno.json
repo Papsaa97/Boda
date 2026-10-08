@@ -1,0 +1,18 @@
+{
+  "lock": false,
+  "tasks": {
+    "check": "deno check boda-chat/index.ts revenuecat-webhook/index.ts delete-account/index.ts",
+    "test": "deno test --allow-env"
+  },
+  "compilerOptions": {
+    "strict": true
+  },
+  "fmt": {
+    "lineWidth": 120
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  }
+}

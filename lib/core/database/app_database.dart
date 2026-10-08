@@ -95,6 +95,10 @@ class Photos extends Table {
   /// Pořadí fotky v záznamu.
   IntColumn get position => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime()();
+
+  /// Od schématu 4 (synchronizace „poslední zápis vyhrává“); starší
+  /// fotky ho dostaly podle `created_at`.
+  DateTimeColumn get updatedAt => dateTime().nullable()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
 
   @override
@@ -288,12 +292,13 @@ class SettingEntries extends Table {
     AssistantMessages,
     SettingEntries,
   ],
+  include: {'sync.drift'},
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -320,6 +325,52 @@ class AppDatabase extends _$AppDatabase {
       from2To3: (m, schema) async {
         await m.createTable(schema.assistantThreads);
         await m.createTable(schema.assistantMessages);
+      },
+      // 1.0: synchronizace – fronta změn, stav, čas změny fotek.
+      from3To4: (m, schema) async {
+        await m.addColumn(schema.photos, schema.photos.updatedAt);
+        await m.database.customStatement(
+          'UPDATE photos SET updated_at = created_at',
+        );
+        await m.createTable(schema.syncOutbox);
+        await m.createTable(schema.syncState);
+        for (final trigger in [
+          schema.gardensOutboxInsert,
+          schema.gardensOutboxUpdate,
+          schema.gardensOutboxDelete,
+          schema.zonesOutboxInsert,
+          schema.zonesOutboxUpdate,
+          schema.zonesOutboxDelete,
+          schema.inventoryItemsOutboxInsert,
+          schema.inventoryItemsOutboxUpdate,
+          schema.inventoryItemsOutboxDelete,
+          schema.tasksOutboxInsert,
+          schema.tasksOutboxUpdate,
+          schema.tasksOutboxDelete,
+          schema.activitiesOutboxInsert,
+          schema.activitiesOutboxUpdate,
+          schema.activitiesOutboxDelete,
+          schema.photosOutboxInsert,
+          schema.photosOutboxUpdate,
+          schema.photosOutboxDelete,
+          schema.taskMaterialsOutboxInsert,
+          schema.taskMaterialsOutboxUpdate,
+          schema.taskMaterialsOutboxDelete,
+          schema.activityMaterialsOutboxInsert,
+          schema.activityMaterialsOutboxUpdate,
+          schema.activityMaterialsOutboxDelete,
+          schema.shoppingItemsOutboxInsert,
+          schema.shoppingItemsOutboxUpdate,
+          schema.shoppingItemsOutboxDelete,
+          schema.assistantThreadsOutboxInsert,
+          schema.assistantThreadsOutboxUpdate,
+          schema.assistantThreadsOutboxDelete,
+          schema.assistantMessagesOutboxInsert,
+          schema.assistantMessagesOutboxUpdate,
+          schema.assistantMessagesOutboxDelete,
+        ]) {
+          await m.create(trigger);
+        }
       },
     ),
     beforeOpen: (details) async {

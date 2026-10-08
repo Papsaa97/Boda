@@ -1,0 +1,54 @@
+name: Supabase
+
+on:
+  pull_request:
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase.yml"
+  push:
+    branches: [feat/mvp01-offline-diary-core]
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Migrace + testy RLS (pgTAP) proti lokální databázi Supabase.
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Spustit lokální databázi a použít migrace
+        run: supabase db start
+      - name: Testy databáze (pgTAP)
+        run: supabase test db
+      - name: Zastavit databázi
+        if: always()
+        run: supabase stop --no-backup
+
+  # Edge Functions: kontrola typů a unit testy (Deno).
+  functions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: supabase/functions
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Kontrola typů
+        run: deno check boda-chat/index.ts revenuecat-webhook/index.ts delete-account/index.ts
+      - name: Unit testy
+        run: deno test --allow-env

@@ -1,0 +1,258 @@
+-- Fronta změn k odeslání na server (synchronizace 1.0, DECLOG D69).
+--
+-- Triggery zapíšou do fronty každý vložený, změněný nebo smazaný řádek
+-- synchronizované tabulky (natvrdo maže jen obnova ze zálohy; na server
+-- se takový řádek pošle jako měkce smazaný). Řádek je ve frontě nejvýš
+-- jednou; nová změna ho smaže a vloží znovu s novým pořadím, takže změna
+-- během odesílání se neztratí. (INSERT OR REPLACE by v triggeru přebila
+-- konfliktní strategie vnějšího příkazu.) Při zápisu dat stažených ze
+-- serveru je v sync_state řádek 'applying' a triggery mlčí (žádná ozvěna
+-- zpět na server).
+
+import 'app_database.dart';
+
+CREATE TABLE sync_outbox (
+  seq INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  entity TEXT NOT NULL,
+  row_key TEXT NOT NULL,
+  UNIQUE (entity, row_key)
+) AS SyncOutboxRow;
+
+-- Stav synchronizace: časová razítka posledního stažení po tabulkách
+-- ('pulled:<tabulka>'), zahrada spárovaná s účtem a příznak 'applying'.
+CREATE TABLE sync_state (
+  name TEXT NOT NULL PRIMARY KEY,
+  value TEXT
+) AS SyncStateRow;
+
+
+CREATE TRIGGER gardens_outbox_insert AFTER INSERT ON gardens
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', NEW.id);
+END;
+
+CREATE TRIGGER gardens_outbox_update AFTER UPDATE ON gardens
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', NEW.id);
+END;
+
+CREATE TRIGGER gardens_outbox_delete AFTER DELETE ON gardens
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'gardens' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('gardens', OLD.id);
+END;
+
+CREATE TRIGGER zones_outbox_insert AFTER INSERT ON zones
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', NEW.id);
+END;
+
+CREATE TRIGGER zones_outbox_update AFTER UPDATE ON zones
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', NEW.id);
+END;
+
+CREATE TRIGGER zones_outbox_delete AFTER DELETE ON zones
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'zones' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('zones', OLD.id);
+END;
+
+CREATE TRIGGER inventory_items_outbox_insert AFTER INSERT ON inventory_items
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', NEW.id);
+END;
+
+CREATE TRIGGER inventory_items_outbox_update AFTER UPDATE ON inventory_items
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', NEW.id);
+END;
+
+CREATE TRIGGER inventory_items_outbox_delete AFTER DELETE ON inventory_items
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'inventory_items' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('inventory_items', OLD.id);
+END;
+
+CREATE TRIGGER tasks_outbox_insert AFTER INSERT ON tasks
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', NEW.id);
+END;
+
+CREATE TRIGGER tasks_outbox_update AFTER UPDATE ON tasks
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', NEW.id);
+END;
+
+CREATE TRIGGER tasks_outbox_delete AFTER DELETE ON tasks
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'tasks' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('tasks', OLD.id);
+END;
+
+CREATE TRIGGER activities_outbox_insert AFTER INSERT ON activities
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', NEW.id);
+END;
+
+CREATE TRIGGER activities_outbox_update AFTER UPDATE ON activities
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', NEW.id);
+END;
+
+CREATE TRIGGER activities_outbox_delete AFTER DELETE ON activities
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'activities' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('activities', OLD.id);
+END;
+
+CREATE TRIGGER photos_outbox_insert AFTER INSERT ON photos
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', NEW.id);
+END;
+
+CREATE TRIGGER photos_outbox_update AFTER UPDATE ON photos
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', NEW.id);
+END;
+
+CREATE TRIGGER photos_outbox_delete AFTER DELETE ON photos
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'photos' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('photos', OLD.id);
+END;
+
+CREATE TRIGGER task_materials_outbox_insert AFTER INSERT ON task_materials
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = NEW.task_id || '|' || NEW.item_id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', NEW.task_id || '|' || NEW.item_id);
+END;
+
+CREATE TRIGGER task_materials_outbox_update AFTER UPDATE ON task_materials
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = NEW.task_id || '|' || NEW.item_id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', NEW.task_id || '|' || NEW.item_id);
+END;
+
+CREATE TRIGGER task_materials_outbox_delete AFTER DELETE ON task_materials
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'task_materials' AND row_key = OLD.task_id || '|' || OLD.item_id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('task_materials', OLD.task_id || '|' || OLD.item_id);
+END;
+
+CREATE TRIGGER activity_materials_outbox_insert AFTER INSERT ON activity_materials
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = NEW.activity_id || '|' || NEW.item_id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', NEW.activity_id || '|' || NEW.item_id);
+END;
+
+CREATE TRIGGER activity_materials_outbox_update AFTER UPDATE ON activity_materials
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = NEW.activity_id || '|' || NEW.item_id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', NEW.activity_id || '|' || NEW.item_id);
+END;
+
+CREATE TRIGGER activity_materials_outbox_delete AFTER DELETE ON activity_materials
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'activity_materials' AND row_key = OLD.activity_id || '|' || OLD.item_id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('activity_materials', OLD.activity_id || '|' || OLD.item_id);
+END;
+
+CREATE TRIGGER shopping_items_outbox_insert AFTER INSERT ON shopping_items
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', NEW.id);
+END;
+
+CREATE TRIGGER shopping_items_outbox_update AFTER UPDATE ON shopping_items
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', NEW.id);
+END;
+
+CREATE TRIGGER shopping_items_outbox_delete AFTER DELETE ON shopping_items
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'shopping_items' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('shopping_items', OLD.id);
+END;
+
+CREATE TRIGGER assistant_threads_outbox_insert AFTER INSERT ON assistant_threads
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', NEW.id);
+END;
+
+CREATE TRIGGER assistant_threads_outbox_update AFTER UPDATE ON assistant_threads
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', NEW.id);
+END;
+
+CREATE TRIGGER assistant_threads_outbox_delete AFTER DELETE ON assistant_threads
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'assistant_threads' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_threads', OLD.id);
+END;
+
+CREATE TRIGGER assistant_messages_outbox_insert AFTER INSERT ON assistant_messages
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', NEW.id);
+END;
+
+CREATE TRIGGER assistant_messages_outbox_update AFTER UPDATE ON assistant_messages
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = NEW.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', NEW.id);
+END;
+
+CREATE TRIGGER assistant_messages_outbox_delete AFTER DELETE ON assistant_messages
+  WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = 'applying')
+BEGIN
+  DELETE FROM sync_outbox WHERE entity = 'assistant_messages' AND row_key = OLD.id;
+  INSERT INTO sync_outbox (entity, row_key) VALUES ('assistant_messages', OLD.id);
+END;

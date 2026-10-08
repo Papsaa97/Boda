@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/time/today.dart';
+import 'features/account/presentation/sync_controller.dart';
 import 'features/activity/presentation/screens/activity_form_screen.dart';
 import 'features/activity/presentation/screens/timeline_screen.dart';
 import 'features/assistant/presentation/assistant_screen.dart';
@@ -50,6 +51,9 @@ class AppRoot extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
+    // Synchronizace běží i během onboardingu: druhý telefon se přihlásí
+    // a převezme zahradu z účtu (DECLOG D70).
+    ref.listen(syncControllerProvider, (_, _) {});
     final zones = ref.watch(zonesControllerProvider);
     return zones.when(
       skipError: true,
@@ -93,6 +97,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
     // Po návratu do aplikace (třeba druhý den ráno) přepočítat „dnes“.
     if (state == AppLifecycleState.resumed) {
       ref.read(todayProvider.notifier).refresh();
+      ref.read(syncControllerProvider.notifier).syncNow();
     }
   }
 

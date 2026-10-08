@@ -1,0 +1,116 @@
+# Konfigurace lokálního vývoje Supabase (`supabase start`, `supabase test db`).
+# Hosted projekty (dev, prod) se nastavují v dashboardu, viz supabase/README.md.
+# Žádná tajemství sem nepatří: hodnoty env(...) se berou z proměnných
+# prostředí nebo ze souboru supabase/.env (není v gitu).
+
+project_id = "zahradnik-boda"
+
+[api]
+enabled = true
+port = 54321
+# Přes REST (PostgREST) je vystavené jen schéma public; pomocné funkce
+# pro RLS jsou ve schématu private, které vystavené není.
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.pooler]
+enabled = false
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+enabled = false
+
+[realtime]
+# Realtime zatím není potřeba (stahuje se podle server_updated_at, spec 7.4).
+enabled = false
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[inbucket]
+# Lokální schránka pro e-maily s jednorázovým kódem: http://127.0.0.1:54324
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "10MiB"
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["cz.zahradnikboda.app://login-callback"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+# Host pracuje jen lokálně (DECLOG D29), anonymní účty nejsou potřeba.
+enable_anonymous_sign_ins = false
+enable_manual_linking = false
+
+[auth.rate_limit]
+email_sent = 2
+token_verifications = 30
+
+[auth.captcha]
+# V produkci zapnout (spec kap. 9: CAPTCHA u registrace e-mailem).
+enabled = false
+provider = "hcaptcha"
+secret = "env(SUPABASE_AUTH_CAPTCHA_SECRET)"
+
+[auth.email]
+# Přihlášení e-mailem s jednorázovým kódem (OTP), bez hesla (DECLOG D29).
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+secure_password_change = false
+max_frequency = "1m0s"
+otp_length = 6
+otp_expiry = 900
+
+[auth.sms]
+enable_signup = false
+
+[auth.external.google]
+# Nativní přihlášení v aplikaci + signInWithIdToken. Zapnout až s klíči.
+enabled = false
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+skip_nonce_check = false
+
+[auth.external.apple]
+# Sign in with Apple (nativní dialog). Zapnout až s klíči.
+enabled = false
+client_id = "env(SUPABASE_AUTH_EXTERNAL_APPLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
+skip_nonce_check = false
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+inspector_port = 8083
+deno_version = 2
+
+# Bóďa a smazání účtu vyžadují přihlášeného uživatele (JWT ověřuje brána
+# i samotná funkce). Webhook RevenueCat má vlastní tajný Bearer token.
+[functions.boda-chat]
+verify_jwt = true
+
+[functions.delete-account]
+verify_jwt = true
+
+[functions.revenuecat-webhook]
+verify_jwt = false
+
+[analytics]
+enabled = false

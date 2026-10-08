@@ -11,7 +11,7 @@ Mobilní aplikace, která vede **deník a digitální model zahrady** a nad ním
 | **MVP 0.1 – Offline deník** | ✅ implementováno |
 | **MVP 0.2 – Spolehlivý deník** (export/import, úkoly, rychlý zápis) | ✅ implementováno, k testerům do konce února 2027 |
 | Sezóna 2027 – validace „vydrží lidé zapisovat?“ | ○ |
-| MVP 1.0 – Chytrý parťák (účet, synchronizace, Bóďa) | ◐ rozpracováno: zahrada, sklad, úkoly s materiálem a Bóďa (v ukázkovém režimu do připojení účtu) hotové (DECLOG D50, D60) |
+| MVP 1.0 – Chytrý parťák (účet, synchronizace, Bóďa) | ◐ rozpracováno: zahrada, sklad, úkoly s materiálem, Bóďa, účet a synchronizace hotové (DECLOG D50, D60, D69); čeká na projekt Supabase a klíč k AI |
 | MVP 1.1 – 2D plátno, V2, V3 | ○ |
 
 Celá roadmapa s definicí hotovo je ve [specifikaci, kap. 4](docs/SPECIFIKACE.md#4-roadmapa-a-rozsah-fází).
@@ -46,8 +46,9 @@ všechno, co je potřeba, aby se na deník dalo spolehnout celou sezónu.
 * ✅ **Zahrada (1.0):** vlastnosti zón (výměra, půda, pH, oslunění, závlaha, krytí), sklad osiv, hnojiv, přípravků a nářadí s hlídačem zásob, nákupní seznam.
 * ✅ **Úkoly v plném rozsahu (1.0):** odhad doby, nářadí, materiál ze skladu, režim „víkend na chalupě“.
 * ✅ **Sklizeň a náklady** u záznamu, **přehled sezóny** v zimě.
-* ✅ **Bóďa (1.0):** rozhovor nad daty zahrady, dávky hnojiv spočítané z obalu a výměry zóny, „Z čeho vycházím“, varování u dávek mimo výpočet a u chemie, akce (úkol, nákup, záznam), 👍/👎, dotazy bez připojení počkají. Do připojení účtu běží v ukázkovém režimu bez AI (DECLOG D64).
-* ✅ **Offline-first:** data i fotky zůstávají na zařízení (SQLite přes Drift + složka aplikace). Žádný backend. Data z verze 0.1 se při prvním spuštění jednorázově převedou.
+* ✅ **Bóďa (1.0):** rozhovor nad daty zahrady, dávky hnojiv spočítané z obalu a výměry zóny, „Z čeho vycházím“, varování u dávek mimo výpočet a u chemie, akce (úkol, nákup, záznam), 👍/👎, dotazy bez připojení počkají. Bez účtu a souhlasu běží v ukázkovém režimu bez AI (DECLOG D64, D72).
+* ✅ **Účet a synchronizace (1.0):** přihlášení kódem z e-mailu, synchronizace všech dat i fotek mezi telefony (poslední zápis vyhrává), převzetí zahrady z účtu na druhém telefonu, smazání účtu (DECLOG D69–D71). Zapne se jen v buildu s adresou backendu.
+* ✅ **Offline-first:** data i fotky jsou vždy v zařízení (SQLite přes Drift + složka aplikace); účet je volitelný a cloud slouží jako záloha a most mezi telefony. Data z verze 0.1 se při prvním spuštění jednorázově převedou.
 
 Na webu funguje vše kromě fotek, zálohy a připomínek (prohlížeč nemá trvalé úložiště souborů ani plánované notifikace).
 
@@ -63,6 +64,7 @@ Na webu funguje vše kromě fotek, zálohy a připomínek (prohlížeč nemá tr
   * `features/settings`, `features/stats` – nastavení a statistiky pro testery
   * `features/dashboard` – „Co dnes?“ a tipy od Bódi
   * `features/onboarding` – první spuštění, výběr zón
+  * `features/account` + `core/sync` – účet, fronta změn a synchronizace se Supabase
 * **State Management:** Riverpod 3 (`AsyncNotifier`, zápisy přes `AsyncValue.guard()`)
 * **Lokální databáze:** Drift (SQLite), tabulky odpovídají budoucímu schématu Supabase (spec kap. 8). Snímky schématu jsou v `drift_schemas/`.
 * **Notifikace:** `flutter_local_notifications`, plán počítá čistá funkce `planReminders` (testovaná)
@@ -75,7 +77,15 @@ Na webu funguje vše kromě fotek, zálohy a připomínek (prohlížeč nemá tr
 ## Jak spustit
 1. Naklonujte repozitář.
 2. `flutter pub get`
-3. `flutter run`
+3. `flutter run` (jen v telefonu, bez účtu a AI)
+
+S backendem (účet, synchronizace, Bóďa s AI):
+```
+flutter run --dart-define=SUPABASE_URL=https://<projekt>.supabase.co \
+            --dart-define=SUPABASE_PUBLISHABLE_KEY=<publishable klíč>
+```
+Obě hodnoty jsou veřejné (přístup hlídá RLS); nastavení projektu popisuje
+[supabase/README.md](supabase/README.md).
 
 Vygenerovaný kód (Drift, lokalizace) je v repozitáři. Po změně tabulek v
 `lib/core/database/app_database.dart` spusťte

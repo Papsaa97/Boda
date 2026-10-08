@@ -3,6 +3,480 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
+class SyncOutbox extends Table with TableInfo<SyncOutbox, SyncOutboxRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SyncOutbox(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _seqMeta = const VerificationMeta('seq');
+  late final GeneratedColumn<int> seq = GeneratedColumn<int>(
+    'seq',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL PRIMARY KEY AUTOINCREMENT',
+  );
+  static const VerificationMeta _entityMeta = const VerificationMeta('entity');
+  late final GeneratedColumn<String> entity = GeneratedColumn<String>(
+    'entity',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _rowKeyMeta = const VerificationMeta('rowKey');
+  late final GeneratedColumn<String> rowKey = GeneratedColumn<String>(
+    'row_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [seq, entity, rowKey];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sync_outbox';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SyncOutboxRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('seq')) {
+      context.handle(
+        _seqMeta,
+        seq.isAcceptableOrUnknown(data['seq']!, _seqMeta),
+      );
+    }
+    if (data.containsKey('entity')) {
+      context.handle(
+        _entityMeta,
+        entity.isAcceptableOrUnknown(data['entity']!, _entityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_entityMeta);
+    }
+    if (data.containsKey('row_key')) {
+      context.handle(
+        _rowKeyMeta,
+        rowKey.isAcceptableOrUnknown(data['row_key']!, _rowKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_rowKeyMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {seq};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {entity, rowKey},
+  ];
+  @override
+  SyncOutboxRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SyncOutboxRow(
+      seq: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}seq'],
+      )!,
+      entity: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entity'],
+      )!,
+      rowKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}row_key'],
+      )!,
+    );
+  }
+
+  @override
+  SyncOutbox createAlias(String alias) {
+    return SyncOutbox(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const ['UNIQUE(entity, row_key)'];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class SyncOutboxRow extends DataClass implements Insertable<SyncOutboxRow> {
+  final int seq;
+  final String entity;
+  final String rowKey;
+  const SyncOutboxRow({
+    required this.seq,
+    required this.entity,
+    required this.rowKey,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['seq'] = Variable<int>(seq);
+    map['entity'] = Variable<String>(entity);
+    map['row_key'] = Variable<String>(rowKey);
+    return map;
+  }
+
+  SyncOutboxCompanion toCompanion(bool nullToAbsent) {
+    return SyncOutboxCompanion(
+      seq: Value(seq),
+      entity: Value(entity),
+      rowKey: Value(rowKey),
+    );
+  }
+
+  factory SyncOutboxRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SyncOutboxRow(
+      seq: serializer.fromJson<int>(json['seq']),
+      entity: serializer.fromJson<String>(json['entity']),
+      rowKey: serializer.fromJson<String>(json['row_key']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'seq': serializer.toJson<int>(seq),
+      'entity': serializer.toJson<String>(entity),
+      'row_key': serializer.toJson<String>(rowKey),
+    };
+  }
+
+  SyncOutboxRow copyWith({int? seq, String? entity, String? rowKey}) =>
+      SyncOutboxRow(
+        seq: seq ?? this.seq,
+        entity: entity ?? this.entity,
+        rowKey: rowKey ?? this.rowKey,
+      );
+  SyncOutboxRow copyWithCompanion(SyncOutboxCompanion data) {
+    return SyncOutboxRow(
+      seq: data.seq.present ? data.seq.value : this.seq,
+      entity: data.entity.present ? data.entity.value : this.entity,
+      rowKey: data.rowKey.present ? data.rowKey.value : this.rowKey,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncOutboxRow(')
+          ..write('seq: $seq, ')
+          ..write('entity: $entity, ')
+          ..write('rowKey: $rowKey')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(seq, entity, rowKey);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SyncOutboxRow &&
+          other.seq == this.seq &&
+          other.entity == this.entity &&
+          other.rowKey == this.rowKey);
+}
+
+class SyncOutboxCompanion extends UpdateCompanion<SyncOutboxRow> {
+  final Value<int> seq;
+  final Value<String> entity;
+  final Value<String> rowKey;
+  const SyncOutboxCompanion({
+    this.seq = const Value.absent(),
+    this.entity = const Value.absent(),
+    this.rowKey = const Value.absent(),
+  });
+  SyncOutboxCompanion.insert({
+    this.seq = const Value.absent(),
+    required String entity,
+    required String rowKey,
+  }) : entity = Value(entity),
+       rowKey = Value(rowKey);
+  static Insertable<SyncOutboxRow> custom({
+    Expression<int>? seq,
+    Expression<String>? entity,
+    Expression<String>? rowKey,
+  }) {
+    return RawValuesInsertable({
+      if (seq != null) 'seq': seq,
+      if (entity != null) 'entity': entity,
+      if (rowKey != null) 'row_key': rowKey,
+    });
+  }
+
+  SyncOutboxCompanion copyWith({
+    Value<int>? seq,
+    Value<String>? entity,
+    Value<String>? rowKey,
+  }) {
+    return SyncOutboxCompanion(
+      seq: seq ?? this.seq,
+      entity: entity ?? this.entity,
+      rowKey: rowKey ?? this.rowKey,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (seq.present) {
+      map['seq'] = Variable<int>(seq.value);
+    }
+    if (entity.present) {
+      map['entity'] = Variable<String>(entity.value);
+    }
+    if (rowKey.present) {
+      map['row_key'] = Variable<String>(rowKey.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncOutboxCompanion(')
+          ..write('seq: $seq, ')
+          ..write('entity: $entity, ')
+          ..write('rowKey: $rowKey')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class SyncState extends Table with TableInfo<SyncState, SyncStateRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SyncState(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [name, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sync_state';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SyncStateRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {name};
+  @override
+  SyncStateRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SyncStateRow(
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      ),
+    );
+  }
+
+  @override
+  SyncState createAlias(String alias) {
+    return SyncState(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class SyncStateRow extends DataClass implements Insertable<SyncStateRow> {
+  final String name;
+  final String? value;
+  const SyncStateRow({required this.name, this.value});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || value != null) {
+      map['value'] = Variable<String>(value);
+    }
+    return map;
+  }
+
+  SyncStateCompanion toCompanion(bool nullToAbsent) {
+    return SyncStateCompanion(
+      name: Value(name),
+      value: value == null && nullToAbsent
+          ? const Value.absent()
+          : Value(value),
+    );
+  }
+
+  factory SyncStateRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SyncStateRow(
+      name: serializer.fromJson<String>(json['name']),
+      value: serializer.fromJson<String?>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'name': serializer.toJson<String>(name),
+      'value': serializer.toJson<String?>(value),
+    };
+  }
+
+  SyncStateRow copyWith({
+    String? name,
+    Value<String?> value = const Value.absent(),
+  }) => SyncStateRow(
+    name: name ?? this.name,
+    value: value.present ? value.value : this.value,
+  );
+  SyncStateRow copyWithCompanion(SyncStateCompanion data) {
+    return SyncStateRow(
+      name: data.name.present ? data.name.value : this.name,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncStateRow(')
+          ..write('name: $name, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(name, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SyncStateRow &&
+          other.name == this.name &&
+          other.value == this.value);
+}
+
+class SyncStateCompanion extends UpdateCompanion<SyncStateRow> {
+  final Value<String> name;
+  final Value<String?> value;
+  final Value<int> rowid;
+  const SyncStateCompanion({
+    this.name = const Value.absent(),
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SyncStateCompanion.insert({
+    required String name,
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<SyncStateRow> custom({
+    Expression<String>? name,
+    Expression<String>? value,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (name != null) 'name': name,
+      if (value != null) 'value': value,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SyncStateCompanion copyWith({
+    Value<String>? name,
+    Value<String?>? value,
+    Value<int>? rowid,
+  }) {
+    return SyncStateCompanion(
+      name: name ?? this.name,
+      value: value ?? this.value,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncStateCompanion(')
+          ..write('name: $name, ')
+          ..write('value: $value, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $GardensTable extends Gardens with TableInfo<$GardensTable, GardenRow> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -1226,12 +1700,12 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
   }
 }
 
-class $ActivitiesTable extends Activities
-    with TableInfo<$ActivitiesTable, ActivityRow> {
+class $InventoryItemsTable extends InventoryItems
+    with TableInfo<$InventoryItemsTable, InventoryItemRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ActivitiesTable(this.attachedDatabase, [this._alias]);
+  $InventoryItemsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
@@ -1255,104 +1729,65 @@ class $ActivitiesTable extends Activities
       'REFERENCES gardens (id)',
     ),
   );
-  static const VerificationMeta _zoneIdMeta = const VerificationMeta('zoneId');
-  @override
-  late final GeneratedColumn<String> zoneId = GeneratedColumn<String>(
-    'zone_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES zones (id)',
-    ),
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
   );
-  static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
-  late final GeneratedColumn<String> type = GeneratedColumn<String>(
-    'type',
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-    'title',
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
-    'occurredAt',
-  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
   @override
-  late final GeneratedColumn<DateTime> occurredAt = GeneratedColumn<DateTime>(
-    'occurred_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _occurredTzMeta = const VerificationMeta(
-    'occurredTz',
-  );
-  @override
-  late final GeneratedColumn<String> occurredTz = GeneratedColumn<String>(
-    'occurred_tz',
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
-  @override
-  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
-    'notes',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _harvestQtyMeta = const VerificationMeta(
-    'harvestQty',
+  static const VerificationMeta _stockQtyMeta = const VerificationMeta(
+    'stockQty',
   );
   @override
-  late final GeneratedColumn<double> harvestQty = GeneratedColumn<double>(
-    'harvest_qty',
+  late final GeneratedColumn<double> stockQty = GeneratedColumn<double>(
+    'stock_qty',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.double,
     requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
-  static const VerificationMeta _harvestUnitMeta = const VerificationMeta(
-    'harvestUnit',
-  );
-  @override
-  late final GeneratedColumn<String> harvestUnit = GeneratedColumn<String>(
-    'harvest_unit',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _costCzkMeta = const VerificationMeta(
-    'costCzk',
+  static const VerificationMeta _lowStockThresholdMeta = const VerificationMeta(
+    'lowStockThreshold',
   );
   @override
-  late final GeneratedColumn<double> costCzk = GeneratedColumn<double>(
-    'cost_czk',
-    aliasedName,
-    true,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
+  late final GeneratedColumn<double> lowStockThreshold =
+      GeneratedColumn<double>(
+        'low_stock_threshold',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _detailsMeta = const VerificationMeta(
+    'details',
   );
-  static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
   @override
-  late final GeneratedColumn<String> taskId = GeneratedColumn<String>(
-    'task_id',
+  late final GeneratedColumn<String> details = GeneratedColumn<String>(
+    'details',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -1395,16 +1830,12 @@ class $ActivitiesTable extends Activities
   List<GeneratedColumn> get $columns => [
     id,
     gardenId,
-    zoneId,
-    type,
-    title,
-    occurredAt,
-    occurredTz,
-    notes,
-    harvestQty,
-    harvestUnit,
-    costCzk,
-    taskId,
+    category,
+    name,
+    unit,
+    stockQty,
+    lowStockThreshold,
+    details,
     createdAt,
     updatedAt,
     deletedAt,
@@ -1413,10 +1844,10 @@ class $ActivitiesTable extends Activities
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'activities';
+  static const String $name = 'inventory_items';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ActivityRow> instance, {
+    Insertable<InventoryItemRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1434,77 +1865,49 @@ class $ActivitiesTable extends Activities
     } else if (isInserting) {
       context.missing(_gardenIdMeta);
     }
-    if (data.containsKey('zone_id')) {
+    if (data.containsKey('category')) {
       context.handle(
-        _zoneIdMeta,
-        zoneId.isAcceptableOrUnknown(data['zone_id']!, _zoneIdMeta),
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
       );
     } else if (isInserting) {
-      context.missing(_zoneIdMeta);
+      context.missing(_categoryMeta);
     }
-    if (data.containsKey('type')) {
+    if (data.containsKey('name')) {
       context.handle(
-        _typeMeta,
-        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
       );
     } else if (isInserting) {
-      context.missing(_typeMeta);
+      context.missing(_nameMeta);
     }
-    if (data.containsKey('title')) {
+    if (data.containsKey('unit')) {
       context.handle(
-        _titleMeta,
-        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
       );
     } else if (isInserting) {
-      context.missing(_titleMeta);
+      context.missing(_unitMeta);
     }
-    if (data.containsKey('occurred_at')) {
+    if (data.containsKey('stock_qty')) {
       context.handle(
-        _occurredAtMeta,
-        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_occurredAtMeta);
-    }
-    if (data.containsKey('occurred_tz')) {
-      context.handle(
-        _occurredTzMeta,
-        occurredTz.isAcceptableOrUnknown(data['occurred_tz']!, _occurredTzMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_occurredTzMeta);
-    }
-    if (data.containsKey('notes')) {
-      context.handle(
-        _notesMeta,
-        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+        _stockQtyMeta,
+        stockQty.isAcceptableOrUnknown(data['stock_qty']!, _stockQtyMeta),
       );
     }
-    if (data.containsKey('harvest_qty')) {
+    if (data.containsKey('low_stock_threshold')) {
       context.handle(
-        _harvestQtyMeta,
-        harvestQty.isAcceptableOrUnknown(data['harvest_qty']!, _harvestQtyMeta),
-      );
-    }
-    if (data.containsKey('harvest_unit')) {
-      context.handle(
-        _harvestUnitMeta,
-        harvestUnit.isAcceptableOrUnknown(
-          data['harvest_unit']!,
-          _harvestUnitMeta,
+        _lowStockThresholdMeta,
+        lowStockThreshold.isAcceptableOrUnknown(
+          data['low_stock_threshold']!,
+          _lowStockThresholdMeta,
         ),
       );
     }
-    if (data.containsKey('cost_czk')) {
+    if (data.containsKey('details')) {
       context.handle(
-        _costCzkMeta,
-        costCzk.isAcceptableOrUnknown(data['cost_czk']!, _costCzkMeta),
-      );
-    }
-    if (data.containsKey('task_id')) {
-      context.handle(
-        _taskIdMeta,
-        taskId.isAcceptableOrUnknown(data['task_id']!, _taskIdMeta),
+        _detailsMeta,
+        details.isAcceptableOrUnknown(data['details']!, _detailsMeta),
       );
     }
     if (data.containsKey('created_at')) {
@@ -1535,9 +1938,9 @@ class $ActivitiesTable extends Activities
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ActivityRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  InventoryItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ActivityRow(
+    return InventoryItemRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -1546,45 +1949,29 @@ class $ActivitiesTable extends Activities
         DriftSqlType.string,
         data['${effectivePrefix}garden_id'],
       )!,
-      zoneId: attachedDatabase.typeMapping.read(
+      category: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}zone_id'],
+        data['${effectivePrefix}category'],
       )!,
-      type: attachedDatabase.typeMapping.read(
+      name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}type'],
+        data['${effectivePrefix}name'],
       )!,
-      title: attachedDatabase.typeMapping.read(
+      unit: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}title'],
+        data['${effectivePrefix}unit'],
       )!,
-      occurredAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}occurred_at'],
-      )!,
-      occurredTz: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}occurred_tz'],
-      )!,
-      notes: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}notes'],
-      ),
-      harvestQty: attachedDatabase.typeMapping.read(
+      stockQty: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
-        data['${effectivePrefix}harvest_qty'],
-      ),
-      harvestUnit: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}harvest_unit'],
-      ),
-      costCzk: attachedDatabase.typeMapping.read(
+        data['${effectivePrefix}stock_qty'],
+      )!,
+      lowStockThreshold: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
-        data['${effectivePrefix}cost_czk'],
+        data['${effectivePrefix}low_stock_threshold'],
       ),
-      taskId: attachedDatabase.typeMapping.read(
+      details: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}task_id'],
+        data['${effectivePrefix}details'],
       ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -1602,44 +1989,39 @@ class $ActivitiesTable extends Activities
   }
 
   @override
-  $ActivitiesTable createAlias(String alias) {
-    return $ActivitiesTable(attachedDatabase, alias);
+  $InventoryItemsTable createAlias(String alias) {
+    return $InventoryItemsTable(attachedDatabase, alias);
   }
 }
 
-class ActivityRow extends DataClass implements Insertable<ActivityRow> {
+class InventoryItemRow extends DataClass
+    implements Insertable<InventoryItemRow> {
   final String id;
   final String gardenId;
-  final String zoneId;
 
-  /// Číselník `activity.type` (kap. 8.3).
-  final String type;
-  final String title;
-  final DateTime occurredAt;
+  /// `seed`, `fertilizer`, `plantProtection`, `tool`, `other`.
+  final String category;
+  final String name;
 
-  /// Posun časové zóny v době činnosti, např. `+02:00` (kap. 7.3).
-  final String occurredTz;
-  final String? notes;
-  final double? harvestQty;
-  final String? harvestUnit;
-  final double? costCzk;
-  final String? taskId;
+  /// `g`, `kg`, `ml`, `l`, `ks`, `pack`.
+  final String unit;
+  final double stockQty;
+  final double? lowStockThreshold;
+
+  /// Údaje podle kategorie jako JSON (v PostgreSQL `jsonb`).
+  final String? details;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
-  const ActivityRow({
+  const InventoryItemRow({
     required this.id,
     required this.gardenId,
-    required this.zoneId,
-    required this.type,
-    required this.title,
-    required this.occurredAt,
-    required this.occurredTz,
-    this.notes,
-    this.harvestQty,
-    this.harvestUnit,
-    this.costCzk,
-    this.taskId,
+    required this.category,
+    required this.name,
+    required this.unit,
+    required this.stockQty,
+    this.lowStockThreshold,
+    this.details,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -1649,25 +2031,15 @@ class ActivityRow extends DataClass implements Insertable<ActivityRow> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['garden_id'] = Variable<String>(gardenId);
-    map['zone_id'] = Variable<String>(zoneId);
-    map['type'] = Variable<String>(type);
-    map['title'] = Variable<String>(title);
-    map['occurred_at'] = Variable<DateTime>(occurredAt);
-    map['occurred_tz'] = Variable<String>(occurredTz);
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
+    map['category'] = Variable<String>(category);
+    map['name'] = Variable<String>(name);
+    map['unit'] = Variable<String>(unit);
+    map['stock_qty'] = Variable<double>(stockQty);
+    if (!nullToAbsent || lowStockThreshold != null) {
+      map['low_stock_threshold'] = Variable<double>(lowStockThreshold);
     }
-    if (!nullToAbsent || harvestQty != null) {
-      map['harvest_qty'] = Variable<double>(harvestQty);
-    }
-    if (!nullToAbsent || harvestUnit != null) {
-      map['harvest_unit'] = Variable<String>(harvestUnit);
-    }
-    if (!nullToAbsent || costCzk != null) {
-      map['cost_czk'] = Variable<double>(costCzk);
-    }
-    if (!nullToAbsent || taskId != null) {
-      map['task_id'] = Variable<String>(taskId);
+    if (!nullToAbsent || details != null) {
+      map['details'] = Variable<String>(details);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -1677,30 +2049,20 @@ class ActivityRow extends DataClass implements Insertable<ActivityRow> {
     return map;
   }
 
-  ActivitiesCompanion toCompanion(bool nullToAbsent) {
-    return ActivitiesCompanion(
+  InventoryItemsCompanion toCompanion(bool nullToAbsent) {
+    return InventoryItemsCompanion(
       id: Value(id),
       gardenId: Value(gardenId),
-      zoneId: Value(zoneId),
-      type: Value(type),
-      title: Value(title),
-      occurredAt: Value(occurredAt),
-      occurredTz: Value(occurredTz),
-      notes: notes == null && nullToAbsent
+      category: Value(category),
+      name: Value(name),
+      unit: Value(unit),
+      stockQty: Value(stockQty),
+      lowStockThreshold: lowStockThreshold == null && nullToAbsent
           ? const Value.absent()
-          : Value(notes),
-      harvestQty: harvestQty == null && nullToAbsent
+          : Value(lowStockThreshold),
+      details: details == null && nullToAbsent
           ? const Value.absent()
-          : Value(harvestQty),
-      harvestUnit: harvestUnit == null && nullToAbsent
-          ? const Value.absent()
-          : Value(harvestUnit),
-      costCzk: costCzk == null && nullToAbsent
-          ? const Value.absent()
-          : Value(costCzk),
-      taskId: taskId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(taskId),
+          : Value(details),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -1709,24 +2071,22 @@ class ActivityRow extends DataClass implements Insertable<ActivityRow> {
     );
   }
 
-  factory ActivityRow.fromJson(
+  factory InventoryItemRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ActivityRow(
+    return InventoryItemRow(
       id: serializer.fromJson<String>(json['id']),
       gardenId: serializer.fromJson<String>(json['gardenId']),
-      zoneId: serializer.fromJson<String>(json['zoneId']),
-      type: serializer.fromJson<String>(json['type']),
-      title: serializer.fromJson<String>(json['title']),
-      occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
-      occurredTz: serializer.fromJson<String>(json['occurredTz']),
-      notes: serializer.fromJson<String?>(json['notes']),
-      harvestQty: serializer.fromJson<double?>(json['harvestQty']),
-      harvestUnit: serializer.fromJson<String?>(json['harvestUnit']),
-      costCzk: serializer.fromJson<double?>(json['costCzk']),
-      taskId: serializer.fromJson<String?>(json['taskId']),
+      category: serializer.fromJson<String>(json['category']),
+      name: serializer.fromJson<String>(json['name']),
+      unit: serializer.fromJson<String>(json['unit']),
+      stockQty: serializer.fromJson<double>(json['stockQty']),
+      lowStockThreshold: serializer.fromJson<double?>(
+        json['lowStockThreshold'],
+      ),
+      details: serializer.fromJson<String?>(json['details']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -1738,77 +2098,57 @@ class ActivityRow extends DataClass implements Insertable<ActivityRow> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'gardenId': serializer.toJson<String>(gardenId),
-      'zoneId': serializer.toJson<String>(zoneId),
-      'type': serializer.toJson<String>(type),
-      'title': serializer.toJson<String>(title),
-      'occurredAt': serializer.toJson<DateTime>(occurredAt),
-      'occurredTz': serializer.toJson<String>(occurredTz),
-      'notes': serializer.toJson<String?>(notes),
-      'harvestQty': serializer.toJson<double?>(harvestQty),
-      'harvestUnit': serializer.toJson<String?>(harvestUnit),
-      'costCzk': serializer.toJson<double?>(costCzk),
-      'taskId': serializer.toJson<String?>(taskId),
+      'category': serializer.toJson<String>(category),
+      'name': serializer.toJson<String>(name),
+      'unit': serializer.toJson<String>(unit),
+      'stockQty': serializer.toJson<double>(stockQty),
+      'lowStockThreshold': serializer.toJson<double?>(lowStockThreshold),
+      'details': serializer.toJson<String?>(details),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
-  ActivityRow copyWith({
+  InventoryItemRow copyWith({
     String? id,
     String? gardenId,
-    String? zoneId,
-    String? type,
-    String? title,
-    DateTime? occurredAt,
-    String? occurredTz,
-    Value<String?> notes = const Value.absent(),
-    Value<double?> harvestQty = const Value.absent(),
-    Value<String?> harvestUnit = const Value.absent(),
-    Value<double?> costCzk = const Value.absent(),
-    Value<String?> taskId = const Value.absent(),
+    String? category,
+    String? name,
+    String? unit,
+    double? stockQty,
+    Value<double?> lowStockThreshold = const Value.absent(),
+    Value<String?> details = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
-  }) => ActivityRow(
+  }) => InventoryItemRow(
     id: id ?? this.id,
     gardenId: gardenId ?? this.gardenId,
-    zoneId: zoneId ?? this.zoneId,
-    type: type ?? this.type,
-    title: title ?? this.title,
-    occurredAt: occurredAt ?? this.occurredAt,
-    occurredTz: occurredTz ?? this.occurredTz,
-    notes: notes.present ? notes.value : this.notes,
-    harvestQty: harvestQty.present ? harvestQty.value : this.harvestQty,
-    harvestUnit: harvestUnit.present ? harvestUnit.value : this.harvestUnit,
-    costCzk: costCzk.present ? costCzk.value : this.costCzk,
-    taskId: taskId.present ? taskId.value : this.taskId,
+    category: category ?? this.category,
+    name: name ?? this.name,
+    unit: unit ?? this.unit,
+    stockQty: stockQty ?? this.stockQty,
+    lowStockThreshold: lowStockThreshold.present
+        ? lowStockThreshold.value
+        : this.lowStockThreshold,
+    details: details.present ? details.value : this.details,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
   );
-  ActivityRow copyWithCompanion(ActivitiesCompanion data) {
-    return ActivityRow(
+  InventoryItemRow copyWithCompanion(InventoryItemsCompanion data) {
+    return InventoryItemRow(
       id: data.id.present ? data.id.value : this.id,
       gardenId: data.gardenId.present ? data.gardenId.value : this.gardenId,
-      zoneId: data.zoneId.present ? data.zoneId.value : this.zoneId,
-      type: data.type.present ? data.type.value : this.type,
-      title: data.title.present ? data.title.value : this.title,
-      occurredAt: data.occurredAt.present
-          ? data.occurredAt.value
-          : this.occurredAt,
-      occurredTz: data.occurredTz.present
-          ? data.occurredTz.value
-          : this.occurredTz,
-      notes: data.notes.present ? data.notes.value : this.notes,
-      harvestQty: data.harvestQty.present
-          ? data.harvestQty.value
-          : this.harvestQty,
-      harvestUnit: data.harvestUnit.present
-          ? data.harvestUnit.value
-          : this.harvestUnit,
-      costCzk: data.costCzk.present ? data.costCzk.value : this.costCzk,
-      taskId: data.taskId.present ? data.taskId.value : this.taskId,
+      category: data.category.present ? data.category.value : this.category,
+      name: data.name.present ? data.name.value : this.name,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      stockQty: data.stockQty.present ? data.stockQty.value : this.stockQty,
+      lowStockThreshold: data.lowStockThreshold.present
+          ? data.lowStockThreshold.value
+          : this.lowStockThreshold,
+      details: data.details.present ? data.details.value : this.details,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -1817,19 +2157,15 @@ class ActivityRow extends DataClass implements Insertable<ActivityRow> {
 
   @override
   String toString() {
-    return (StringBuffer('ActivityRow(')
+    return (StringBuffer('InventoryItemRow(')
           ..write('id: $id, ')
           ..write('gardenId: $gardenId, ')
-          ..write('zoneId: $zoneId, ')
-          ..write('type: $type, ')
-          ..write('title: $title, ')
-          ..write('occurredAt: $occurredAt, ')
-          ..write('occurredTz: $occurredTz, ')
-          ..write('notes: $notes, ')
-          ..write('harvestQty: $harvestQty, ')
-          ..write('harvestUnit: $harvestUnit, ')
-          ..write('costCzk: $costCzk, ')
-          ..write('taskId: $taskId, ')
+          ..write('category: $category, ')
+          ..write('name: $name, ')
+          ..write('unit: $unit, ')
+          ..write('stockQty: $stockQty, ')
+          ..write('lowStockThreshold: $lowStockThreshold, ')
+          ..write('details: $details, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
@@ -1841,16 +2177,12 @@ class ActivityRow extends DataClass implements Insertable<ActivityRow> {
   int get hashCode => Object.hash(
     id,
     gardenId,
-    zoneId,
-    type,
-    title,
-    occurredAt,
-    occurredTz,
-    notes,
-    harvestQty,
-    harvestUnit,
-    costCzk,
-    taskId,
+    category,
+    name,
+    unit,
+    stockQty,
+    lowStockThreshold,
+    details,
     createdAt,
     updatedAt,
     deletedAt,
@@ -1858,98 +2190,76 @@ class ActivityRow extends DataClass implements Insertable<ActivityRow> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ActivityRow &&
+      (other is InventoryItemRow &&
           other.id == this.id &&
           other.gardenId == this.gardenId &&
-          other.zoneId == this.zoneId &&
-          other.type == this.type &&
-          other.title == this.title &&
-          other.occurredAt == this.occurredAt &&
-          other.occurredTz == this.occurredTz &&
-          other.notes == this.notes &&
-          other.harvestQty == this.harvestQty &&
-          other.harvestUnit == this.harvestUnit &&
-          other.costCzk == this.costCzk &&
-          other.taskId == this.taskId &&
+          other.category == this.category &&
+          other.name == this.name &&
+          other.unit == this.unit &&
+          other.stockQty == this.stockQty &&
+          other.lowStockThreshold == this.lowStockThreshold &&
+          other.details == this.details &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt);
 }
 
-class ActivitiesCompanion extends UpdateCompanion<ActivityRow> {
+class InventoryItemsCompanion extends UpdateCompanion<InventoryItemRow> {
   final Value<String> id;
   final Value<String> gardenId;
-  final Value<String> zoneId;
-  final Value<String> type;
-  final Value<String> title;
-  final Value<DateTime> occurredAt;
-  final Value<String> occurredTz;
-  final Value<String?> notes;
-  final Value<double?> harvestQty;
-  final Value<String?> harvestUnit;
-  final Value<double?> costCzk;
-  final Value<String?> taskId;
+  final Value<String> category;
+  final Value<String> name;
+  final Value<String> unit;
+  final Value<double> stockQty;
+  final Value<double?> lowStockThreshold;
+  final Value<String?> details;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
   final Value<int> rowid;
-  const ActivitiesCompanion({
+  const InventoryItemsCompanion({
     this.id = const Value.absent(),
     this.gardenId = const Value.absent(),
-    this.zoneId = const Value.absent(),
-    this.type = const Value.absent(),
-    this.title = const Value.absent(),
-    this.occurredAt = const Value.absent(),
-    this.occurredTz = const Value.absent(),
-    this.notes = const Value.absent(),
-    this.harvestQty = const Value.absent(),
-    this.harvestUnit = const Value.absent(),
-    this.costCzk = const Value.absent(),
-    this.taskId = const Value.absent(),
+    this.category = const Value.absent(),
+    this.name = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.stockQty = const Value.absent(),
+    this.lowStockThreshold = const Value.absent(),
+    this.details = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  ActivitiesCompanion.insert({
+  InventoryItemsCompanion.insert({
     required String id,
     required String gardenId,
-    required String zoneId,
-    required String type,
-    required String title,
-    required DateTime occurredAt,
-    required String occurredTz,
-    this.notes = const Value.absent(),
-    this.harvestQty = const Value.absent(),
-    this.harvestUnit = const Value.absent(),
-    this.costCzk = const Value.absent(),
-    this.taskId = const Value.absent(),
+    required String category,
+    required String name,
+    required String unit,
+    this.stockQty = const Value.absent(),
+    this.lowStockThreshold = const Value.absent(),
+    this.details = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        gardenId = Value(gardenId),
-       zoneId = Value(zoneId),
-       type = Value(type),
-       title = Value(title),
-       occurredAt = Value(occurredAt),
-       occurredTz = Value(occurredTz),
+       category = Value(category),
+       name = Value(name),
+       unit = Value(unit),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
-  static Insertable<ActivityRow> custom({
+  static Insertable<InventoryItemRow> custom({
     Expression<String>? id,
     Expression<String>? gardenId,
-    Expression<String>? zoneId,
-    Expression<String>? type,
-    Expression<String>? title,
-    Expression<DateTime>? occurredAt,
-    Expression<String>? occurredTz,
-    Expression<String>? notes,
-    Expression<double>? harvestQty,
-    Expression<String>? harvestUnit,
-    Expression<double>? costCzk,
-    Expression<String>? taskId,
+    Expression<String>? category,
+    Expression<String>? name,
+    Expression<String>? unit,
+    Expression<double>? stockQty,
+    Expression<double>? lowStockThreshold,
+    Expression<String>? details,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -1958,16 +2268,12 @@ class ActivitiesCompanion extends UpdateCompanion<ActivityRow> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (gardenId != null) 'garden_id': gardenId,
-      if (zoneId != null) 'zone_id': zoneId,
-      if (type != null) 'type': type,
-      if (title != null) 'title': title,
-      if (occurredAt != null) 'occurred_at': occurredAt,
-      if (occurredTz != null) 'occurred_tz': occurredTz,
-      if (notes != null) 'notes': notes,
-      if (harvestQty != null) 'harvest_qty': harvestQty,
-      if (harvestUnit != null) 'harvest_unit': harvestUnit,
-      if (costCzk != null) 'cost_czk': costCzk,
-      if (taskId != null) 'task_id': taskId,
+      if (category != null) 'category': category,
+      if (name != null) 'name': name,
+      if (unit != null) 'unit': unit,
+      if (stockQty != null) 'stock_qty': stockQty,
+      if (lowStockThreshold != null) 'low_stock_threshold': lowStockThreshold,
+      if (details != null) 'details': details,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -1975,37 +2281,29 @@ class ActivitiesCompanion extends UpdateCompanion<ActivityRow> {
     });
   }
 
-  ActivitiesCompanion copyWith({
+  InventoryItemsCompanion copyWith({
     Value<String>? id,
     Value<String>? gardenId,
-    Value<String>? zoneId,
-    Value<String>? type,
-    Value<String>? title,
-    Value<DateTime>? occurredAt,
-    Value<String>? occurredTz,
-    Value<String?>? notes,
-    Value<double?>? harvestQty,
-    Value<String?>? harvestUnit,
-    Value<double?>? costCzk,
-    Value<String?>? taskId,
+    Value<String>? category,
+    Value<String>? name,
+    Value<String>? unit,
+    Value<double>? stockQty,
+    Value<double?>? lowStockThreshold,
+    Value<String?>? details,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
     Value<int>? rowid,
   }) {
-    return ActivitiesCompanion(
+    return InventoryItemsCompanion(
       id: id ?? this.id,
       gardenId: gardenId ?? this.gardenId,
-      zoneId: zoneId ?? this.zoneId,
-      type: type ?? this.type,
-      title: title ?? this.title,
-      occurredAt: occurredAt ?? this.occurredAt,
-      occurredTz: occurredTz ?? this.occurredTz,
-      notes: notes ?? this.notes,
-      harvestQty: harvestQty ?? this.harvestQty,
-      harvestUnit: harvestUnit ?? this.harvestUnit,
-      costCzk: costCzk ?? this.costCzk,
-      taskId: taskId ?? this.taskId,
+      category: category ?? this.category,
+      name: name ?? this.name,
+      unit: unit ?? this.unit,
+      stockQty: stockQty ?? this.stockQty,
+      lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
+      details: details ?? this.details,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -2022,35 +2320,23 @@ class ActivitiesCompanion extends UpdateCompanion<ActivityRow> {
     if (gardenId.present) {
       map['garden_id'] = Variable<String>(gardenId.value);
     }
-    if (zoneId.present) {
-      map['zone_id'] = Variable<String>(zoneId.value);
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
     }
-    if (type.present) {
-      map['type'] = Variable<String>(type.value);
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
     }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
     }
-    if (occurredAt.present) {
-      map['occurred_at'] = Variable<DateTime>(occurredAt.value);
+    if (stockQty.present) {
+      map['stock_qty'] = Variable<double>(stockQty.value);
     }
-    if (occurredTz.present) {
-      map['occurred_tz'] = Variable<String>(occurredTz.value);
+    if (lowStockThreshold.present) {
+      map['low_stock_threshold'] = Variable<double>(lowStockThreshold.value);
     }
-    if (notes.present) {
-      map['notes'] = Variable<String>(notes.value);
-    }
-    if (harvestQty.present) {
-      map['harvest_qty'] = Variable<double>(harvestQty.value);
-    }
-    if (harvestUnit.present) {
-      map['harvest_unit'] = Variable<String>(harvestUnit.value);
-    }
-    if (costCzk.present) {
-      map['cost_czk'] = Variable<double>(costCzk.value);
-    }
-    if (taskId.present) {
-      map['task_id'] = Variable<String>(taskId.value);
+    if (details.present) {
+      map['details'] = Variable<String>(details.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -2069,497 +2355,17 @@ class ActivitiesCompanion extends UpdateCompanion<ActivityRow> {
 
   @override
   String toString() {
-    return (StringBuffer('ActivitiesCompanion(')
+    return (StringBuffer('InventoryItemsCompanion(')
           ..write('id: $id, ')
           ..write('gardenId: $gardenId, ')
-          ..write('zoneId: $zoneId, ')
-          ..write('type: $type, ')
-          ..write('title: $title, ')
-          ..write('occurredAt: $occurredAt, ')
-          ..write('occurredTz: $occurredTz, ')
-          ..write('notes: $notes, ')
-          ..write('harvestQty: $harvestQty, ')
-          ..write('harvestUnit: $harvestUnit, ')
-          ..write('costCzk: $costCzk, ')
-          ..write('taskId: $taskId, ')
+          ..write('category: $category, ')
+          ..write('name: $name, ')
+          ..write('unit: $unit, ')
+          ..write('stockQty: $stockQty, ')
+          ..write('lowStockThreshold: $lowStockThreshold, ')
+          ..write('details: $details, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deletedAt: $deletedAt, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $PhotosTable extends Photos with TableInfo<$PhotosTable, PhotoRow> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $PhotosTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _gardenIdMeta = const VerificationMeta(
-    'gardenId',
-  );
-  @override
-  late final GeneratedColumn<String> gardenId = GeneratedColumn<String>(
-    'garden_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES gardens (id)',
-    ),
-  );
-  static const VerificationMeta _activityIdMeta = const VerificationMeta(
-    'activityId',
-  );
-  @override
-  late final GeneratedColumn<String> activityId = GeneratedColumn<String>(
-    'activity_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES activities (id)',
-    ),
-  );
-  static const VerificationMeta _localPathMeta = const VerificationMeta(
-    'localPath',
-  );
-  @override
-  late final GeneratedColumn<String> localPath = GeneratedColumn<String>(
-    'local_path',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _positionMeta = const VerificationMeta(
-    'position',
-  );
-  @override
-  late final GeneratedColumn<int> position = GeneratedColumn<int>(
-    'position',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
-    'deletedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-    'deleted_at',
-    aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    gardenId,
-    activityId,
-    localPath,
-    position,
-    createdAt,
-    deletedAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'photos';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<PhotoRow> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('garden_id')) {
-      context.handle(
-        _gardenIdMeta,
-        gardenId.isAcceptableOrUnknown(data['garden_id']!, _gardenIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_gardenIdMeta);
-    }
-    if (data.containsKey('activity_id')) {
-      context.handle(
-        _activityIdMeta,
-        activityId.isAcceptableOrUnknown(data['activity_id']!, _activityIdMeta),
-      );
-    }
-    if (data.containsKey('local_path')) {
-      context.handle(
-        _localPathMeta,
-        localPath.isAcceptableOrUnknown(data['local_path']!, _localPathMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_localPathMeta);
-    }
-    if (data.containsKey('position')) {
-      context.handle(
-        _positionMeta,
-        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
-      );
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
-    }
-    if (data.containsKey('deleted_at')) {
-      context.handle(
-        _deletedAtMeta,
-        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  PhotoRow map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return PhotoRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
-      gardenId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}garden_id'],
-      )!,
-      activityId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}activity_id'],
-      ),
-      localPath: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}local_path'],
-      )!,
-      position: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}position'],
-      )!,
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-      deletedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}deleted_at'],
-      ),
-    );
-  }
-
-  @override
-  $PhotosTable createAlias(String alias) {
-    return $PhotosTable(attachedDatabase, alias);
-  }
-}
-
-class PhotoRow extends DataClass implements Insertable<PhotoRow> {
-  final String id;
-  final String gardenId;
-  final String? activityId;
-
-  /// Cesta k souboru relativní ke složce dokumentů aplikace. Na server
-  /// se neposílá (tam je `storage_path`).
-  final String localPath;
-
-  /// Pořadí fotky v záznamu.
-  final int position;
-  final DateTime createdAt;
-  final DateTime? deletedAt;
-  const PhotoRow({
-    required this.id,
-    required this.gardenId,
-    this.activityId,
-    required this.localPath,
-    required this.position,
-    required this.createdAt,
-    this.deletedAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['garden_id'] = Variable<String>(gardenId);
-    if (!nullToAbsent || activityId != null) {
-      map['activity_id'] = Variable<String>(activityId);
-    }
-    map['local_path'] = Variable<String>(localPath);
-    map['position'] = Variable<int>(position);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    if (!nullToAbsent || deletedAt != null) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt);
-    }
-    return map;
-  }
-
-  PhotosCompanion toCompanion(bool nullToAbsent) {
-    return PhotosCompanion(
-      id: Value(id),
-      gardenId: Value(gardenId),
-      activityId: activityId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(activityId),
-      localPath: Value(localPath),
-      position: Value(position),
-      createdAt: Value(createdAt),
-      deletedAt: deletedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(deletedAt),
-    );
-  }
-
-  factory PhotoRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return PhotoRow(
-      id: serializer.fromJson<String>(json['id']),
-      gardenId: serializer.fromJson<String>(json['gardenId']),
-      activityId: serializer.fromJson<String?>(json['activityId']),
-      localPath: serializer.fromJson<String>(json['localPath']),
-      position: serializer.fromJson<int>(json['position']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'gardenId': serializer.toJson<String>(gardenId),
-      'activityId': serializer.toJson<String?>(activityId),
-      'localPath': serializer.toJson<String>(localPath),
-      'position': serializer.toJson<int>(position),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
-    };
-  }
-
-  PhotoRow copyWith({
-    String? id,
-    String? gardenId,
-    Value<String?> activityId = const Value.absent(),
-    String? localPath,
-    int? position,
-    DateTime? createdAt,
-    Value<DateTime?> deletedAt = const Value.absent(),
-  }) => PhotoRow(
-    id: id ?? this.id,
-    gardenId: gardenId ?? this.gardenId,
-    activityId: activityId.present ? activityId.value : this.activityId,
-    localPath: localPath ?? this.localPath,
-    position: position ?? this.position,
-    createdAt: createdAt ?? this.createdAt,
-    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
-  );
-  PhotoRow copyWithCompanion(PhotosCompanion data) {
-    return PhotoRow(
-      id: data.id.present ? data.id.value : this.id,
-      gardenId: data.gardenId.present ? data.gardenId.value : this.gardenId,
-      activityId: data.activityId.present
-          ? data.activityId.value
-          : this.activityId,
-      localPath: data.localPath.present ? data.localPath.value : this.localPath,
-      position: data.position.present ? data.position.value : this.position,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('PhotoRow(')
-          ..write('id: $id, ')
-          ..write('gardenId: $gardenId, ')
-          ..write('activityId: $activityId, ')
-          ..write('localPath: $localPath, ')
-          ..write('position: $position, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('deletedAt: $deletedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    gardenId,
-    activityId,
-    localPath,
-    position,
-    createdAt,
-    deletedAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is PhotoRow &&
-          other.id == this.id &&
-          other.gardenId == this.gardenId &&
-          other.activityId == this.activityId &&
-          other.localPath == this.localPath &&
-          other.position == this.position &&
-          other.createdAt == this.createdAt &&
-          other.deletedAt == this.deletedAt);
-}
-
-class PhotosCompanion extends UpdateCompanion<PhotoRow> {
-  final Value<String> id;
-  final Value<String> gardenId;
-  final Value<String?> activityId;
-  final Value<String> localPath;
-  final Value<int> position;
-  final Value<DateTime> createdAt;
-  final Value<DateTime?> deletedAt;
-  final Value<int> rowid;
-  const PhotosCompanion({
-    this.id = const Value.absent(),
-    this.gardenId = const Value.absent(),
-    this.activityId = const Value.absent(),
-    this.localPath = const Value.absent(),
-    this.position = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.deletedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  PhotosCompanion.insert({
-    required String id,
-    required String gardenId,
-    this.activityId = const Value.absent(),
-    required String localPath,
-    this.position = const Value.absent(),
-    required DateTime createdAt,
-    this.deletedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       gardenId = Value(gardenId),
-       localPath = Value(localPath),
-       createdAt = Value(createdAt);
-  static Insertable<PhotoRow> custom({
-    Expression<String>? id,
-    Expression<String>? gardenId,
-    Expression<String>? activityId,
-    Expression<String>? localPath,
-    Expression<int>? position,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? deletedAt,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (gardenId != null) 'garden_id': gardenId,
-      if (activityId != null) 'activity_id': activityId,
-      if (localPath != null) 'local_path': localPath,
-      if (position != null) 'position': position,
-      if (createdAt != null) 'created_at': createdAt,
-      if (deletedAt != null) 'deleted_at': deletedAt,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  PhotosCompanion copyWith({
-    Value<String>? id,
-    Value<String>? gardenId,
-    Value<String?>? activityId,
-    Value<String>? localPath,
-    Value<int>? position,
-    Value<DateTime>? createdAt,
-    Value<DateTime?>? deletedAt,
-    Value<int>? rowid,
-  }) {
-    return PhotosCompanion(
-      id: id ?? this.id,
-      gardenId: gardenId ?? this.gardenId,
-      activityId: activityId ?? this.activityId,
-      localPath: localPath ?? this.localPath,
-      position: position ?? this.position,
-      createdAt: createdAt ?? this.createdAt,
-      deletedAt: deletedAt ?? this.deletedAt,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
-    if (gardenId.present) {
-      map['garden_id'] = Variable<String>(gardenId.value);
-    }
-    if (activityId.present) {
-      map['activity_id'] = Variable<String>(activityId.value);
-    }
-    if (localPath.present) {
-      map['local_path'] = Variable<String>(localPath.value);
-    }
-    if (position.present) {
-      map['position'] = Variable<int>(position.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (deletedAt.present) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('PhotosCompanion(')
-          ..write('id: $id, ')
-          ..write('gardenId: $gardenId, ')
-          ..write('activityId: $activityId, ')
-          ..write('localPath: $localPath, ')
-          ..write('position: $position, ')
-          ..write('createdAt: $createdAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -3591,12 +3397,12 @@ class TasksCompanion extends UpdateCompanion<TaskRow> {
   }
 }
 
-class $InventoryItemsTable extends InventoryItems
-    with TableInfo<$InventoryItemsTable, InventoryItemRow> {
+class $ActivitiesTable extends Activities
+    with TableInfo<$ActivitiesTable, ActivityRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $InventoryItemsTable(this.attachedDatabase, [this._alias]);
+  $ActivitiesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
@@ -3620,65 +3426,104 @@ class $InventoryItemsTable extends InventoryItems
       'REFERENCES gardens (id)',
     ),
   );
-  static const VerificationMeta _categoryMeta = const VerificationMeta(
-    'category',
-  );
+  static const VerificationMeta _zoneIdMeta = const VerificationMeta('zoneId');
   @override
-  late final GeneratedColumn<String> category = GeneratedColumn<String>(
-    'category',
+  late final GeneratedColumn<String> zoneId = GeneratedColumn<String>(
+    'zone_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES zones (id)',
+    ),
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
   @override
-  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
-    'unit',
+  late final GeneratedColumn<DateTime> occurredAt = GeneratedColumn<DateTime>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _occurredTzMeta = const VerificationMeta(
+    'occurredTz',
+  );
+  @override
+  late final GeneratedColumn<String> occurredTz = GeneratedColumn<String>(
+    'occurred_tz',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _stockQtyMeta = const VerificationMeta(
-    'stockQty',
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _harvestQtyMeta = const VerificationMeta(
+    'harvestQty',
   );
   @override
-  late final GeneratedColumn<double> stockQty = GeneratedColumn<double>(
-    'stock_qty',
+  late final GeneratedColumn<double> harvestQty = GeneratedColumn<double>(
+    'harvest_qty',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.double,
     requiredDuringInsert: false,
-    defaultValue: const Constant(0),
   );
-  static const VerificationMeta _lowStockThresholdMeta = const VerificationMeta(
-    'lowStockThreshold',
-  );
-  @override
-  late final GeneratedColumn<double> lowStockThreshold =
-      GeneratedColumn<double>(
-        'low_stock_threshold',
-        aliasedName,
-        true,
-        type: DriftSqlType.double,
-        requiredDuringInsert: false,
-      );
-  static const VerificationMeta _detailsMeta = const VerificationMeta(
-    'details',
+  static const VerificationMeta _harvestUnitMeta = const VerificationMeta(
+    'harvestUnit',
   );
   @override
-  late final GeneratedColumn<String> details = GeneratedColumn<String>(
-    'details',
+  late final GeneratedColumn<String> harvestUnit = GeneratedColumn<String>(
+    'harvest_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _costCzkMeta = const VerificationMeta(
+    'costCzk',
+  );
+  @override
+  late final GeneratedColumn<double> costCzk = GeneratedColumn<double>(
+    'cost_czk',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
+  @override
+  late final GeneratedColumn<String> taskId = GeneratedColumn<String>(
+    'task_id',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -3721,12 +3566,16 @@ class $InventoryItemsTable extends InventoryItems
   List<GeneratedColumn> get $columns => [
     id,
     gardenId,
-    category,
-    name,
-    unit,
-    stockQty,
-    lowStockThreshold,
-    details,
+    zoneId,
+    type,
+    title,
+    occurredAt,
+    occurredTz,
+    notes,
+    harvestQty,
+    harvestUnit,
+    costCzk,
+    taskId,
     createdAt,
     updatedAt,
     deletedAt,
@@ -3735,10 +3584,10 @@ class $InventoryItemsTable extends InventoryItems
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'inventory_items';
+  static const String $name = 'activities';
   @override
   VerificationContext validateIntegrity(
-    Insertable<InventoryItemRow> instance, {
+    Insertable<ActivityRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -3756,49 +3605,77 @@ class $InventoryItemsTable extends InventoryItems
     } else if (isInserting) {
       context.missing(_gardenIdMeta);
     }
-    if (data.containsKey('category')) {
+    if (data.containsKey('zone_id')) {
       context.handle(
-        _categoryMeta,
-        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+        _zoneIdMeta,
+        zoneId.isAcceptableOrUnknown(data['zone_id']!, _zoneIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_categoryMeta);
+      context.missing(_zoneIdMeta);
     }
-    if (data.containsKey('name')) {
+    if (data.containsKey('type')) {
       context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
       );
     } else if (isInserting) {
-      context.missing(_nameMeta);
+      context.missing(_typeMeta);
     }
-    if (data.containsKey('unit')) {
+    if (data.containsKey('title')) {
       context.handle(
-        _unitMeta,
-        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
       );
     } else if (isInserting) {
-      context.missing(_unitMeta);
+      context.missing(_titleMeta);
     }
-    if (data.containsKey('stock_qty')) {
+    if (data.containsKey('occurred_at')) {
       context.handle(
-        _stockQtyMeta,
-        stockQty.isAcceptableOrUnknown(data['stock_qty']!, _stockQtyMeta),
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    if (data.containsKey('occurred_tz')) {
+      context.handle(
+        _occurredTzMeta,
+        occurredTz.isAcceptableOrUnknown(data['occurred_tz']!, _occurredTzMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredTzMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
-    if (data.containsKey('low_stock_threshold')) {
+    if (data.containsKey('harvest_qty')) {
       context.handle(
-        _lowStockThresholdMeta,
-        lowStockThreshold.isAcceptableOrUnknown(
-          data['low_stock_threshold']!,
-          _lowStockThresholdMeta,
+        _harvestQtyMeta,
+        harvestQty.isAcceptableOrUnknown(data['harvest_qty']!, _harvestQtyMeta),
+      );
+    }
+    if (data.containsKey('harvest_unit')) {
+      context.handle(
+        _harvestUnitMeta,
+        harvestUnit.isAcceptableOrUnknown(
+          data['harvest_unit']!,
+          _harvestUnitMeta,
         ),
       );
     }
-    if (data.containsKey('details')) {
+    if (data.containsKey('cost_czk')) {
       context.handle(
-        _detailsMeta,
-        details.isAcceptableOrUnknown(data['details']!, _detailsMeta),
+        _costCzkMeta,
+        costCzk.isAcceptableOrUnknown(data['cost_czk']!, _costCzkMeta),
+      );
+    }
+    if (data.containsKey('task_id')) {
+      context.handle(
+        _taskIdMeta,
+        taskId.isAcceptableOrUnknown(data['task_id']!, _taskIdMeta),
       );
     }
     if (data.containsKey('created_at')) {
@@ -3829,9 +3706,9 @@ class $InventoryItemsTable extends InventoryItems
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  InventoryItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ActivityRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return InventoryItemRow(
+    return ActivityRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -3840,29 +3717,45 @@ class $InventoryItemsTable extends InventoryItems
         DriftSqlType.string,
         data['${effectivePrefix}garden_id'],
       )!,
-      category: attachedDatabase.typeMapping.read(
+      zoneId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}category'],
+        data['${effectivePrefix}zone_id'],
       )!,
-      name: attachedDatabase.typeMapping.read(
+      type: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}name'],
+        data['${effectivePrefix}type'],
       )!,
-      unit: attachedDatabase.typeMapping.read(
+      title: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}unit'],
+        data['${effectivePrefix}title'],
       )!,
-      stockQty: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}stock_qty'],
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}occurred_at'],
       )!,
-      lowStockThreshold: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}low_stock_threshold'],
+      occurredTz: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}occurred_tz'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
       ),
-      details: attachedDatabase.typeMapping.read(
+      harvestQty: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}harvest_qty'],
+      ),
+      harvestUnit: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}details'],
+        data['${effectivePrefix}harvest_unit'],
+      ),
+      costCzk: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}cost_czk'],
+      ),
+      taskId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}task_id'],
       ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -3880,39 +3773,44 @@ class $InventoryItemsTable extends InventoryItems
   }
 
   @override
-  $InventoryItemsTable createAlias(String alias) {
-    return $InventoryItemsTable(attachedDatabase, alias);
+  $ActivitiesTable createAlias(String alias) {
+    return $ActivitiesTable(attachedDatabase, alias);
   }
 }
 
-class InventoryItemRow extends DataClass
-    implements Insertable<InventoryItemRow> {
+class ActivityRow extends DataClass implements Insertable<ActivityRow> {
   final String id;
   final String gardenId;
+  final String zoneId;
 
-  /// `seed`, `fertilizer`, `plantProtection`, `tool`, `other`.
-  final String category;
-  final String name;
+  /// Číselník `activity.type` (kap. 8.3).
+  final String type;
+  final String title;
+  final DateTime occurredAt;
 
-  /// `g`, `kg`, `ml`, `l`, `ks`, `pack`.
-  final String unit;
-  final double stockQty;
-  final double? lowStockThreshold;
-
-  /// Údaje podle kategorie jako JSON (v PostgreSQL `jsonb`).
-  final String? details;
+  /// Posun časové zóny v době činnosti, např. `+02:00` (kap. 7.3).
+  final String occurredTz;
+  final String? notes;
+  final double? harvestQty;
+  final String? harvestUnit;
+  final double? costCzk;
+  final String? taskId;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
-  const InventoryItemRow({
+  const ActivityRow({
     required this.id,
     required this.gardenId,
-    required this.category,
-    required this.name,
-    required this.unit,
-    required this.stockQty,
-    this.lowStockThreshold,
-    this.details,
+    required this.zoneId,
+    required this.type,
+    required this.title,
+    required this.occurredAt,
+    required this.occurredTz,
+    this.notes,
+    this.harvestQty,
+    this.harvestUnit,
+    this.costCzk,
+    this.taskId,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -3922,15 +3820,25 @@ class InventoryItemRow extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['garden_id'] = Variable<String>(gardenId);
-    map['category'] = Variable<String>(category);
-    map['name'] = Variable<String>(name);
-    map['unit'] = Variable<String>(unit);
-    map['stock_qty'] = Variable<double>(stockQty);
-    if (!nullToAbsent || lowStockThreshold != null) {
-      map['low_stock_threshold'] = Variable<double>(lowStockThreshold);
+    map['zone_id'] = Variable<String>(zoneId);
+    map['type'] = Variable<String>(type);
+    map['title'] = Variable<String>(title);
+    map['occurred_at'] = Variable<DateTime>(occurredAt);
+    map['occurred_tz'] = Variable<String>(occurredTz);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
     }
-    if (!nullToAbsent || details != null) {
-      map['details'] = Variable<String>(details);
+    if (!nullToAbsent || harvestQty != null) {
+      map['harvest_qty'] = Variable<double>(harvestQty);
+    }
+    if (!nullToAbsent || harvestUnit != null) {
+      map['harvest_unit'] = Variable<String>(harvestUnit);
+    }
+    if (!nullToAbsent || costCzk != null) {
+      map['cost_czk'] = Variable<double>(costCzk);
+    }
+    if (!nullToAbsent || taskId != null) {
+      map['task_id'] = Variable<String>(taskId);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -3940,20 +3848,30 @@ class InventoryItemRow extends DataClass
     return map;
   }
 
-  InventoryItemsCompanion toCompanion(bool nullToAbsent) {
-    return InventoryItemsCompanion(
+  ActivitiesCompanion toCompanion(bool nullToAbsent) {
+    return ActivitiesCompanion(
       id: Value(id),
       gardenId: Value(gardenId),
-      category: Value(category),
-      name: Value(name),
-      unit: Value(unit),
-      stockQty: Value(stockQty),
-      lowStockThreshold: lowStockThreshold == null && nullToAbsent
+      zoneId: Value(zoneId),
+      type: Value(type),
+      title: Value(title),
+      occurredAt: Value(occurredAt),
+      occurredTz: Value(occurredTz),
+      notes: notes == null && nullToAbsent
           ? const Value.absent()
-          : Value(lowStockThreshold),
-      details: details == null && nullToAbsent
+          : Value(notes),
+      harvestQty: harvestQty == null && nullToAbsent
           ? const Value.absent()
-          : Value(details),
+          : Value(harvestQty),
+      harvestUnit: harvestUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(harvestUnit),
+      costCzk: costCzk == null && nullToAbsent
+          ? const Value.absent()
+          : Value(costCzk),
+      taskId: taskId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(taskId),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -3962,22 +3880,24 @@ class InventoryItemRow extends DataClass
     );
   }
 
-  factory InventoryItemRow.fromJson(
+  factory ActivityRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return InventoryItemRow(
+    return ActivityRow(
       id: serializer.fromJson<String>(json['id']),
       gardenId: serializer.fromJson<String>(json['gardenId']),
-      category: serializer.fromJson<String>(json['category']),
-      name: serializer.fromJson<String>(json['name']),
-      unit: serializer.fromJson<String>(json['unit']),
-      stockQty: serializer.fromJson<double>(json['stockQty']),
-      lowStockThreshold: serializer.fromJson<double?>(
-        json['lowStockThreshold'],
-      ),
-      details: serializer.fromJson<String?>(json['details']),
+      zoneId: serializer.fromJson<String>(json['zoneId']),
+      type: serializer.fromJson<String>(json['type']),
+      title: serializer.fromJson<String>(json['title']),
+      occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
+      occurredTz: serializer.fromJson<String>(json['occurredTz']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      harvestQty: serializer.fromJson<double?>(json['harvestQty']),
+      harvestUnit: serializer.fromJson<String?>(json['harvestUnit']),
+      costCzk: serializer.fromJson<double?>(json['costCzk']),
+      taskId: serializer.fromJson<String?>(json['taskId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -3989,57 +3909,77 @@ class InventoryItemRow extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'gardenId': serializer.toJson<String>(gardenId),
-      'category': serializer.toJson<String>(category),
-      'name': serializer.toJson<String>(name),
-      'unit': serializer.toJson<String>(unit),
-      'stockQty': serializer.toJson<double>(stockQty),
-      'lowStockThreshold': serializer.toJson<double?>(lowStockThreshold),
-      'details': serializer.toJson<String?>(details),
+      'zoneId': serializer.toJson<String>(zoneId),
+      'type': serializer.toJson<String>(type),
+      'title': serializer.toJson<String>(title),
+      'occurredAt': serializer.toJson<DateTime>(occurredAt),
+      'occurredTz': serializer.toJson<String>(occurredTz),
+      'notes': serializer.toJson<String?>(notes),
+      'harvestQty': serializer.toJson<double?>(harvestQty),
+      'harvestUnit': serializer.toJson<String?>(harvestUnit),
+      'costCzk': serializer.toJson<double?>(costCzk),
+      'taskId': serializer.toJson<String?>(taskId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
-  InventoryItemRow copyWith({
+  ActivityRow copyWith({
     String? id,
     String? gardenId,
-    String? category,
-    String? name,
-    String? unit,
-    double? stockQty,
-    Value<double?> lowStockThreshold = const Value.absent(),
-    Value<String?> details = const Value.absent(),
+    String? zoneId,
+    String? type,
+    String? title,
+    DateTime? occurredAt,
+    String? occurredTz,
+    Value<String?> notes = const Value.absent(),
+    Value<double?> harvestQty = const Value.absent(),
+    Value<String?> harvestUnit = const Value.absent(),
+    Value<double?> costCzk = const Value.absent(),
+    Value<String?> taskId = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
-  }) => InventoryItemRow(
+  }) => ActivityRow(
     id: id ?? this.id,
     gardenId: gardenId ?? this.gardenId,
-    category: category ?? this.category,
-    name: name ?? this.name,
-    unit: unit ?? this.unit,
-    stockQty: stockQty ?? this.stockQty,
-    lowStockThreshold: lowStockThreshold.present
-        ? lowStockThreshold.value
-        : this.lowStockThreshold,
-    details: details.present ? details.value : this.details,
+    zoneId: zoneId ?? this.zoneId,
+    type: type ?? this.type,
+    title: title ?? this.title,
+    occurredAt: occurredAt ?? this.occurredAt,
+    occurredTz: occurredTz ?? this.occurredTz,
+    notes: notes.present ? notes.value : this.notes,
+    harvestQty: harvestQty.present ? harvestQty.value : this.harvestQty,
+    harvestUnit: harvestUnit.present ? harvestUnit.value : this.harvestUnit,
+    costCzk: costCzk.present ? costCzk.value : this.costCzk,
+    taskId: taskId.present ? taskId.value : this.taskId,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
   );
-  InventoryItemRow copyWithCompanion(InventoryItemsCompanion data) {
-    return InventoryItemRow(
+  ActivityRow copyWithCompanion(ActivitiesCompanion data) {
+    return ActivityRow(
       id: data.id.present ? data.id.value : this.id,
       gardenId: data.gardenId.present ? data.gardenId.value : this.gardenId,
-      category: data.category.present ? data.category.value : this.category,
-      name: data.name.present ? data.name.value : this.name,
-      unit: data.unit.present ? data.unit.value : this.unit,
-      stockQty: data.stockQty.present ? data.stockQty.value : this.stockQty,
-      lowStockThreshold: data.lowStockThreshold.present
-          ? data.lowStockThreshold.value
-          : this.lowStockThreshold,
-      details: data.details.present ? data.details.value : this.details,
+      zoneId: data.zoneId.present ? data.zoneId.value : this.zoneId,
+      type: data.type.present ? data.type.value : this.type,
+      title: data.title.present ? data.title.value : this.title,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      occurredTz: data.occurredTz.present
+          ? data.occurredTz.value
+          : this.occurredTz,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      harvestQty: data.harvestQty.present
+          ? data.harvestQty.value
+          : this.harvestQty,
+      harvestUnit: data.harvestUnit.present
+          ? data.harvestUnit.value
+          : this.harvestUnit,
+      costCzk: data.costCzk.present ? data.costCzk.value : this.costCzk,
+      taskId: data.taskId.present ? data.taskId.value : this.taskId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -4048,15 +3988,19 @@ class InventoryItemRow extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('InventoryItemRow(')
+    return (StringBuffer('ActivityRow(')
           ..write('id: $id, ')
           ..write('gardenId: $gardenId, ')
-          ..write('category: $category, ')
-          ..write('name: $name, ')
-          ..write('unit: $unit, ')
-          ..write('stockQty: $stockQty, ')
-          ..write('lowStockThreshold: $lowStockThreshold, ')
-          ..write('details: $details, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('type: $type, ')
+          ..write('title: $title, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('occurredTz: $occurredTz, ')
+          ..write('notes: $notes, ')
+          ..write('harvestQty: $harvestQty, ')
+          ..write('harvestUnit: $harvestUnit, ')
+          ..write('costCzk: $costCzk, ')
+          ..write('taskId: $taskId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
@@ -4068,12 +4012,16 @@ class InventoryItemRow extends DataClass
   int get hashCode => Object.hash(
     id,
     gardenId,
-    category,
-    name,
-    unit,
-    stockQty,
-    lowStockThreshold,
-    details,
+    zoneId,
+    type,
+    title,
+    occurredAt,
+    occurredTz,
+    notes,
+    harvestQty,
+    harvestUnit,
+    costCzk,
+    taskId,
     createdAt,
     updatedAt,
     deletedAt,
@@ -4081,76 +4029,98 @@ class InventoryItemRow extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is InventoryItemRow &&
+      (other is ActivityRow &&
           other.id == this.id &&
           other.gardenId == this.gardenId &&
-          other.category == this.category &&
-          other.name == this.name &&
-          other.unit == this.unit &&
-          other.stockQty == this.stockQty &&
-          other.lowStockThreshold == this.lowStockThreshold &&
-          other.details == this.details &&
+          other.zoneId == this.zoneId &&
+          other.type == this.type &&
+          other.title == this.title &&
+          other.occurredAt == this.occurredAt &&
+          other.occurredTz == this.occurredTz &&
+          other.notes == this.notes &&
+          other.harvestQty == this.harvestQty &&
+          other.harvestUnit == this.harvestUnit &&
+          other.costCzk == this.costCzk &&
+          other.taskId == this.taskId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt);
 }
 
-class InventoryItemsCompanion extends UpdateCompanion<InventoryItemRow> {
+class ActivitiesCompanion extends UpdateCompanion<ActivityRow> {
   final Value<String> id;
   final Value<String> gardenId;
-  final Value<String> category;
-  final Value<String> name;
-  final Value<String> unit;
-  final Value<double> stockQty;
-  final Value<double?> lowStockThreshold;
-  final Value<String?> details;
+  final Value<String> zoneId;
+  final Value<String> type;
+  final Value<String> title;
+  final Value<DateTime> occurredAt;
+  final Value<String> occurredTz;
+  final Value<String?> notes;
+  final Value<double?> harvestQty;
+  final Value<String?> harvestUnit;
+  final Value<double?> costCzk;
+  final Value<String?> taskId;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
   final Value<int> rowid;
-  const InventoryItemsCompanion({
+  const ActivitiesCompanion({
     this.id = const Value.absent(),
     this.gardenId = const Value.absent(),
-    this.category = const Value.absent(),
-    this.name = const Value.absent(),
-    this.unit = const Value.absent(),
-    this.stockQty = const Value.absent(),
-    this.lowStockThreshold = const Value.absent(),
-    this.details = const Value.absent(),
+    this.zoneId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.title = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.occurredTz = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.harvestQty = const Value.absent(),
+    this.harvestUnit = const Value.absent(),
+    this.costCzk = const Value.absent(),
+    this.taskId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  InventoryItemsCompanion.insert({
+  ActivitiesCompanion.insert({
     required String id,
     required String gardenId,
-    required String category,
-    required String name,
-    required String unit,
-    this.stockQty = const Value.absent(),
-    this.lowStockThreshold = const Value.absent(),
-    this.details = const Value.absent(),
+    required String zoneId,
+    required String type,
+    required String title,
+    required DateTime occurredAt,
+    required String occurredTz,
+    this.notes = const Value.absent(),
+    this.harvestQty = const Value.absent(),
+    this.harvestUnit = const Value.absent(),
+    this.costCzk = const Value.absent(),
+    this.taskId = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        gardenId = Value(gardenId),
-       category = Value(category),
-       name = Value(name),
-       unit = Value(unit),
+       zoneId = Value(zoneId),
+       type = Value(type),
+       title = Value(title),
+       occurredAt = Value(occurredAt),
+       occurredTz = Value(occurredTz),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
-  static Insertable<InventoryItemRow> custom({
+  static Insertable<ActivityRow> custom({
     Expression<String>? id,
     Expression<String>? gardenId,
-    Expression<String>? category,
-    Expression<String>? name,
-    Expression<String>? unit,
-    Expression<double>? stockQty,
-    Expression<double>? lowStockThreshold,
-    Expression<String>? details,
+    Expression<String>? zoneId,
+    Expression<String>? type,
+    Expression<String>? title,
+    Expression<DateTime>? occurredAt,
+    Expression<String>? occurredTz,
+    Expression<String>? notes,
+    Expression<double>? harvestQty,
+    Expression<String>? harvestUnit,
+    Expression<double>? costCzk,
+    Expression<String>? taskId,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -4159,12 +4129,16 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItemRow> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (gardenId != null) 'garden_id': gardenId,
-      if (category != null) 'category': category,
-      if (name != null) 'name': name,
-      if (unit != null) 'unit': unit,
-      if (stockQty != null) 'stock_qty': stockQty,
-      if (lowStockThreshold != null) 'low_stock_threshold': lowStockThreshold,
-      if (details != null) 'details': details,
+      if (zoneId != null) 'zone_id': zoneId,
+      if (type != null) 'type': type,
+      if (title != null) 'title': title,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (occurredTz != null) 'occurred_tz': occurredTz,
+      if (notes != null) 'notes': notes,
+      if (harvestQty != null) 'harvest_qty': harvestQty,
+      if (harvestUnit != null) 'harvest_unit': harvestUnit,
+      if (costCzk != null) 'cost_czk': costCzk,
+      if (taskId != null) 'task_id': taskId,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -4172,29 +4146,37 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItemRow> {
     });
   }
 
-  InventoryItemsCompanion copyWith({
+  ActivitiesCompanion copyWith({
     Value<String>? id,
     Value<String>? gardenId,
-    Value<String>? category,
-    Value<String>? name,
-    Value<String>? unit,
-    Value<double>? stockQty,
-    Value<double?>? lowStockThreshold,
-    Value<String?>? details,
+    Value<String>? zoneId,
+    Value<String>? type,
+    Value<String>? title,
+    Value<DateTime>? occurredAt,
+    Value<String>? occurredTz,
+    Value<String?>? notes,
+    Value<double?>? harvestQty,
+    Value<String?>? harvestUnit,
+    Value<double?>? costCzk,
+    Value<String?>? taskId,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
     Value<int>? rowid,
   }) {
-    return InventoryItemsCompanion(
+    return ActivitiesCompanion(
       id: id ?? this.id,
       gardenId: gardenId ?? this.gardenId,
-      category: category ?? this.category,
-      name: name ?? this.name,
-      unit: unit ?? this.unit,
-      stockQty: stockQty ?? this.stockQty,
-      lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
-      details: details ?? this.details,
+      zoneId: zoneId ?? this.zoneId,
+      type: type ?? this.type,
+      title: title ?? this.title,
+      occurredAt: occurredAt ?? this.occurredAt,
+      occurredTz: occurredTz ?? this.occurredTz,
+      notes: notes ?? this.notes,
+      harvestQty: harvestQty ?? this.harvestQty,
+      harvestUnit: harvestUnit ?? this.harvestUnit,
+      costCzk: costCzk ?? this.costCzk,
+      taskId: taskId ?? this.taskId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -4211,23 +4193,35 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItemRow> {
     if (gardenId.present) {
       map['garden_id'] = Variable<String>(gardenId.value);
     }
-    if (category.present) {
-      map['category'] = Variable<String>(category.value);
+    if (zoneId.present) {
+      map['zone_id'] = Variable<String>(zoneId.value);
     }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
     }
-    if (unit.present) {
-      map['unit'] = Variable<String>(unit.value);
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
     }
-    if (stockQty.present) {
-      map['stock_qty'] = Variable<double>(stockQty.value);
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<DateTime>(occurredAt.value);
     }
-    if (lowStockThreshold.present) {
-      map['low_stock_threshold'] = Variable<double>(lowStockThreshold.value);
+    if (occurredTz.present) {
+      map['occurred_tz'] = Variable<String>(occurredTz.value);
     }
-    if (details.present) {
-      map['details'] = Variable<String>(details.value);
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (harvestQty.present) {
+      map['harvest_qty'] = Variable<double>(harvestQty.value);
+    }
+    if (harvestUnit.present) {
+      map['harvest_unit'] = Variable<String>(harvestUnit.value);
+    }
+    if (costCzk.present) {
+      map['cost_czk'] = Variable<double>(costCzk.value);
+    }
+    if (taskId.present) {
+      map['task_id'] = Variable<String>(taskId.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -4246,15 +4240,547 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItemRow> {
 
   @override
   String toString() {
-    return (StringBuffer('InventoryItemsCompanion(')
+    return (StringBuffer('ActivitiesCompanion(')
           ..write('id: $id, ')
           ..write('gardenId: $gardenId, ')
-          ..write('category: $category, ')
-          ..write('name: $name, ')
-          ..write('unit: $unit, ')
-          ..write('stockQty: $stockQty, ')
-          ..write('lowStockThreshold: $lowStockThreshold, ')
-          ..write('details: $details, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('type: $type, ')
+          ..write('title: $title, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('occurredTz: $occurredTz, ')
+          ..write('notes: $notes, ')
+          ..write('harvestQty: $harvestQty, ')
+          ..write('harvestUnit: $harvestUnit, ')
+          ..write('costCzk: $costCzk, ')
+          ..write('taskId: $taskId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PhotosTable extends Photos with TableInfo<$PhotosTable, PhotoRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PhotosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gardenIdMeta = const VerificationMeta(
+    'gardenId',
+  );
+  @override
+  late final GeneratedColumn<String> gardenId = GeneratedColumn<String>(
+    'garden_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES gardens (id)',
+    ),
+  );
+  static const VerificationMeta _activityIdMeta = const VerificationMeta(
+    'activityId',
+  );
+  @override
+  late final GeneratedColumn<String> activityId = GeneratedColumn<String>(
+    'activity_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES activities (id)',
+    ),
+  );
+  static const VerificationMeta _localPathMeta = const VerificationMeta(
+    'localPath',
+  );
+  @override
+  late final GeneratedColumn<String> localPath = GeneratedColumn<String>(
+    'local_path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    gardenId,
+    activityId,
+    localPath,
+    position,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'photos';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PhotoRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('garden_id')) {
+      context.handle(
+        _gardenIdMeta,
+        gardenId.isAcceptableOrUnknown(data['garden_id']!, _gardenIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gardenIdMeta);
+    }
+    if (data.containsKey('activity_id')) {
+      context.handle(
+        _activityIdMeta,
+        activityId.isAcceptableOrUnknown(data['activity_id']!, _activityIdMeta),
+      );
+    }
+    if (data.containsKey('local_path')) {
+      context.handle(
+        _localPathMeta,
+        localPath.isAcceptableOrUnknown(data['local_path']!, _localPathMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_localPathMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PhotoRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PhotoRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      gardenId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}garden_id'],
+      )!,
+      activityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}activity_id'],
+      ),
+      localPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_path'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $PhotosTable createAlias(String alias) {
+    return $PhotosTable(attachedDatabase, alias);
+  }
+}
+
+class PhotoRow extends DataClass implements Insertable<PhotoRow> {
+  final String id;
+  final String gardenId;
+  final String? activityId;
+
+  /// Cesta k souboru relativní ke složce dokumentů aplikace. Na server
+  /// se neposílá (tam je `storage_path`).
+  final String localPath;
+
+  /// Pořadí fotky v záznamu.
+  final int position;
+  final DateTime createdAt;
+
+  /// Od schématu 4 (synchronizace „poslední zápis vyhrává“); starší
+  /// fotky ho dostaly podle `created_at`.
+  final DateTime? updatedAt;
+  final DateTime? deletedAt;
+  const PhotoRow({
+    required this.id,
+    required this.gardenId,
+    this.activityId,
+    required this.localPath,
+    required this.position,
+    required this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['garden_id'] = Variable<String>(gardenId);
+    if (!nullToAbsent || activityId != null) {
+      map['activity_id'] = Variable<String>(activityId);
+    }
+    map['local_path'] = Variable<String>(localPath);
+    map['position'] = Variable<int>(position);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  PhotosCompanion toCompanion(bool nullToAbsent) {
+    return PhotosCompanion(
+      id: Value(id),
+      gardenId: Value(gardenId),
+      activityId: activityId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(activityId),
+      localPath: Value(localPath),
+      position: Value(position),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory PhotoRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PhotoRow(
+      id: serializer.fromJson<String>(json['id']),
+      gardenId: serializer.fromJson<String>(json['gardenId']),
+      activityId: serializer.fromJson<String?>(json['activityId']),
+      localPath: serializer.fromJson<String>(json['localPath']),
+      position: serializer.fromJson<int>(json['position']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'gardenId': serializer.toJson<String>(gardenId),
+      'activityId': serializer.toJson<String?>(activityId),
+      'localPath': serializer.toJson<String>(localPath),
+      'position': serializer.toJson<int>(position),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  PhotoRow copyWith({
+    String? id,
+    String? gardenId,
+    Value<String?> activityId = const Value.absent(),
+    String? localPath,
+    int? position,
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => PhotoRow(
+    id: id ?? this.id,
+    gardenId: gardenId ?? this.gardenId,
+    activityId: activityId.present ? activityId.value : this.activityId,
+    localPath: localPath ?? this.localPath,
+    position: position ?? this.position,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  PhotoRow copyWithCompanion(PhotosCompanion data) {
+    return PhotoRow(
+      id: data.id.present ? data.id.value : this.id,
+      gardenId: data.gardenId.present ? data.gardenId.value : this.gardenId,
+      activityId: data.activityId.present
+          ? data.activityId.value
+          : this.activityId,
+      localPath: data.localPath.present ? data.localPath.value : this.localPath,
+      position: data.position.present ? data.position.value : this.position,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhotoRow(')
+          ..write('id: $id, ')
+          ..write('gardenId: $gardenId, ')
+          ..write('activityId: $activityId, ')
+          ..write('localPath: $localPath, ')
+          ..write('position: $position, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    gardenId,
+    activityId,
+    localPath,
+    position,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PhotoRow &&
+          other.id == this.id &&
+          other.gardenId == this.gardenId &&
+          other.activityId == this.activityId &&
+          other.localPath == this.localPath &&
+          other.position == this.position &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class PhotosCompanion extends UpdateCompanion<PhotoRow> {
+  final Value<String> id;
+  final Value<String> gardenId;
+  final Value<String?> activityId;
+  final Value<String> localPath;
+  final Value<int> position;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const PhotosCompanion({
+    this.id = const Value.absent(),
+    this.gardenId = const Value.absent(),
+    this.activityId = const Value.absent(),
+    this.localPath = const Value.absent(),
+    this.position = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PhotosCompanion.insert({
+    required String id,
+    required String gardenId,
+    this.activityId = const Value.absent(),
+    required String localPath,
+    this.position = const Value.absent(),
+    required DateTime createdAt,
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       gardenId = Value(gardenId),
+       localPath = Value(localPath),
+       createdAt = Value(createdAt);
+  static Insertable<PhotoRow> custom({
+    Expression<String>? id,
+    Expression<String>? gardenId,
+    Expression<String>? activityId,
+    Expression<String>? localPath,
+    Expression<int>? position,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (gardenId != null) 'garden_id': gardenId,
+      if (activityId != null) 'activity_id': activityId,
+      if (localPath != null) 'local_path': localPath,
+      if (position != null) 'position': position,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PhotosCompanion copyWith({
+    Value<String>? id,
+    Value<String>? gardenId,
+    Value<String?>? activityId,
+    Value<String>? localPath,
+    Value<int>? position,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return PhotosCompanion(
+      id: id ?? this.id,
+      gardenId: gardenId ?? this.gardenId,
+      activityId: activityId ?? this.activityId,
+      localPath: localPath ?? this.localPath,
+      position: position ?? this.position,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (gardenId.present) {
+      map['garden_id'] = Variable<String>(gardenId.value);
+    }
+    if (activityId.present) {
+      map['activity_id'] = Variable<String>(activityId.value);
+    }
+    if (localPath.present) {
+      map['local_path'] = Variable<String>(localPath.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhotosCompanion(')
+          ..write('id: $id, ')
+          ..write('gardenId: $gardenId, ')
+          ..write('activityId: $activityId, ')
+          ..write('localPath: $localPath, ')
+          ..write('position: $position, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -7266,45 +7792,846 @@ class SettingEntriesCompanion extends UpdateCompanion<SettingRow> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final SyncOutbox syncOutbox = SyncOutbox(this);
+  late final SyncState syncState = SyncState(this);
   late final $GardensTable gardens = $GardensTable(this);
+  late final Trigger gardensOutboxInsert = Trigger(
+    'CREATE TRIGGER gardens_outbox_insert AFTER INSERT ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'gardens\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'gardens\', NEW.id);END',
+    'gardens_outbox_insert',
+  );
+  late final Trigger gardensOutboxUpdate = Trigger(
+    'CREATE TRIGGER gardens_outbox_update AFTER UPDATE ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'gardens\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'gardens\', NEW.id);END',
+    'gardens_outbox_update',
+  );
+  late final Trigger gardensOutboxDelete = Trigger(
+    'CREATE TRIGGER gardens_outbox_delete AFTER DELETE ON gardens WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'gardens\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'gardens\', OLD.id);END',
+    'gardens_outbox_delete',
+  );
   late final $ZonesTable zones = $ZonesTable(this);
-  late final $ActivitiesTable activities = $ActivitiesTable(this);
-  late final $PhotosTable photos = $PhotosTable(this);
-  late final $TasksTable tasks = $TasksTable(this);
+  late final Trigger zonesOutboxInsert = Trigger(
+    'CREATE TRIGGER zones_outbox_insert AFTER INSERT ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'zones\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'zones\', NEW.id);END',
+    'zones_outbox_insert',
+  );
+  late final Trigger zonesOutboxUpdate = Trigger(
+    'CREATE TRIGGER zones_outbox_update AFTER UPDATE ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'zones\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'zones\', NEW.id);END',
+    'zones_outbox_update',
+  );
+  late final Trigger zonesOutboxDelete = Trigger(
+    'CREATE TRIGGER zones_outbox_delete AFTER DELETE ON zones WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'zones\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'zones\', OLD.id);END',
+    'zones_outbox_delete',
+  );
   late final $InventoryItemsTable inventoryItems = $InventoryItemsTable(this);
+  late final Trigger inventoryItemsOutboxInsert = Trigger(
+    'CREATE TRIGGER inventory_items_outbox_insert AFTER INSERT ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_items\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_items\', NEW.id);END',
+    'inventory_items_outbox_insert',
+  );
+  late final Trigger inventoryItemsOutboxUpdate = Trigger(
+    'CREATE TRIGGER inventory_items_outbox_update AFTER UPDATE ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_items\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_items\', NEW.id);END',
+    'inventory_items_outbox_update',
+  );
+  late final Trigger inventoryItemsOutboxDelete = Trigger(
+    'CREATE TRIGGER inventory_items_outbox_delete AFTER DELETE ON inventory_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_items\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_items\', OLD.id);END',
+    'inventory_items_outbox_delete',
+  );
+  late final $TasksTable tasks = $TasksTable(this);
+  late final Trigger tasksOutboxInsert = Trigger(
+    'CREATE TRIGGER tasks_outbox_insert AFTER INSERT ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'tasks\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'tasks\', NEW.id);END',
+    'tasks_outbox_insert',
+  );
+  late final Trigger tasksOutboxUpdate = Trigger(
+    'CREATE TRIGGER tasks_outbox_update AFTER UPDATE ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'tasks\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'tasks\', NEW.id);END',
+    'tasks_outbox_update',
+  );
+  late final Trigger tasksOutboxDelete = Trigger(
+    'CREATE TRIGGER tasks_outbox_delete AFTER DELETE ON tasks WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'tasks\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'tasks\', OLD.id);END',
+    'tasks_outbox_delete',
+  );
+  late final $ActivitiesTable activities = $ActivitiesTable(this);
+  late final Trigger activitiesOutboxInsert = Trigger(
+    'CREATE TRIGGER activities_outbox_insert AFTER INSERT ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activities\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activities\', NEW.id);END',
+    'activities_outbox_insert',
+  );
+  late final Trigger activitiesOutboxUpdate = Trigger(
+    'CREATE TRIGGER activities_outbox_update AFTER UPDATE ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activities\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activities\', NEW.id);END',
+    'activities_outbox_update',
+  );
+  late final Trigger activitiesOutboxDelete = Trigger(
+    'CREATE TRIGGER activities_outbox_delete AFTER DELETE ON activities WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activities\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activities\', OLD.id);END',
+    'activities_outbox_delete',
+  );
+  late final $PhotosTable photos = $PhotosTable(this);
+  late final Trigger photosOutboxInsert = Trigger(
+    'CREATE TRIGGER photos_outbox_insert AFTER INSERT ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'photos\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'photos\', NEW.id);END',
+    'photos_outbox_insert',
+  );
+  late final Trigger photosOutboxUpdate = Trigger(
+    'CREATE TRIGGER photos_outbox_update AFTER UPDATE ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'photos\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'photos\', NEW.id);END',
+    'photos_outbox_update',
+  );
+  late final Trigger photosOutboxDelete = Trigger(
+    'CREATE TRIGGER photos_outbox_delete AFTER DELETE ON photos WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'photos\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'photos\', OLD.id);END',
+    'photos_outbox_delete',
+  );
   late final $TaskMaterialsTable taskMaterials = $TaskMaterialsTable(this);
+  late final Trigger taskMaterialsOutboxInsert = Trigger(
+    'CREATE TRIGGER task_materials_outbox_insert AFTER INSERT ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'task_materials\' AND row_key = NEW.task_id || \'|\' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'task_materials\', NEW.task_id || \'|\' || NEW.item_id);END',
+    'task_materials_outbox_insert',
+  );
+  late final Trigger taskMaterialsOutboxUpdate = Trigger(
+    'CREATE TRIGGER task_materials_outbox_update AFTER UPDATE ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'task_materials\' AND row_key = NEW.task_id || \'|\' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'task_materials\', NEW.task_id || \'|\' || NEW.item_id);END',
+    'task_materials_outbox_update',
+  );
+  late final Trigger taskMaterialsOutboxDelete = Trigger(
+    'CREATE TRIGGER task_materials_outbox_delete AFTER DELETE ON task_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'task_materials\' AND row_key = OLD.task_id || \'|\' || OLD.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'task_materials\', OLD.task_id || \'|\' || OLD.item_id);END',
+    'task_materials_outbox_delete',
+  );
   late final $ActivityMaterialsTable activityMaterials =
       $ActivityMaterialsTable(this);
+  late final Trigger activityMaterialsOutboxInsert = Trigger(
+    'CREATE TRIGGER activity_materials_outbox_insert AFTER INSERT ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activity_materials\' AND row_key = NEW.activity_id || \'|\' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activity_materials\', NEW.activity_id || \'|\' || NEW.item_id);END',
+    'activity_materials_outbox_insert',
+  );
+  late final Trigger activityMaterialsOutboxUpdate = Trigger(
+    'CREATE TRIGGER activity_materials_outbox_update AFTER UPDATE ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activity_materials\' AND row_key = NEW.activity_id || \'|\' || NEW.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activity_materials\', NEW.activity_id || \'|\' || NEW.item_id);END',
+    'activity_materials_outbox_update',
+  );
+  late final Trigger activityMaterialsOutboxDelete = Trigger(
+    'CREATE TRIGGER activity_materials_outbox_delete AFTER DELETE ON activity_materials WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'activity_materials\' AND row_key = OLD.activity_id || \'|\' || OLD.item_id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'activity_materials\', OLD.activity_id || \'|\' || OLD.item_id);END',
+    'activity_materials_outbox_delete',
+  );
   late final $ShoppingItemsTable shoppingItems = $ShoppingItemsTable(this);
+  late final Trigger shoppingItemsOutboxInsert = Trigger(
+    'CREATE TRIGGER shopping_items_outbox_insert AFTER INSERT ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'shopping_items\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'shopping_items\', NEW.id);END',
+    'shopping_items_outbox_insert',
+  );
+  late final Trigger shoppingItemsOutboxUpdate = Trigger(
+    'CREATE TRIGGER shopping_items_outbox_update AFTER UPDATE ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'shopping_items\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'shopping_items\', NEW.id);END',
+    'shopping_items_outbox_update',
+  );
+  late final Trigger shoppingItemsOutboxDelete = Trigger(
+    'CREATE TRIGGER shopping_items_outbox_delete AFTER DELETE ON shopping_items WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'shopping_items\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'shopping_items\', OLD.id);END',
+    'shopping_items_outbox_delete',
+  );
   late final $AssistantThreadsTable assistantThreads = $AssistantThreadsTable(
     this,
   );
+  late final Trigger assistantThreadsOutboxInsert = Trigger(
+    'CREATE TRIGGER assistant_threads_outbox_insert AFTER INSERT ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_threads\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_threads\', NEW.id);END',
+    'assistant_threads_outbox_insert',
+  );
+  late final Trigger assistantThreadsOutboxUpdate = Trigger(
+    'CREATE TRIGGER assistant_threads_outbox_update AFTER UPDATE ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_threads\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_threads\', NEW.id);END',
+    'assistant_threads_outbox_update',
+  );
+  late final Trigger assistantThreadsOutboxDelete = Trigger(
+    'CREATE TRIGGER assistant_threads_outbox_delete AFTER DELETE ON assistant_threads WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_threads\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_threads\', OLD.id);END',
+    'assistant_threads_outbox_delete',
+  );
   late final $AssistantMessagesTable assistantMessages =
       $AssistantMessagesTable(this);
+  late final Trigger assistantMessagesOutboxInsert = Trigger(
+    'CREATE TRIGGER assistant_messages_outbox_insert AFTER INSERT ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_messages\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_messages\', NEW.id);END',
+    'assistant_messages_outbox_insert',
+  );
+  late final Trigger assistantMessagesOutboxUpdate = Trigger(
+    'CREATE TRIGGER assistant_messages_outbox_update AFTER UPDATE ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_messages\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_messages\', NEW.id);END',
+    'assistant_messages_outbox_update',
+  );
+  late final Trigger assistantMessagesOutboxDelete = Trigger(
+    'CREATE TRIGGER assistant_messages_outbox_delete AFTER DELETE ON assistant_messages WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'assistant_messages\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'assistant_messages\', OLD.id);END',
+    'assistant_messages_outbox_delete',
+  );
   late final $SettingEntriesTable settingEntries = $SettingEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    syncOutbox,
+    syncState,
     gardens,
+    gardensOutboxInsert,
+    gardensOutboxUpdate,
+    gardensOutboxDelete,
     zones,
-    activities,
-    photos,
-    tasks,
+    zonesOutboxInsert,
+    zonesOutboxUpdate,
+    zonesOutboxDelete,
     inventoryItems,
+    inventoryItemsOutboxInsert,
+    inventoryItemsOutboxUpdate,
+    inventoryItemsOutboxDelete,
+    tasks,
+    tasksOutboxInsert,
+    tasksOutboxUpdate,
+    tasksOutboxDelete,
+    activities,
+    activitiesOutboxInsert,
+    activitiesOutboxUpdate,
+    activitiesOutboxDelete,
+    photos,
+    photosOutboxInsert,
+    photosOutboxUpdate,
+    photosOutboxDelete,
     taskMaterials,
+    taskMaterialsOutboxInsert,
+    taskMaterialsOutboxUpdate,
+    taskMaterialsOutboxDelete,
     activityMaterials,
+    activityMaterialsOutboxInsert,
+    activityMaterialsOutboxUpdate,
+    activityMaterialsOutboxDelete,
     shoppingItems,
+    shoppingItemsOutboxInsert,
+    shoppingItemsOutboxUpdate,
+    shoppingItemsOutboxDelete,
     assistantThreads,
+    assistantThreadsOutboxInsert,
+    assistantThreadsOutboxUpdate,
+    assistantThreadsOutboxDelete,
     assistantMessages,
+    assistantMessagesOutboxInsert,
+    assistantMessagesOutboxUpdate,
+    assistantMessagesOutboxDelete,
     settingEntries,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'gardens',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'gardens',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'gardens',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'zones',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'zones',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'zones',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'inventory_items',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'inventory_items',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'inventory_items',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'tasks',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'tasks',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'tasks',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'activities',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'activities',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'activities',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'photos',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'photos',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'photos',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'task_materials',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'task_materials',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'task_materials',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'activity_materials',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'activity_materials',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'activity_materials',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'shopping_items',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'shopping_items',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'shopping_items',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'assistant_threads',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'assistant_threads',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'assistant_threads',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'assistant_messages',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'assistant_messages',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'assistant_messages',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+  ]);
   @override
   DriftDatabaseOptions get options =>
       const DriftDatabaseOptions(storeDateTimeAsText: true);
 }
 
+typedef $SyncOutboxCreateCompanionBuilder =
+    SyncOutboxCompanion Function({
+      Value<int> seq,
+      required String entity,
+      required String rowKey,
+    });
+typedef $SyncOutboxUpdateCompanionBuilder =
+    SyncOutboxCompanion Function({
+      Value<int> seq,
+      Value<String> entity,
+      Value<String> rowKey,
+    });
+
+class $SyncOutboxFilterComposer extends Composer<_$AppDatabase, SyncOutbox> {
+  $SyncOutboxFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get seq => $composableBuilder(
+    column: $table.seq,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get entity => $composableBuilder(
+    column: $table.entity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rowKey => $composableBuilder(
+    column: $table.rowKey,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $SyncOutboxOrderingComposer extends Composer<_$AppDatabase, SyncOutbox> {
+  $SyncOutboxOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get seq => $composableBuilder(
+    column: $table.seq,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get entity => $composableBuilder(
+    column: $table.entity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rowKey => $composableBuilder(
+    column: $table.rowKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $SyncOutboxAnnotationComposer
+    extends Composer<_$AppDatabase, SyncOutbox> {
+  $SyncOutboxAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get seq =>
+      $composableBuilder(column: $table.seq, builder: (column) => column);
+
+  GeneratedColumn<String> get entity =>
+      $composableBuilder(column: $table.entity, builder: (column) => column);
+
+  GeneratedColumn<String> get rowKey =>
+      $composableBuilder(column: $table.rowKey, builder: (column) => column);
+}
+
+class $SyncOutboxTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          SyncOutbox,
+          SyncOutboxRow,
+          $SyncOutboxFilterComposer,
+          $SyncOutboxOrderingComposer,
+          $SyncOutboxAnnotationComposer,
+          $SyncOutboxCreateCompanionBuilder,
+          $SyncOutboxUpdateCompanionBuilder,
+          (
+            SyncOutboxRow,
+            BaseReferences<_$AppDatabase, SyncOutbox, SyncOutboxRow>,
+          ),
+          SyncOutboxRow,
+          PrefetchHooks Function()
+        > {
+  $SyncOutboxTableManager(_$AppDatabase db, SyncOutbox table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $SyncOutboxFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $SyncOutboxOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $SyncOutboxAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> seq = const Value.absent(),
+                Value<String> entity = const Value.absent(),
+                Value<String> rowKey = const Value.absent(),
+              }) =>
+                  SyncOutboxCompanion(seq: seq, entity: entity, rowKey: rowKey),
+          createCompanionCallback:
+              ({
+                Value<int> seq = const Value.absent(),
+                required String entity,
+                required String rowKey,
+              }) => SyncOutboxCompanion.insert(
+                seq: seq,
+                entity: entity,
+                rowKey: rowKey,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<SyncOutbox, SyncOutboxRow>(table),
+                  BaseReferences<_$AppDatabase, SyncOutbox, SyncOutboxRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $SyncOutboxProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      SyncOutbox,
+      SyncOutboxRow,
+      $SyncOutboxFilterComposer,
+      $SyncOutboxOrderingComposer,
+      $SyncOutboxAnnotationComposer,
+      $SyncOutboxCreateCompanionBuilder,
+      $SyncOutboxUpdateCompanionBuilder,
+      (SyncOutboxRow, BaseReferences<_$AppDatabase, SyncOutbox, SyncOutboxRow>),
+      SyncOutboxRow,
+      PrefetchHooks Function()
+    >;
+typedef $SyncStateCreateCompanionBuilder =
+    SyncStateCompanion Function({
+      required String name,
+      Value<String?> value,
+      Value<int> rowid,
+    });
+typedef $SyncStateUpdateCompanionBuilder =
+    SyncStateCompanion Function({
+      Value<String> name,
+      Value<String?> value,
+      Value<int> rowid,
+    });
+
+class $SyncStateFilterComposer extends Composer<_$AppDatabase, SyncState> {
+  $SyncStateFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $SyncStateOrderingComposer extends Composer<_$AppDatabase, SyncState> {
+  $SyncStateOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $SyncStateAnnotationComposer extends Composer<_$AppDatabase, SyncState> {
+  $SyncStateAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+}
+
+class $SyncStateTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          SyncState,
+          SyncStateRow,
+          $SyncStateFilterComposer,
+          $SyncStateOrderingComposer,
+          $SyncStateAnnotationComposer,
+          $SyncStateCreateCompanionBuilder,
+          $SyncStateUpdateCompanionBuilder,
+          (
+            SyncStateRow,
+            BaseReferences<_$AppDatabase, SyncState, SyncStateRow>,
+          ),
+          SyncStateRow,
+          PrefetchHooks Function()
+        > {
+  $SyncStateTableManager(_$AppDatabase db, SyncState table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $SyncStateFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $SyncStateOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $SyncStateAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> name = const Value.absent(),
+                Value<String?> value = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SyncStateCompanion(name: name, value: value, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String name,
+                Value<String?> value = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SyncStateCompanion.insert(
+                name: name,
+                value: value,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<SyncState, SyncStateRow>(table),
+                  BaseReferences<_$AppDatabase, SyncState, SyncStateRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $SyncStateProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      SyncState,
+      SyncStateRow,
+      $SyncStateFilterComposer,
+      $SyncStateOrderingComposer,
+      $SyncStateAnnotationComposer,
+      $SyncStateCreateCompanionBuilder,
+      $SyncStateUpdateCompanionBuilder,
+      (SyncStateRow, BaseReferences<_$AppDatabase, SyncState, SyncStateRow>),
+      SyncStateRow,
+      PrefetchHooks Function()
+    >;
 typedef $$GardensTableCreateCompanionBuilder =
     GardensCompanion Function({
       required String id,
@@ -7345,6 +8672,43 @@ final class $$GardensTableReferences
     );
   }
 
+  static MultiTypedResultKey<$InventoryItemsTable, List<InventoryItemRow>>
+  _inventoryItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.inventoryItems,
+    aliasName: 'gardens__id__inventory_items__garden_id',
+  );
+
+  $$InventoryItemsTableProcessedTableManager get inventoryItemsRefs {
+    final manager = $$InventoryItemsTableTableManager(
+      $_db,
+      $_db.inventoryItems,
+    ).filter((f) => f.gardenId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_inventoryItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$TasksTable, List<TaskRow>> _tasksRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.tasks,
+    aliasName: 'gardens__id__tasks__garden_id',
+  );
+
+  $$TasksTableProcessedTableManager get tasksRefs {
+    final manager = $$TasksTableTableManager(
+      $_db,
+      $_db.tasks,
+    ).filter((f) => f.gardenId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_tasksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$ActivitiesTable, List<ActivityRow>>
   _activitiesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.activities,
@@ -7377,43 +8741,6 @@ final class $$GardensTableReferences
     ).filter((f) => f.gardenId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_photosRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$TasksTable, List<TaskRow>> _tasksRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.tasks,
-    aliasName: 'gardens__id__tasks__garden_id',
-  );
-
-  $$TasksTableProcessedTableManager get tasksRefs {
-    final manager = $$TasksTableTableManager(
-      $_db,
-      $_db.tasks,
-    ).filter((f) => f.gardenId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_tasksRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$InventoryItemsTable, List<InventoryItemRow>>
-  _inventoryItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.inventoryItems,
-    aliasName: 'gardens__id__inventory_items__garden_id',
-  );
-
-  $$InventoryItemsTableProcessedTableManager get inventoryItemsRefs {
-    final manager = $$InventoryItemsTableTableManager(
-      $_db,
-      $_db.inventoryItems,
-    ).filter((f) => f.gardenId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_inventoryItemsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -7551,6 +8878,56 @@ class $$GardensTableFilterComposer
     return f(composer);
   }
 
+  Expression<bool> inventoryItemsRefs(
+    Expression<bool> Function($$InventoryItemsTableFilterComposer f) f,
+  ) {
+    final $$InventoryItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.inventoryItems,
+      getReferencedColumn: (t) => t.gardenId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InventoryItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.inventoryItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> tasksRefs(
+    Expression<bool> Function($$TasksTableFilterComposer f) f,
+  ) {
+    final $$TasksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.tasks,
+      getReferencedColumn: (t) => t.gardenId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TasksTableFilterComposer(
+            $db: $db,
+            $table: $db.tasks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<bool> activitiesRefs(
     Expression<bool> Function($$ActivitiesTableFilterComposer f) f,
   ) {
@@ -7592,56 +8969,6 @@ class $$GardensTableFilterComposer
           }) => $$PhotosTableFilterComposer(
             $db: $db,
             $table: $db.photos,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> tasksRefs(
-    Expression<bool> Function($$TasksTableFilterComposer f) f,
-  ) {
-    final $$TasksTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.tasks,
-      getReferencedColumn: (t) => t.gardenId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TasksTableFilterComposer(
-            $db: $db,
-            $table: $db.tasks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> inventoryItemsRefs(
-    Expression<bool> Function($$InventoryItemsTableFilterComposer f) f,
-  ) {
-    final $$InventoryItemsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.inventoryItems,
-      getReferencedColumn: (t) => t.gardenId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$InventoryItemsTableFilterComposer(
-            $db: $db,
-            $table: $db.inventoryItems,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7828,6 +9155,56 @@ class $$GardensTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> inventoryItemsRefs<T extends Object>(
+    Expression<T> Function($$InventoryItemsTableAnnotationComposer a) f,
+  ) {
+    final $$InventoryItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.inventoryItems,
+      getReferencedColumn: (t) => t.gardenId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InventoryItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.inventoryItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> tasksRefs<T extends Object>(
+    Expression<T> Function($$TasksTableAnnotationComposer a) f,
+  ) {
+    final $$TasksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.tasks,
+      getReferencedColumn: (t) => t.gardenId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TasksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tasks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> activitiesRefs<T extends Object>(
     Expression<T> Function($$ActivitiesTableAnnotationComposer a) f,
   ) {
@@ -7869,56 +9246,6 @@ class $$GardensTableAnnotationComposer
           }) => $$PhotosTableAnnotationComposer(
             $db: $db,
             $table: $db.photos,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> tasksRefs<T extends Object>(
-    Expression<T> Function($$TasksTableAnnotationComposer a) f,
-  ) {
-    final $$TasksTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.tasks,
-      getReferencedColumn: (t) => t.gardenId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TasksTableAnnotationComposer(
-            $db: $db,
-            $table: $db.tasks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> inventoryItemsRefs<T extends Object>(
-    Expression<T> Function($$InventoryItemsTableAnnotationComposer a) f,
-  ) {
-    final $$InventoryItemsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.inventoryItems,
-      getReferencedColumn: (t) => t.gardenId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$InventoryItemsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.inventoryItems,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8045,10 +9372,10 @@ class $$GardensTableTableManager
           GardenRow,
           PrefetchHooks Function({
             bool zonesRefs,
+            bool inventoryItemsRefs,
+            bool tasksRefs,
             bool activitiesRefs,
             bool photosRefs,
-            bool tasksRefs,
-            bool inventoryItemsRefs,
             bool taskMaterialsRefs,
             bool activityMaterialsRefs,
             bool shoppingItemsRefs,
@@ -8105,10 +9432,10 @@ class $$GardensTableTableManager
           prefetchHooksCallback:
               ({
                 zonesRefs = false,
+                inventoryItemsRefs = false,
+                tasksRefs = false,
                 activitiesRefs = false,
                 photosRefs = false,
-                tasksRefs = false,
-                inventoryItemsRefs = false,
                 taskMaterialsRefs = false,
                 activityMaterialsRefs = false,
                 shoppingItemsRefs = false,
@@ -8118,10 +9445,10 @@ class $$GardensTableTableManager
                   db: db,
                   explicitlyWatchedTables: [
                     if (zonesRefs) db.zones,
+                    if (inventoryItemsRefs) db.inventoryItems,
+                    if (tasksRefs) db.tasks,
                     if (activitiesRefs) db.activities,
                     if (photosRefs) db.photos,
-                    if (tasksRefs) db.tasks,
-                    if (inventoryItemsRefs) db.inventoryItems,
                     if (taskMaterialsRefs) db.taskMaterials,
                     if (activityMaterialsRefs) db.activityMaterials,
                     if (shoppingItemsRefs) db.shoppingItems,
@@ -8141,6 +9468,44 @@ class $$GardensTableTableManager
                               ._zonesRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$GardensTableReferences(db, table, p0).zonesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gardenId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (inventoryItemsRefs)
+                        await $_getPrefetchedData<
+                          GardenRow,
+                          $GardensTable,
+                          InventoryItemRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$GardensTableReferences
+                              ._inventoryItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GardensTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).inventoryItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gardenId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (tasksRefs)
+                        await $_getPrefetchedData<
+                          GardenRow,
+                          $GardensTable,
+                          TaskRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$GardensTableReferences
+                              ._tasksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GardensTableReferences(db, table, p0).tasksRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.gardenId == item.id,
@@ -8183,44 +9548,6 @@ class $$GardensTableTableManager
                                 table,
                                 p0,
                               ).photosRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.gardenId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (tasksRefs)
-                        await $_getPrefetchedData<
-                          GardenRow,
-                          $GardensTable,
-                          TaskRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$GardensTableReferences
-                              ._tasksRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$GardensTableReferences(db, table, p0).tasksRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.gardenId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (inventoryItemsRefs)
-                        await $_getPrefetchedData<
-                          GardenRow,
-                          $GardensTable,
-                          InventoryItemRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$GardensTableReferences
-                              ._inventoryItemsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$GardensTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).inventoryItemsRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.gardenId == item.id,
@@ -8333,10 +9660,10 @@ typedef $$GardensTableProcessedTableManager =
       GardenRow,
       PrefetchHooks Function({
         bool zonesRefs,
+        bool inventoryItemsRefs,
+        bool tasksRefs,
         bool activitiesRefs,
         bool photosRefs,
-        bool tasksRefs,
-        bool inventoryItemsRefs,
         bool taskMaterialsRefs,
         bool activityMaterialsRefs,
         bool shoppingItemsRefs,
@@ -8405,24 +9732,6 @@ final class $$ZonesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ActivitiesTable, List<ActivityRow>>
-  _activitiesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.activities,
-    aliasName: 'zones__id__activities__zone_id',
-  );
-
-  $$ActivitiesTableProcessedTableManager get activitiesRefs {
-    final manager = $$ActivitiesTableTableManager(
-      $_db,
-      $_db.activities,
-    ).filter((f) => f.zoneId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_activitiesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
   static MultiTypedResultKey<$TasksTable, List<TaskRow>> _tasksRefsTable(
     _$AppDatabase db,
   ) => MultiTypedResultKey.fromTable(
@@ -8437,6 +9746,24 @@ final class $$ZonesTableReferences
     ).filter((f) => f.zoneId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_tasksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ActivitiesTable, List<ActivityRow>>
+  _activitiesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.activities,
+    aliasName: 'zones__id__activities__zone_id',
+  );
+
+  $$ActivitiesTableProcessedTableManager get activitiesRefs {
+    final manager = $$ActivitiesTableTableManager(
+      $_db,
+      $_db.activities,
+    ).filter((f) => f.zoneId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_activitiesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -8549,31 +9876,6 @@ class $$ZonesTableFilterComposer extends Composer<_$AppDatabase, $ZonesTable> {
     return composer;
   }
 
-  Expression<bool> activitiesRefs(
-    Expression<bool> Function($$ActivitiesTableFilterComposer f) f,
-  ) {
-    final $$ActivitiesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.activities,
-      getReferencedColumn: (t) => t.zoneId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ActivitiesTableFilterComposer(
-            $db: $db,
-            $table: $db.activities,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
   Expression<bool> tasksRefs(
     Expression<bool> Function($$TasksTableFilterComposer f) f,
   ) {
@@ -8590,6 +9892,31 @@ class $$ZonesTableFilterComposer extends Composer<_$AppDatabase, $ZonesTable> {
           }) => $$TasksTableFilterComposer(
             $db: $db,
             $table: $db.tasks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activitiesRefs(
+    Expression<bool> Function($$ActivitiesTableFilterComposer f) f,
+  ) {
+    final $$ActivitiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activities,
+      getReferencedColumn: (t) => t.zoneId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitiesTableFilterComposer(
+            $db: $db,
+            $table: $db.activities,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8793,31 +10120,6 @@ class $$ZonesTableAnnotationComposer
     return composer;
   }
 
-  Expression<T> activitiesRefs<T extends Object>(
-    Expression<T> Function($$ActivitiesTableAnnotationComposer a) f,
-  ) {
-    final $$ActivitiesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.activities,
-      getReferencedColumn: (t) => t.zoneId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ActivitiesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.activities,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
   Expression<T> tasksRefs<T extends Object>(
     Expression<T> Function($$TasksTableAnnotationComposer a) f,
   ) {
@@ -8834,6 +10136,31 @@ class $$ZonesTableAnnotationComposer
           }) => $$TasksTableAnnotationComposer(
             $db: $db,
             $table: $db.tasks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> activitiesRefs<T extends Object>(
+    Expression<T> Function($$ActivitiesTableAnnotationComposer a) f,
+  ) {
+    final $$ActivitiesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activities,
+      getReferencedColumn: (t) => t.zoneId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitiesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.activities,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8859,8 +10186,8 @@ class $$ZonesTableTableManager
           ZoneRow,
           PrefetchHooks Function({
             bool gardenId,
-            bool activitiesRefs,
             bool tasksRefs,
+            bool activitiesRefs,
           })
         > {
   $$ZonesTableTableManager(_$AppDatabase db, $ZonesTable table)
@@ -8959,12 +10286,12 @@ class $$ZonesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({gardenId = false, activitiesRefs = false, tasksRefs = false}) {
+              ({gardenId = false, tasksRefs = false, activitiesRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
-                    if (activitiesRefs) db.activities,
                     if (tasksRefs) db.tasks,
+                    if (activitiesRefs) db.activities,
                   ],
                   addJoins:
                       <
@@ -9000,6 +10327,23 @@ class $$ZonesTableTableManager
                       },
                   getPrefetchedDataCallback: (items) async {
                     return [
+                      if (tasksRefs)
+                        await $_getPrefetchedData<
+                          ZoneRow,
+                          $ZonesTable,
+                          TaskRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ZonesTableReferences
+                              ._tasksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ZonesTableReferences(db, table, p0).tasksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.zoneId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (activitiesRefs)
                         await $_getPrefetchedData<
                           ZoneRow,
@@ -9015,23 +10359,6 @@ class $$ZonesTableTableManager
                                 table,
                                 p0,
                               ).activitiesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.zoneId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (tasksRefs)
-                        await $_getPrefetchedData<
-                          ZoneRow,
-                          $ZonesTable,
-                          TaskRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$ZonesTableReferences
-                              ._tasksRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$ZonesTableReferences(db, table, p0).tasksRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.zoneId == item.id,
@@ -9060,8 +10387,1500 @@ typedef $$ZonesTableProcessedTableManager =
       ZoneRow,
       PrefetchHooks Function({
         bool gardenId,
-        bool activitiesRefs,
         bool tasksRefs,
+        bool activitiesRefs,
+      })
+    >;
+typedef $$InventoryItemsTableCreateCompanionBuilder =
+    InventoryItemsCompanion Function({
+      required String id,
+      required String gardenId,
+      required String category,
+      required String name,
+      required String unit,
+      Value<double> stockQty,
+      Value<double?> lowStockThreshold,
+      Value<String?> details,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$InventoryItemsTableUpdateCompanionBuilder =
+    InventoryItemsCompanion Function({
+      Value<String> id,
+      Value<String> gardenId,
+      Value<String> category,
+      Value<String> name,
+      Value<String> unit,
+      Value<double> stockQty,
+      Value<double?> lowStockThreshold,
+      Value<String?> details,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+
+final class $$InventoryItemsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $InventoryItemsTable, InventoryItemRow> {
+  $$InventoryItemsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $GardensTable _gardenIdTable(_$AppDatabase db) =>
+      db.gardens.createAlias('inventory_items__garden_id__gardens__id');
+
+  $$GardensTableProcessedTableManager get gardenId {
+    final $_column = $_itemColumn<String>('garden_id')!;
+
+    final manager = $$GardensTableTableManager(
+      $_db,
+      $_db.gardens,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gardenIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$TaskMaterialsTable, List<TaskMaterialRow>>
+  _taskMaterialsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.taskMaterials,
+    aliasName: 'inventory_items__id__task_materials__item_id',
+  );
+
+  $$TaskMaterialsTableProcessedTableManager get taskMaterialsRefs {
+    final manager = $$TaskMaterialsTableTableManager(
+      $_db,
+      $_db.taskMaterials,
+    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_taskMaterialsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ActivityMaterialsTable, List<ActivityMaterialRow>>
+  _activityMaterialsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activityMaterials,
+        aliasName: 'inventory_items__id__activity_materials__item_id',
+      );
+
+  $$ActivityMaterialsTableProcessedTableManager get activityMaterialsRefs {
+    final manager = $$ActivityMaterialsTableTableManager(
+      $_db,
+      $_db.activityMaterials,
+    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activityMaterialsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ShoppingItemsTable, List<ShoppingItemRow>>
+  _shoppingItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.shoppingItems,
+    aliasName: 'inventory_items__id__shopping_items__item_id',
+  );
+
+  $$ShoppingItemsTableProcessedTableManager get shoppingItemsRefs {
+    final manager = $$ShoppingItemsTableTableManager(
+      $_db,
+      $_db.shoppingItems,
+    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_shoppingItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$InventoryItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $InventoryItemsTable> {
+  $$InventoryItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get stockQty => $composableBuilder(
+    column: $table.stockQty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lowStockThreshold => $composableBuilder(
+    column: $table.lowStockThreshold,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get details => $composableBuilder(
+    column: $table.details,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GardensTableFilterComposer get gardenId {
+    final $$GardensTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableFilterComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> taskMaterialsRefs(
+    Expression<bool> Function($$TaskMaterialsTableFilterComposer f) f,
+  ) {
+    final $$TaskMaterialsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.taskMaterials,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaskMaterialsTableFilterComposer(
+            $db: $db,
+            $table: $db.taskMaterials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activityMaterialsRefs(
+    Expression<bool> Function($$ActivityMaterialsTableFilterComposer f) f,
+  ) {
+    final $$ActivityMaterialsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activityMaterials,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivityMaterialsTableFilterComposer(
+            $db: $db,
+            $table: $db.activityMaterials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> shoppingItemsRefs(
+    Expression<bool> Function($$ShoppingItemsTableFilterComposer f) f,
+  ) {
+    final $$ShoppingItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.shoppingItems,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShoppingItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.shoppingItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$InventoryItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $InventoryItemsTable> {
+  $$InventoryItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get stockQty => $composableBuilder(
+    column: $table.stockQty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get lowStockThreshold => $composableBuilder(
+    column: $table.lowStockThreshold,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get details => $composableBuilder(
+    column: $table.details,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GardensTableOrderingComposer get gardenId {
+    final $$GardensTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableOrderingComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InventoryItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InventoryItemsTable> {
+  $$InventoryItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<double> get stockQty =>
+      $composableBuilder(column: $table.stockQty, builder: (column) => column);
+
+  GeneratedColumn<double> get lowStockThreshold => $composableBuilder(
+    column: $table.lowStockThreshold,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get details =>
+      $composableBuilder(column: $table.details, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$GardensTableAnnotationComposer get gardenId {
+    final $$GardensTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> taskMaterialsRefs<T extends Object>(
+    Expression<T> Function($$TaskMaterialsTableAnnotationComposer a) f,
+  ) {
+    final $$TaskMaterialsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.taskMaterials,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaskMaterialsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.taskMaterials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> activityMaterialsRefs<T extends Object>(
+    Expression<T> Function($$ActivityMaterialsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivityMaterialsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activityMaterials,
+          getReferencedColumn: (t) => t.itemId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivityMaterialsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activityMaterials,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> shoppingItemsRefs<T extends Object>(
+    Expression<T> Function($$ShoppingItemsTableAnnotationComposer a) f,
+  ) {
+    final $$ShoppingItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.shoppingItems,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShoppingItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.shoppingItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$InventoryItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InventoryItemsTable,
+          InventoryItemRow,
+          $$InventoryItemsTableFilterComposer,
+          $$InventoryItemsTableOrderingComposer,
+          $$InventoryItemsTableAnnotationComposer,
+          $$InventoryItemsTableCreateCompanionBuilder,
+          $$InventoryItemsTableUpdateCompanionBuilder,
+          (InventoryItemRow, $$InventoryItemsTableReferences),
+          InventoryItemRow,
+          PrefetchHooks Function({
+            bool gardenId,
+            bool taskMaterialsRefs,
+            bool activityMaterialsRefs,
+            bool shoppingItemsRefs,
+          })
+        > {
+  $$InventoryItemsTableTableManager(
+    _$AppDatabase db,
+    $InventoryItemsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InventoryItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InventoryItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InventoryItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> gardenId = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<double> stockQty = const Value.absent(),
+                Value<double?> lowStockThreshold = const Value.absent(),
+                Value<String?> details = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InventoryItemsCompanion(
+                id: id,
+                gardenId: gardenId,
+                category: category,
+                name: name,
+                unit: unit,
+                stockQty: stockQty,
+                lowStockThreshold: lowStockThreshold,
+                details: details,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String gardenId,
+                required String category,
+                required String name,
+                required String unit,
+                Value<double> stockQty = const Value.absent(),
+                Value<double?> lowStockThreshold = const Value.absent(),
+                Value<String?> details = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InventoryItemsCompanion.insert(
+                id: id,
+                gardenId: gardenId,
+                category: category,
+                name: name,
+                unit: unit,
+                stockQty: stockQty,
+                lowStockThreshold: lowStockThreshold,
+                details: details,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$InventoryItemsTable, InventoryItemRow>(table),
+                  $$InventoryItemsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                gardenId = false,
+                taskMaterialsRefs = false,
+                activityMaterialsRefs = false,
+                shoppingItemsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (taskMaterialsRefs) db.taskMaterials,
+                    if (activityMaterialsRefs) db.activityMaterials,
+                    if (shoppingItemsRefs) db.shoppingItems,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (gardenId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.gardenId,
+                                    referencedTable:
+                                        $$InventoryItemsTableReferences
+                                            ._gardenIdTable(db),
+                                    referencedColumn:
+                                        $$InventoryItemsTableReferences
+                                            ._gardenIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (taskMaterialsRefs)
+                        await $_getPrefetchedData<
+                          InventoryItemRow,
+                          $InventoryItemsTable,
+                          TaskMaterialRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$InventoryItemsTableReferences
+                              ._taskMaterialsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$InventoryItemsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).taskMaterialsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.itemId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activityMaterialsRefs)
+                        await $_getPrefetchedData<
+                          InventoryItemRow,
+                          $InventoryItemsTable,
+                          ActivityMaterialRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$InventoryItemsTableReferences
+                              ._activityMaterialsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$InventoryItemsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activityMaterialsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.itemId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (shoppingItemsRefs)
+                        await $_getPrefetchedData<
+                          InventoryItemRow,
+                          $InventoryItemsTable,
+                          ShoppingItemRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$InventoryItemsTableReferences
+                              ._shoppingItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$InventoryItemsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).shoppingItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.itemId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$InventoryItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InventoryItemsTable,
+      InventoryItemRow,
+      $$InventoryItemsTableFilterComposer,
+      $$InventoryItemsTableOrderingComposer,
+      $$InventoryItemsTableAnnotationComposer,
+      $$InventoryItemsTableCreateCompanionBuilder,
+      $$InventoryItemsTableUpdateCompanionBuilder,
+      (InventoryItemRow, $$InventoryItemsTableReferences),
+      InventoryItemRow,
+      PrefetchHooks Function({
+        bool gardenId,
+        bool taskMaterialsRefs,
+        bool activityMaterialsRefs,
+        bool shoppingItemsRefs,
+      })
+    >;
+typedef $$TasksTableCreateCompanionBuilder =
+    TasksCompanion Function({
+      required String id,
+      required String gardenId,
+      required String title,
+      Value<String?> zoneId,
+      required String due,
+      Value<int?> remindAt,
+      Value<String?> rrule,
+      Value<String?> snoozedUntil,
+      Value<String> status,
+      Value<String?> notes,
+      Value<DateTime?> completedAt,
+      Value<String?> completedActivityId,
+      Value<String> source,
+      Value<int?> durationEstMin,
+      Value<String?> tools,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$TasksTableUpdateCompanionBuilder =
+    TasksCompanion Function({
+      Value<String> id,
+      Value<String> gardenId,
+      Value<String> title,
+      Value<String?> zoneId,
+      Value<String> due,
+      Value<int?> remindAt,
+      Value<String?> rrule,
+      Value<String?> snoozedUntil,
+      Value<String> status,
+      Value<String?> notes,
+      Value<DateTime?> completedAt,
+      Value<String?> completedActivityId,
+      Value<String> source,
+      Value<int?> durationEstMin,
+      Value<String?> tools,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+
+final class $$TasksTableReferences
+    extends BaseReferences<_$AppDatabase, $TasksTable, TaskRow> {
+  $$TasksTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GardensTable _gardenIdTable(_$AppDatabase db) =>
+      db.gardens.createAlias('tasks__garden_id__gardens__id');
+
+  $$GardensTableProcessedTableManager get gardenId {
+    final $_column = $_itemColumn<String>('garden_id')!;
+
+    final manager = $$GardensTableTableManager(
+      $_db,
+      $_db.gardens,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gardenIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ZonesTable _zoneIdTable(_$AppDatabase db) =>
+      db.zones.createAlias('tasks__zone_id__zones__id');
+
+  $$ZonesTableProcessedTableManager? get zoneId {
+    final $_column = $_itemColumn<String>('zone_id');
+    if ($_column == null) return null;
+    final manager = $$ZonesTableTableManager(
+      $_db,
+      $_db.zones,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_zoneIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$TaskMaterialsTable, List<TaskMaterialRow>>
+  _taskMaterialsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.taskMaterials,
+    aliasName: 'tasks__id__task_materials__task_id',
+  );
+
+  $$TaskMaterialsTableProcessedTableManager get taskMaterialsRefs {
+    final manager = $$TaskMaterialsTableTableManager(
+      $_db,
+      $_db.taskMaterials,
+    ).filter((f) => f.taskId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_taskMaterialsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
+  $$TasksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get due => $composableBuilder(
+    column: $table.due,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get remindAt => $composableBuilder(
+    column: $table.remindAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rrule => $composableBuilder(
+    column: $table.rrule,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get snoozedUntil => $composableBuilder(
+    column: $table.snoozedUntil,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get completedActivityId => $composableBuilder(
+    column: $table.completedActivityId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationEstMin => $composableBuilder(
+    column: $table.durationEstMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tools => $composableBuilder(
+    column: $table.tools,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GardensTableFilterComposer get gardenId {
+    final $$GardensTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableFilterComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableFilterComposer get zoneId {
+    final $$ZonesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableFilterComposer(
+            $db: $db,
+            $table: $db.zones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> taskMaterialsRefs(
+    Expression<bool> Function($$TaskMaterialsTableFilterComposer f) f,
+  ) {
+    final $$TaskMaterialsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.taskMaterials,
+      getReferencedColumn: (t) => t.taskId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaskMaterialsTableFilterComposer(
+            $db: $db,
+            $table: $db.taskMaterials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TasksTableOrderingComposer
+    extends Composer<_$AppDatabase, $TasksTable> {
+  $$TasksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get due => $composableBuilder(
+    column: $table.due,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get remindAt => $composableBuilder(
+    column: $table.remindAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rrule => $composableBuilder(
+    column: $table.rrule,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get snoozedUntil => $composableBuilder(
+    column: $table.snoozedUntil,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get completedActivityId => $composableBuilder(
+    column: $table.completedActivityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationEstMin => $composableBuilder(
+    column: $table.durationEstMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tools => $composableBuilder(
+    column: $table.tools,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GardensTableOrderingComposer get gardenId {
+    final $$GardensTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableOrderingComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableOrderingComposer get zoneId {
+    final $$ZonesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableOrderingComposer(
+            $db: $db,
+            $table: $db.zones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TasksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TasksTable> {
+  $$TasksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get due =>
+      $composableBuilder(column: $table.due, builder: (column) => column);
+
+  GeneratedColumn<int> get remindAt =>
+      $composableBuilder(column: $table.remindAt, builder: (column) => column);
+
+  GeneratedColumn<String> get rrule =>
+      $composableBuilder(column: $table.rrule, builder: (column) => column);
+
+  GeneratedColumn<String> get snoozedUntil => $composableBuilder(
+    column: $table.snoozedUntil,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get completedActivityId => $composableBuilder(
+    column: $table.completedActivityId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<int> get durationEstMin => $composableBuilder(
+    column: $table.durationEstMin,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get tools =>
+      $composableBuilder(column: $table.tools, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$GardensTableAnnotationComposer get gardenId {
+    final $$GardensTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableAnnotationComposer get zoneId {
+    final $$ZonesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> taskMaterialsRefs<T extends Object>(
+    Expression<T> Function($$TaskMaterialsTableAnnotationComposer a) f,
+  ) {
+    final $$TaskMaterialsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.taskMaterials,
+      getReferencedColumn: (t) => t.taskId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaskMaterialsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.taskMaterials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TasksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TasksTable,
+          TaskRow,
+          $$TasksTableFilterComposer,
+          $$TasksTableOrderingComposer,
+          $$TasksTableAnnotationComposer,
+          $$TasksTableCreateCompanionBuilder,
+          $$TasksTableUpdateCompanionBuilder,
+          (TaskRow, $$TasksTableReferences),
+          TaskRow,
+          PrefetchHooks Function({
+            bool gardenId,
+            bool zoneId,
+            bool taskMaterialsRefs,
+          })
+        > {
+  $$TasksTableTableManager(_$AppDatabase db, $TasksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TasksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TasksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TasksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> gardenId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> zoneId = const Value.absent(),
+                Value<String> due = const Value.absent(),
+                Value<int?> remindAt = const Value.absent(),
+                Value<String?> rrule = const Value.absent(),
+                Value<String?> snoozedUntil = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<String?> completedActivityId = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<int?> durationEstMin = const Value.absent(),
+                Value<String?> tools = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TasksCompanion(
+                id: id,
+                gardenId: gardenId,
+                title: title,
+                zoneId: zoneId,
+                due: due,
+                remindAt: remindAt,
+                rrule: rrule,
+                snoozedUntil: snoozedUntil,
+                status: status,
+                notes: notes,
+                completedAt: completedAt,
+                completedActivityId: completedActivityId,
+                source: source,
+                durationEstMin: durationEstMin,
+                tools: tools,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String gardenId,
+                required String title,
+                Value<String?> zoneId = const Value.absent(),
+                required String due,
+                Value<int?> remindAt = const Value.absent(),
+                Value<String?> rrule = const Value.absent(),
+                Value<String?> snoozedUntil = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<String?> completedActivityId = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<int?> durationEstMin = const Value.absent(),
+                Value<String?> tools = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TasksCompanion.insert(
+                id: id,
+                gardenId: gardenId,
+                title: title,
+                zoneId: zoneId,
+                due: due,
+                remindAt: remindAt,
+                rrule: rrule,
+                snoozedUntil: snoozedUntil,
+                status: status,
+                notes: notes,
+                completedAt: completedAt,
+                completedActivityId: completedActivityId,
+                source: source,
+                durationEstMin: durationEstMin,
+                tools: tools,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TasksTable, TaskRow>(table),
+                  $$TasksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({gardenId = false, zoneId = false, taskMaterialsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (taskMaterialsRefs) db.taskMaterials,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (gardenId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.gardenId,
+                                    referencedTable: $$TasksTableReferences
+                                        ._gardenIdTable(db),
+                                    referencedColumn: $$TasksTableReferences
+                                        ._gardenIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+                        if (zoneId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.zoneId,
+                                    referencedTable: $$TasksTableReferences
+                                        ._zoneIdTable(db),
+                                    referencedColumn: $$TasksTableReferences
+                                        ._zoneIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (taskMaterialsRefs)
+                        await $_getPrefetchedData<
+                          TaskRow,
+                          $TasksTable,
+                          TaskMaterialRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TasksTableReferences
+                              ._taskMaterialsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TasksTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).taskMaterialsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.taskId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$TasksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TasksTable,
+      TaskRow,
+      $$TasksTableFilterComposer,
+      $$TasksTableOrderingComposer,
+      $$TasksTableAnnotationComposer,
+      $$TasksTableCreateCompanionBuilder,
+      $$TasksTableUpdateCompanionBuilder,
+      (TaskRow, $$TasksTableReferences),
+      TaskRow,
+      PrefetchHooks Function({
+        bool gardenId,
+        bool zoneId,
+        bool taskMaterialsRefs,
       })
     >;
 typedef $$ActivitiesTableCreateCompanionBuilder =
@@ -9878,6 +12697,7 @@ typedef $$PhotosTableCreateCompanionBuilder =
       required String localPath,
       Value<int> position,
       required DateTime createdAt,
+      Value<DateTime?> updatedAt,
       Value<DateTime?> deletedAt,
       Value<int> rowid,
     });
@@ -9889,6 +12709,7 @@ typedef $$PhotosTableUpdateCompanionBuilder =
       Value<String> localPath,
       Value<int> position,
       Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
       Value<DateTime?> deletedAt,
       Value<int> rowid,
     });
@@ -9958,6 +12779,11 @@ class $$PhotosTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10042,6 +12868,11 @@ class $$PhotosTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
@@ -10114,6 +12945,9 @@ class $$PhotosTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
@@ -10199,6 +13033,7 @@ class $$PhotosTableTableManager
                 Value<String> localPath = const Value.absent(),
                 Value<int> position = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PhotosCompanion(
@@ -10208,6 +13043,7 @@ class $$PhotosTableTableManager
                 localPath: localPath,
                 position: position,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
                 deletedAt: deletedAt,
                 rowid: rowid,
               ),
@@ -10219,6 +13055,7 @@ class $$PhotosTableTableManager
                 required String localPath,
                 Value<int> position = const Value.absent(),
                 required DateTime createdAt,
+                Value<DateTime?> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PhotosCompanion.insert(
@@ -10228,6 +13065,7 @@ class $$PhotosTableTableManager
                 localPath: localPath,
                 position: position,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
                 deletedAt: deletedAt,
                 rowid: rowid,
               ),
@@ -10310,1498 +13148,6 @@ typedef $$PhotosTableProcessedTableManager =
       (PhotoRow, $$PhotosTableReferences),
       PhotoRow,
       PrefetchHooks Function({bool gardenId, bool activityId})
-    >;
-typedef $$TasksTableCreateCompanionBuilder =
-    TasksCompanion Function({
-      required String id,
-      required String gardenId,
-      required String title,
-      Value<String?> zoneId,
-      required String due,
-      Value<int?> remindAt,
-      Value<String?> rrule,
-      Value<String?> snoozedUntil,
-      Value<String> status,
-      Value<String?> notes,
-      Value<DateTime?> completedAt,
-      Value<String?> completedActivityId,
-      Value<String> source,
-      Value<int?> durationEstMin,
-      Value<String?> tools,
-      required DateTime createdAt,
-      required DateTime updatedAt,
-      Value<DateTime?> deletedAt,
-      Value<int> rowid,
-    });
-typedef $$TasksTableUpdateCompanionBuilder =
-    TasksCompanion Function({
-      Value<String> id,
-      Value<String> gardenId,
-      Value<String> title,
-      Value<String?> zoneId,
-      Value<String> due,
-      Value<int?> remindAt,
-      Value<String?> rrule,
-      Value<String?> snoozedUntil,
-      Value<String> status,
-      Value<String?> notes,
-      Value<DateTime?> completedAt,
-      Value<String?> completedActivityId,
-      Value<String> source,
-      Value<int?> durationEstMin,
-      Value<String?> tools,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<DateTime?> deletedAt,
-      Value<int> rowid,
-    });
-
-final class $$TasksTableReferences
-    extends BaseReferences<_$AppDatabase, $TasksTable, TaskRow> {
-  $$TasksTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $GardensTable _gardenIdTable(_$AppDatabase db) =>
-      db.gardens.createAlias('tasks__garden_id__gardens__id');
-
-  $$GardensTableProcessedTableManager get gardenId {
-    final $_column = $_itemColumn<String>('garden_id')!;
-
-    final manager = $$GardensTableTableManager(
-      $_db,
-      $_db.gardens,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_gardenIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $ZonesTable _zoneIdTable(_$AppDatabase db) =>
-      db.zones.createAlias('tasks__zone_id__zones__id');
-
-  $$ZonesTableProcessedTableManager? get zoneId {
-    final $_column = $_itemColumn<String>('zone_id');
-    if ($_column == null) return null;
-    final manager = $$ZonesTableTableManager(
-      $_db,
-      $_db.zones,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_zoneIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static MultiTypedResultKey<$TaskMaterialsTable, List<TaskMaterialRow>>
-  _taskMaterialsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.taskMaterials,
-    aliasName: 'tasks__id__task_materials__task_id',
-  );
-
-  $$TaskMaterialsTableProcessedTableManager get taskMaterialsRefs {
-    final manager = $$TaskMaterialsTableTableManager(
-      $_db,
-      $_db.taskMaterials,
-    ).filter((f) => f.taskId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_taskMaterialsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
-  $$TasksTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get due => $composableBuilder(
-    column: $table.due,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get remindAt => $composableBuilder(
-    column: $table.remindAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get rrule => $composableBuilder(
-    column: $table.rrule,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get snoozedUntil => $composableBuilder(
-    column: $table.snoozedUntil,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get status => $composableBuilder(
-    column: $table.status,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get completedAt => $composableBuilder(
-    column: $table.completedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get completedActivityId => $composableBuilder(
-    column: $table.completedActivityId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get source => $composableBuilder(
-    column: $table.source,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get durationEstMin => $composableBuilder(
-    column: $table.durationEstMin,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get tools => $composableBuilder(
-    column: $table.tools,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$GardensTableFilterComposer get gardenId {
-    final $$GardensTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.gardenId,
-      referencedTable: $db.gardens,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$GardensTableFilterComposer(
-            $db: $db,
-            $table: $db.gardens,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$ZonesTableFilterComposer get zoneId {
-    final $$ZonesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.zoneId,
-      referencedTable: $db.zones,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ZonesTableFilterComposer(
-            $db: $db,
-            $table: $db.zones,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<bool> taskMaterialsRefs(
-    Expression<bool> Function($$TaskMaterialsTableFilterComposer f) f,
-  ) {
-    final $$TaskMaterialsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.taskMaterials,
-      getReferencedColumn: (t) => t.taskId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaskMaterialsTableFilterComposer(
-            $db: $db,
-            $table: $db.taskMaterials,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$TasksTableOrderingComposer
-    extends Composer<_$AppDatabase, $TasksTable> {
-  $$TasksTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get due => $composableBuilder(
-    column: $table.due,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get remindAt => $composableBuilder(
-    column: $table.remindAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get rrule => $composableBuilder(
-    column: $table.rrule,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get snoozedUntil => $composableBuilder(
-    column: $table.snoozedUntil,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get status => $composableBuilder(
-    column: $table.status,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
-    column: $table.completedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get completedActivityId => $composableBuilder(
-    column: $table.completedActivityId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get source => $composableBuilder(
-    column: $table.source,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get durationEstMin => $composableBuilder(
-    column: $table.durationEstMin,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get tools => $composableBuilder(
-    column: $table.tools,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$GardensTableOrderingComposer get gardenId {
-    final $$GardensTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.gardenId,
-      referencedTable: $db.gardens,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$GardensTableOrderingComposer(
-            $db: $db,
-            $table: $db.gardens,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$ZonesTableOrderingComposer get zoneId {
-    final $$ZonesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.zoneId,
-      referencedTable: $db.zones,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ZonesTableOrderingComposer(
-            $db: $db,
-            $table: $db.zones,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$TasksTableAnnotationComposer
-    extends Composer<_$AppDatabase, $TasksTable> {
-  $$TasksTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
-
-  GeneratedColumn<String> get due =>
-      $composableBuilder(column: $table.due, builder: (column) => column);
-
-  GeneratedColumn<int> get remindAt =>
-      $composableBuilder(column: $table.remindAt, builder: (column) => column);
-
-  GeneratedColumn<String> get rrule =>
-      $composableBuilder(column: $table.rrule, builder: (column) => column);
-
-  GeneratedColumn<String> get snoozedUntil => $composableBuilder(
-    column: $table.snoozedUntil,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get status =>
-      $composableBuilder(column: $table.status, builder: (column) => column);
-
-  GeneratedColumn<String> get notes =>
-      $composableBuilder(column: $table.notes, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
-    column: $table.completedAt,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get completedActivityId => $composableBuilder(
-    column: $table.completedActivityId,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get source =>
-      $composableBuilder(column: $table.source, builder: (column) => column);
-
-  GeneratedColumn<int> get durationEstMin => $composableBuilder(
-    column: $table.durationEstMin,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get tools =>
-      $composableBuilder(column: $table.tools, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get deletedAt =>
-      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$GardensTableAnnotationComposer get gardenId {
-    final $$GardensTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.gardenId,
-      referencedTable: $db.gardens,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$GardensTableAnnotationComposer(
-            $db: $db,
-            $table: $db.gardens,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$ZonesTableAnnotationComposer get zoneId {
-    final $$ZonesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.zoneId,
-      referencedTable: $db.zones,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ZonesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.zones,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<T> taskMaterialsRefs<T extends Object>(
-    Expression<T> Function($$TaskMaterialsTableAnnotationComposer a) f,
-  ) {
-    final $$TaskMaterialsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.taskMaterials,
-      getReferencedColumn: (t) => t.taskId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaskMaterialsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.taskMaterials,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$TasksTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $TasksTable,
-          TaskRow,
-          $$TasksTableFilterComposer,
-          $$TasksTableOrderingComposer,
-          $$TasksTableAnnotationComposer,
-          $$TasksTableCreateCompanionBuilder,
-          $$TasksTableUpdateCompanionBuilder,
-          (TaskRow, $$TasksTableReferences),
-          TaskRow,
-          PrefetchHooks Function({
-            bool gardenId,
-            bool zoneId,
-            bool taskMaterialsRefs,
-          })
-        > {
-  $$TasksTableTableManager(_$AppDatabase db, $TasksTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$TasksTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$TasksTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$TasksTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> gardenId = const Value.absent(),
-                Value<String> title = const Value.absent(),
-                Value<String?> zoneId = const Value.absent(),
-                Value<String> due = const Value.absent(),
-                Value<int?> remindAt = const Value.absent(),
-                Value<String?> rrule = const Value.absent(),
-                Value<String?> snoozedUntil = const Value.absent(),
-                Value<String> status = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
-                Value<DateTime?> completedAt = const Value.absent(),
-                Value<String?> completedActivityId = const Value.absent(),
-                Value<String> source = const Value.absent(),
-                Value<int?> durationEstMin = const Value.absent(),
-                Value<String?> tools = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => TasksCompanion(
-                id: id,
-                gardenId: gardenId,
-                title: title,
-                zoneId: zoneId,
-                due: due,
-                remindAt: remindAt,
-                rrule: rrule,
-                snoozedUntil: snoozedUntil,
-                status: status,
-                notes: notes,
-                completedAt: completedAt,
-                completedActivityId: completedActivityId,
-                source: source,
-                durationEstMin: durationEstMin,
-                tools: tools,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                deletedAt: deletedAt,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String gardenId,
-                required String title,
-                Value<String?> zoneId = const Value.absent(),
-                required String due,
-                Value<int?> remindAt = const Value.absent(),
-                Value<String?> rrule = const Value.absent(),
-                Value<String?> snoozedUntil = const Value.absent(),
-                Value<String> status = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
-                Value<DateTime?> completedAt = const Value.absent(),
-                Value<String?> completedActivityId = const Value.absent(),
-                Value<String> source = const Value.absent(),
-                Value<int?> durationEstMin = const Value.absent(),
-                Value<String?> tools = const Value.absent(),
-                required DateTime createdAt,
-                required DateTime updatedAt,
-                Value<DateTime?> deletedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => TasksCompanion.insert(
-                id: id,
-                gardenId: gardenId,
-                title: title,
-                zoneId: zoneId,
-                due: due,
-                remindAt: remindAt,
-                rrule: rrule,
-                snoozedUntil: snoozedUntil,
-                status: status,
-                notes: notes,
-                completedAt: completedAt,
-                completedActivityId: completedActivityId,
-                source: source,
-                durationEstMin: durationEstMin,
-                tools: tools,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                deletedAt: deletedAt,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable<$TasksTable, TaskRow>(table),
-                  $$TasksTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback:
-              ({gardenId = false, zoneId = false, taskMaterialsRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (taskMaterialsRefs) db.taskMaterials,
-                  ],
-                  addJoins:
-                      <
-                        T extends TableManagerState<
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic
-                        >
-                      >(state) {
-                        if (gardenId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.gardenId,
-                                    referencedTable: $$TasksTableReferences
-                                        ._gardenIdTable(db),
-                                    referencedColumn: $$TasksTableReferences
-                                        ._gardenIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
-                        }
-                        if (zoneId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.zoneId,
-                                    referencedTable: $$TasksTableReferences
-                                        ._zoneIdTable(db),
-                                    referencedColumn: $$TasksTableReferences
-                                        ._zoneIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
-                        }
-
-                        return state;
-                      },
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (taskMaterialsRefs)
-                        await $_getPrefetchedData<
-                          TaskRow,
-                          $TasksTable,
-                          TaskMaterialRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$TasksTableReferences
-                              ._taskMaterialsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$TasksTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).taskMaterialsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.taskId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
-        ),
-      );
-}
-
-typedef $$TasksTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $TasksTable,
-      TaskRow,
-      $$TasksTableFilterComposer,
-      $$TasksTableOrderingComposer,
-      $$TasksTableAnnotationComposer,
-      $$TasksTableCreateCompanionBuilder,
-      $$TasksTableUpdateCompanionBuilder,
-      (TaskRow, $$TasksTableReferences),
-      TaskRow,
-      PrefetchHooks Function({
-        bool gardenId,
-        bool zoneId,
-        bool taskMaterialsRefs,
-      })
-    >;
-typedef $$InventoryItemsTableCreateCompanionBuilder =
-    InventoryItemsCompanion Function({
-      required String id,
-      required String gardenId,
-      required String category,
-      required String name,
-      required String unit,
-      Value<double> stockQty,
-      Value<double?> lowStockThreshold,
-      Value<String?> details,
-      required DateTime createdAt,
-      required DateTime updatedAt,
-      Value<DateTime?> deletedAt,
-      Value<int> rowid,
-    });
-typedef $$InventoryItemsTableUpdateCompanionBuilder =
-    InventoryItemsCompanion Function({
-      Value<String> id,
-      Value<String> gardenId,
-      Value<String> category,
-      Value<String> name,
-      Value<String> unit,
-      Value<double> stockQty,
-      Value<double?> lowStockThreshold,
-      Value<String?> details,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<DateTime?> deletedAt,
-      Value<int> rowid,
-    });
-
-final class $$InventoryItemsTableReferences
-    extends
-        BaseReferences<_$AppDatabase, $InventoryItemsTable, InventoryItemRow> {
-  $$InventoryItemsTableReferences(
-    super.$_db,
-    super.$_table,
-    super.$_typedResult,
-  );
-
-  static $GardensTable _gardenIdTable(_$AppDatabase db) =>
-      db.gardens.createAlias('inventory_items__garden_id__gardens__id');
-
-  $$GardensTableProcessedTableManager get gardenId {
-    final $_column = $_itemColumn<String>('garden_id')!;
-
-    final manager = $$GardensTableTableManager(
-      $_db,
-      $_db.gardens,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_gardenIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static MultiTypedResultKey<$TaskMaterialsTable, List<TaskMaterialRow>>
-  _taskMaterialsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.taskMaterials,
-    aliasName: 'inventory_items__id__task_materials__item_id',
-  );
-
-  $$TaskMaterialsTableProcessedTableManager get taskMaterialsRefs {
-    final manager = $$TaskMaterialsTableTableManager(
-      $_db,
-      $_db.taskMaterials,
-    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_taskMaterialsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$ActivityMaterialsTable, List<ActivityMaterialRow>>
-  _activityMaterialsRefsTable(_$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.activityMaterials,
-        aliasName: 'inventory_items__id__activity_materials__item_id',
-      );
-
-  $$ActivityMaterialsTableProcessedTableManager get activityMaterialsRefs {
-    final manager = $$ActivityMaterialsTableTableManager(
-      $_db,
-      $_db.activityMaterials,
-    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _activityMaterialsRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$ShoppingItemsTable, List<ShoppingItemRow>>
-  _shoppingItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.shoppingItems,
-    aliasName: 'inventory_items__id__shopping_items__item_id',
-  );
-
-  $$ShoppingItemsTableProcessedTableManager get shoppingItemsRefs {
-    final manager = $$ShoppingItemsTableTableManager(
-      $_db,
-      $_db.shoppingItems,
-    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_shoppingItemsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$InventoryItemsTableFilterComposer
-    extends Composer<_$AppDatabase, $InventoryItemsTable> {
-  $$InventoryItemsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get category => $composableBuilder(
-    column: $table.category,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get unit => $composableBuilder(
-    column: $table.unit,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get stockQty => $composableBuilder(
-    column: $table.stockQty,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get lowStockThreshold => $composableBuilder(
-    column: $table.lowStockThreshold,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get details => $composableBuilder(
-    column: $table.details,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$GardensTableFilterComposer get gardenId {
-    final $$GardensTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.gardenId,
-      referencedTable: $db.gardens,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$GardensTableFilterComposer(
-            $db: $db,
-            $table: $db.gardens,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<bool> taskMaterialsRefs(
-    Expression<bool> Function($$TaskMaterialsTableFilterComposer f) f,
-  ) {
-    final $$TaskMaterialsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.taskMaterials,
-      getReferencedColumn: (t) => t.itemId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaskMaterialsTableFilterComposer(
-            $db: $db,
-            $table: $db.taskMaterials,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> activityMaterialsRefs(
-    Expression<bool> Function($$ActivityMaterialsTableFilterComposer f) f,
-  ) {
-    final $$ActivityMaterialsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.activityMaterials,
-      getReferencedColumn: (t) => t.itemId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ActivityMaterialsTableFilterComposer(
-            $db: $db,
-            $table: $db.activityMaterials,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> shoppingItemsRefs(
-    Expression<bool> Function($$ShoppingItemsTableFilterComposer f) f,
-  ) {
-    final $$ShoppingItemsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.shoppingItems,
-      getReferencedColumn: (t) => t.itemId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShoppingItemsTableFilterComposer(
-            $db: $db,
-            $table: $db.shoppingItems,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$InventoryItemsTableOrderingComposer
-    extends Composer<_$AppDatabase, $InventoryItemsTable> {
-  $$InventoryItemsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get category => $composableBuilder(
-    column: $table.category,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get unit => $composableBuilder(
-    column: $table.unit,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get stockQty => $composableBuilder(
-    column: $table.stockQty,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get lowStockThreshold => $composableBuilder(
-    column: $table.lowStockThreshold,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get details => $composableBuilder(
-    column: $table.details,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-    column: $table.deletedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$GardensTableOrderingComposer get gardenId {
-    final $$GardensTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.gardenId,
-      referencedTable: $db.gardens,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$GardensTableOrderingComposer(
-            $db: $db,
-            $table: $db.gardens,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$InventoryItemsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $InventoryItemsTable> {
-  $$InventoryItemsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get category =>
-      $composableBuilder(column: $table.category, builder: (column) => column);
-
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<String> get unit =>
-      $composableBuilder(column: $table.unit, builder: (column) => column);
-
-  GeneratedColumn<double> get stockQty =>
-      $composableBuilder(column: $table.stockQty, builder: (column) => column);
-
-  GeneratedColumn<double> get lowStockThreshold => $composableBuilder(
-    column: $table.lowStockThreshold,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get details =>
-      $composableBuilder(column: $table.details, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get deletedAt =>
-      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$GardensTableAnnotationComposer get gardenId {
-    final $$GardensTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.gardenId,
-      referencedTable: $db.gardens,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$GardensTableAnnotationComposer(
-            $db: $db,
-            $table: $db.gardens,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<T> taskMaterialsRefs<T extends Object>(
-    Expression<T> Function($$TaskMaterialsTableAnnotationComposer a) f,
-  ) {
-    final $$TaskMaterialsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.taskMaterials,
-      getReferencedColumn: (t) => t.itemId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaskMaterialsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.taskMaterials,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> activityMaterialsRefs<T extends Object>(
-    Expression<T> Function($$ActivityMaterialsTableAnnotationComposer a) f,
-  ) {
-    final $$ActivityMaterialsTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.activityMaterials,
-          getReferencedColumn: (t) => t.itemId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$ActivityMaterialsTableAnnotationComposer(
-                $db: $db,
-                $table: $db.activityMaterials,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<T> shoppingItemsRefs<T extends Object>(
-    Expression<T> Function($$ShoppingItemsTableAnnotationComposer a) f,
-  ) {
-    final $$ShoppingItemsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.shoppingItems,
-      getReferencedColumn: (t) => t.itemId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShoppingItemsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.shoppingItems,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$InventoryItemsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $InventoryItemsTable,
-          InventoryItemRow,
-          $$InventoryItemsTableFilterComposer,
-          $$InventoryItemsTableOrderingComposer,
-          $$InventoryItemsTableAnnotationComposer,
-          $$InventoryItemsTableCreateCompanionBuilder,
-          $$InventoryItemsTableUpdateCompanionBuilder,
-          (InventoryItemRow, $$InventoryItemsTableReferences),
-          InventoryItemRow,
-          PrefetchHooks Function({
-            bool gardenId,
-            bool taskMaterialsRefs,
-            bool activityMaterialsRefs,
-            bool shoppingItemsRefs,
-          })
-        > {
-  $$InventoryItemsTableTableManager(
-    _$AppDatabase db,
-    $InventoryItemsTable table,
-  ) : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$InventoryItemsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$InventoryItemsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$InventoryItemsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> gardenId = const Value.absent(),
-                Value<String> category = const Value.absent(),
-                Value<String> name = const Value.absent(),
-                Value<String> unit = const Value.absent(),
-                Value<double> stockQty = const Value.absent(),
-                Value<double?> lowStockThreshold = const Value.absent(),
-                Value<String?> details = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => InventoryItemsCompanion(
-                id: id,
-                gardenId: gardenId,
-                category: category,
-                name: name,
-                unit: unit,
-                stockQty: stockQty,
-                lowStockThreshold: lowStockThreshold,
-                details: details,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                deletedAt: deletedAt,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String gardenId,
-                required String category,
-                required String name,
-                required String unit,
-                Value<double> stockQty = const Value.absent(),
-                Value<double?> lowStockThreshold = const Value.absent(),
-                Value<String?> details = const Value.absent(),
-                required DateTime createdAt,
-                required DateTime updatedAt,
-                Value<DateTime?> deletedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => InventoryItemsCompanion.insert(
-                id: id,
-                gardenId: gardenId,
-                category: category,
-                name: name,
-                unit: unit,
-                stockQty: stockQty,
-                lowStockThreshold: lowStockThreshold,
-                details: details,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                deletedAt: deletedAt,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable<$InventoryItemsTable, InventoryItemRow>(table),
-                  $$InventoryItemsTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback:
-              ({
-                gardenId = false,
-                taskMaterialsRefs = false,
-                activityMaterialsRefs = false,
-                shoppingItemsRefs = false,
-              }) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (taskMaterialsRefs) db.taskMaterials,
-                    if (activityMaterialsRefs) db.activityMaterials,
-                    if (shoppingItemsRefs) db.shoppingItems,
-                  ],
-                  addJoins:
-                      <
-                        T extends TableManagerState<
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic
-                        >
-                      >(state) {
-                        if (gardenId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.gardenId,
-                                    referencedTable:
-                                        $$InventoryItemsTableReferences
-                                            ._gardenIdTable(db),
-                                    referencedColumn:
-                                        $$InventoryItemsTableReferences
-                                            ._gardenIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-
-                        return state;
-                      },
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (taskMaterialsRefs)
-                        await $_getPrefetchedData<
-                          InventoryItemRow,
-                          $InventoryItemsTable,
-                          TaskMaterialRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$InventoryItemsTableReferences
-                              ._taskMaterialsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$InventoryItemsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).taskMaterialsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.itemId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (activityMaterialsRefs)
-                        await $_getPrefetchedData<
-                          InventoryItemRow,
-                          $InventoryItemsTable,
-                          ActivityMaterialRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$InventoryItemsTableReferences
-                              ._activityMaterialsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$InventoryItemsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).activityMaterialsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.itemId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (shoppingItemsRefs)
-                        await $_getPrefetchedData<
-                          InventoryItemRow,
-                          $InventoryItemsTable,
-                          ShoppingItemRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$InventoryItemsTableReferences
-                              ._shoppingItemsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$InventoryItemsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).shoppingItemsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.itemId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
-        ),
-      );
-}
-
-typedef $$InventoryItemsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $InventoryItemsTable,
-      InventoryItemRow,
-      $$InventoryItemsTableFilterComposer,
-      $$InventoryItemsTableOrderingComposer,
-      $$InventoryItemsTableAnnotationComposer,
-      $$InventoryItemsTableCreateCompanionBuilder,
-      $$InventoryItemsTableUpdateCompanionBuilder,
-      (InventoryItemRow, $$InventoryItemsTableReferences),
-      InventoryItemRow,
-      PrefetchHooks Function({
-        bool gardenId,
-        bool taskMaterialsRefs,
-        bool activityMaterialsRefs,
-        bool shoppingItemsRefs,
-      })
     >;
 typedef $$TaskMaterialsTableCreateCompanionBuilder =
     TaskMaterialsCompanion Function({
@@ -14512,18 +15858,22 @@ typedef $$SettingEntriesTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $SyncOutboxTableManager get syncOutbox =>
+      $SyncOutboxTableManager(_db, _db.syncOutbox);
+  $SyncStateTableManager get syncState =>
+      $SyncStateTableManager(_db, _db.syncState);
   $$GardensTableTableManager get gardens =>
       $$GardensTableTableManager(_db, _db.gardens);
   $$ZonesTableTableManager get zones =>
       $$ZonesTableTableManager(_db, _db.zones);
+  $$InventoryItemsTableTableManager get inventoryItems =>
+      $$InventoryItemsTableTableManager(_db, _db.inventoryItems);
+  $$TasksTableTableManager get tasks =>
+      $$TasksTableTableManager(_db, _db.tasks);
   $$ActivitiesTableTableManager get activities =>
       $$ActivitiesTableTableManager(_db, _db.activities);
   $$PhotosTableTableManager get photos =>
       $$PhotosTableTableManager(_db, _db.photos);
-  $$TasksTableTableManager get tasks =>
-      $$TasksTableTableManager(_db, _db.tasks);
-  $$InventoryItemsTableTableManager get inventoryItems =>
-      $$InventoryItemsTableTableManager(_db, _db.inventoryItems);
   $$TaskMaterialsTableTableManager get taskMaterials =>
       $$TaskMaterialsTableTableManager(_db, _db.taskMaterials);
   $$ActivityMaterialsTableTableManager get activityMaterials =>

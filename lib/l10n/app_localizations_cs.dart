@@ -1636,4 +1636,162 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get assistantSaveFailed => 'Rozhovor se nepodařilo uložit.';
+
+  @override
+  String get accountTitle => 'Účet a synchronizace';
+
+  @override
+  String get accountSettingsTile => 'Účet a synchronizace';
+
+  @override
+  String get accountSettingsSignedOut =>
+      'Bez účtu, data jsou jen v tomto telefonu';
+
+  @override
+  String accountSettingsSignedIn(String email) {
+    return 'Účet $email';
+  }
+
+  @override
+  String get accountUnavailable =>
+      'Účet v této verzi aplikace zatím není. Všechno funguje i bez něj, data zůstávají v telefonu.';
+
+  @override
+  String get accountIntro =>
+      'S účtem se zahrada zálohuje do cloudu a jde otevřít i na dalším zařízení. Bóďa s umělou inteligencí účet potřebuje. Bez účtu vše funguje dál jen v tomto telefonu.';
+
+  @override
+  String get accountEmailLabel => 'E-mail';
+
+  @override
+  String get accountSendCode => 'Poslat kód';
+
+  @override
+  String accountCodeSent(String email) {
+    return 'Kód jsme poslali na $email. Platí jen chvíli.';
+  }
+
+  @override
+  String get accountCodeLabel => 'Kód z e-mailu';
+
+  @override
+  String get accountVerify => 'Přihlásit';
+
+  @override
+  String get accountChangeEmail => 'Jiný e-mail';
+
+  @override
+  String get accountErrorEmail => 'Tohle nevypadá jako e-mail.';
+
+  @override
+  String get accountErrorCode => 'Kód nesedí nebo už vypršel. Pošli si nový.';
+
+  @override
+  String get accountErrorRate => 'Moc pokusů. Zkus to za pár minut.';
+
+  @override
+  String get accountErrorOffline => 'Bez připojení. Zkus to, až budeš online.';
+
+  @override
+  String get accountErrorUnknown => 'Něco se nepovedlo. Zkus to znovu.';
+
+  @override
+  String accountSignedInAs(String email) {
+    return 'Účet $email';
+  }
+
+  @override
+  String get accountSyncNow => 'Synchronizovat teď';
+
+  @override
+  String get accountSyncRunning => 'Synchronizuji…';
+
+  @override
+  String get accountSyncNever => 'Ještě se nesynchronizovalo.';
+
+  @override
+  String accountSyncLast(String time) {
+    return 'Naposledy synchronizováno $time';
+  }
+
+  @override
+  String get accountSyncOffline =>
+      'Bez připojení. Změny počkají v telefonu a odešlou se příště.';
+
+  @override
+  String get accountSyncFailed =>
+      'Synchronizace se nepovedla. Data v telefonu jsou v pořádku, zkusí se to znovu.';
+
+  @override
+  String get accountConflictTitle => 'Účet už má jinou zahradu';
+
+  @override
+  String get accountConflictBody =>
+      'K tomuto účtu patří zahrada z jiného zařízení. Můžeš ji použít i tady; data, která jsou teď v tomto telefonu, se nahradí. Když chceš data z telefonu zachovat, nejdřív si udělej zálohu.';
+
+  @override
+  String get accountConflictUse => 'Použít zahradu z účtu';
+
+  @override
+  String get accountConflictConfirmTitle => 'Nahradit data v telefonu?';
+
+  @override
+  String get accountConflictConfirmBody =>
+      'Záznamy, úkoly, zóny a sklad v tomto telefonu se smažou a nahradí zahradou z účtu.';
+
+  @override
+  String get accountConflictConfirm => 'Nahradit';
+
+  @override
+  String get accountSignOut => 'Odhlásit se';
+
+  @override
+  String get accountSignOutBody =>
+      'Data zůstanou v telefonu. Změny se do cloudu dostanou po dalším přihlášení.';
+
+  @override
+  String get accountDelete => 'Smazat účet';
+
+  @override
+  String get accountDeleteTitle => 'Smazat účet?';
+
+  @override
+  String get accountDeleteBody =>
+      'Smaže se účet a všechna data na serveru: zahrada, fotky v cloudu, rozhovory s Bóďou. Sdílené zahrady přejdou na dalšího člena. Data v tomto telefonu zůstanou. Nejde to vrátit.';
+
+  @override
+  String get accountDeleteConfirm => 'Smazat natrvalo';
+
+  @override
+  String get accountDeleted => 'Účet je smazaný. Data v telefonu zůstala.';
+
+  @override
+  String get assistantDemoBannerSignIn =>
+      'Ukázkový režim bez AI. Pro skutečné rady se přihlas v Nastavení, Účet a synchronizace.';
+
+  @override
+  String get assistantConsentTitle => 'Než se zeptáš Bódi';
+
+  @override
+  String get assistantConsentBody =>
+      'Dotaz a vybraná data ze zahrady (zóny, poslední záznamy, úkoly, sklad, spočítané dávky) se pošlou na náš server a odtud jazykovému modelu, který připraví odpověď. Jména, e-maily a fotky se neposílají. Souhlas jde kdykoli odvolat v Nastavení.';
+
+  @override
+  String get assistantConsentAgree => 'Souhlasím';
+
+  @override
+  String get settingsAiConsent =>
+      'Zpracování dotazů na Bóďu umělou inteligencí';
+
+  @override
+  String settingsAiConsentOn(String date) {
+    return 'Souhlas udělen $date';
+  }
+
+  @override
+  String get settingsAiConsentOff =>
+      'Bez souhlasu (Bóďa odpovídá jen v ukázkovém režimu)';
+
+  @override
+  String get onboardingHaveAccount => 'Už mám účet, přihlásit se';
 }
