@@ -8,6 +8,9 @@ import 'package:zahradnik_boda/features/activity/data/drift_activity_repository.
 import 'package:zahradnik_boda/features/activity/domain/activity_entity.dart';
 import 'package:zahradnik_boda/features/canvas/data/drift_plan_repository.dart';
 import 'package:zahradnik_boda/features/canvas/domain/geometry.dart';
+import 'package:zahradnik_boda/features/incidents/data/drift_incident_repository.dart';
+import 'package:zahradnik_boda/features/incidents/domain/incident.dart';
+import 'package:zahradnik_boda/features/inventory/domain/stock_movement.dart';
 import 'package:zahradnik_boda/features/inventory/data/drift_inventory_repository.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
 import 'package:zahradnik_boda/features/inventory/domain/units.dart';
@@ -58,6 +61,8 @@ class Device {
       DriftInventoryRepository(db, gardenId, clock);
 
   DriftPlanRepository get plan => DriftPlanRepository(db, gardenId, clock);
+  DriftIncidentRepository get incidents =>
+      DriftIncidentRepository(db, gardenId, clock);
 
   Future<int> outbox() async => (await db.select(db.syncOutbox).get()).length;
 }
@@ -184,6 +189,57 @@ void main() {
     expect(got.polygon, bed);
     expect(got.layer, ZoneLayer.plan);
     expect(await b.plan.loadOutline(), outline);
+  });
+
+  test('incidents and stock movements travel to the second phone', () async {
+    await seed(a);
+    await a.incidents.save(
+      Incident(
+        id: 'inc-1',
+        zoneId: 'zone-1',
+        label: 'Mšice',
+        candidates: const [IncidentCandidate(label: 'Mšice maková')],
+        createdAt: a.now,
+      ),
+    );
+    await a.tasks.saveTask(
+      TaskEntity(
+        id: 'check-1',
+        title: 'Kontrola',
+        due: DateTime(2026, 10, 10),
+        incidentId: 'inc-1',
+      ),
+    );
+    await a.inventory.applyMovements([
+      StockMovement(
+        id: 'mv-1',
+        itemId: 'item-1',
+        qtyDelta: -1.2,
+        reason: MovementReason.task,
+        taskId: 'task-1',
+        at: a.now,
+      ),
+    ]);
+    await a.engine(server).sync();
+    final inc = server.table('incidents')['inc-1']!;
+    expect(inc['candidates'], [
+      {'label': 'Mšice maková'},
+    ]);
+    expect(server.table('tasks')['check-1']!['incident_id'], 'inc-1');
+    expect(server.table('inventory_movements')['mv-1']!['qty_delta'], -1.2);
+
+    final first = await b.engine(server).sync();
+    final remoteId = (first.pairing as PairingConflict).remoteGardenId;
+    await b.engine(server).adoptRemoteGarden(remoteId);
+    b.gardenId = remoteId;
+    await b.engine(server).sync();
+    final got = (await b.incidents.getAll()).single;
+    expect(got.label, 'Mšice');
+    expect(got.candidates.single.label, 'Mšice maková');
+    expect(
+      (await b.inventory.movements(itemId: 'item-1')).single.reason,
+      MovementReason.task,
+    );
   });
 
   test('a second phone adopts the account garden and gets the data', () async {

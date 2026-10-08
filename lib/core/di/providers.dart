@@ -17,6 +17,8 @@ import '../../features/assistant/data/supabase_assistant_backend.dart';
 import '../../features/assistant/domain/assistant_backend.dart';
 import '../../features/assistant/domain/assistant_message.dart';
 import '../../features/activity/domain/activity_repository.dart';
+import '../../features/incidents/data/drift_incident_repository.dart';
+import '../../features/incidents/domain/incident.dart';
 import '../../features/inventory/data/drift_inventory_repository.dart';
 import '../../features/inventory/domain/inventory_repository.dart';
 import '../../features/premium/data/supabase_entitlement_repository.dart';
@@ -89,6 +91,14 @@ final zoneRepositoryProvider = Provider<ZoneRepository>(
 /// Obrys zahrady a podklad plánu (1.1).
 final planRepositoryProvider = Provider<PlanRepository>(
   (ref) => DriftPlanRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+final incidentRepositoryProvider = Provider<IncidentRepository>(
+  (ref) => DriftIncidentRepository(
     ref.watch(databaseProvider),
     ref.watch(gardenIdProvider),
     ref.watch(clockProvider),

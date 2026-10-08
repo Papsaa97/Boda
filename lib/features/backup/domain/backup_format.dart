@@ -5,8 +5,10 @@ import '../../../core/time/time_zone.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../activity/domain/activity_type.dart';
 import '../../canvas/domain/geometry.dart';
+import '../../incidents/domain/incident.dart';
 import '../../inventory/domain/inventory_item.dart';
 import '../../inventory/domain/shopping_item.dart';
+import '../../inventory/domain/stock_movement.dart';
 import '../../inventory/domain/units.dart';
 import '../../tasks/domain/task_entity.dart';
 import '../../zones/domain/zone_entity.dart';
@@ -15,7 +17,7 @@ import '../../zones/domain/zone_entity.dart';
 ///
 /// Při změně formátu verzi zvýšit, starší verze dál umět načíst
 /// v [decodeBackup] (FR-E2) a doplnit test.
-const backupFormatVersion = 3;
+const backupFormatVersion = 4;
 
 /// Složka s fotkami uvnitř ZIP souboru.
 const backupPhotoFolder = 'photos';
@@ -71,6 +73,8 @@ class BackupData {
     this.shopping = const [],
     this.activityMaterials = const [],
     this.gardenOutline = const [],
+    this.incidents = const [],
+    this.movements = const [],
   });
 
   final int formatVersion;
@@ -89,8 +93,15 @@ class BackupData {
   /// když plán není nakreslený.
   final List<Pt> gardenOutline;
 
-  /// Všechny fotky, na které záznamy odkazují.
-  List<PhotoRef> get photos => [for (final a in activities) ...a.photos];
+  /// Od verze 4 formátu (V2): incidenty a pohyby na skladě.
+  final List<Incident> incidents;
+  final List<StockMovement> movements;
+
+  /// Všechny fotky, na které záznamy a incidenty odkazují.
+  List<PhotoRef> get photos => [
+    for (final a in activities) ...a.photos,
+    for (final i in incidents) ...i.photos,
+  ];
 }
 
 /// Cesta fotky uvnitř ZIP: `photos/<photoId><přípona>`.
@@ -183,6 +194,7 @@ Map<String, Object?> encodeBackup(BackupData data) {
           'durationEstMin': t.durationEstMin,
           'tools': t.tools,
           'source': t.source.name,
+          'incidentId': t.incidentId,
           'materials': [
             for (final m in t.materials)
               {'itemId': m.itemId, 'qty': m.qty, 'unit': m.unit},
@@ -215,6 +227,32 @@ Map<String, Object?> encodeBackup(BackupData data) {
           'source': s.source.name,
         },
     ],
+    'incidents': [
+      for (final i in data.incidents)
+        {
+          'id': i.id,
+          'zoneId': i.zoneId,
+          'label': i.label,
+          'source': i.source.name,
+          'candidates': [for (final c in i.candidates) c.toJson()],
+          'planBio': i.planBio,
+          'planChem': i.planChem,
+          'status': i.status.name,
+          'photoIds': [for (final photo in i.photos) photo.id],
+          'createdAt': i.createdAt == null ? null : _instant(i.createdAt!),
+        },
+    ],
+    'movements': [
+      for (final m in data.movements)
+        {
+          'id': m.id,
+          'itemId': m.itemId,
+          'qtyDelta': m.qtyDelta,
+          'reason': m.reason.name,
+          'taskId': m.taskId,
+          'at': _instant(m.at),
+        },
+    ],
     'photos': [
       for (final photo in photos)
         {'id': photo.id, 'file': backupPhotoPath(photo)},
@@ -231,9 +269,9 @@ BackupData decodeBackup(Map<String, Object?> json) {
   if (version > backupFormatVersion) {
     throw BackupException(BackupError.tooNew, 'formatVersion $version');
   }
-  // Verze 2 a 3 jen přidaly nepovinná pole (vlastnosti zón, sklad,
-  // nákupní seznam, sklizeň, materiál; plán zahrady), takže jeden
-  // dekodér čte všechny verze.
+  // Verze 2 až 4 jen přidaly nepovinná pole (vlastnosti zón, sklad,
+  // nákupní seznam, sklizeň, materiál; plán zahrady; incidenty a pohyby
+  // na skladě), takže jeden dekodér čte všechny verze.
   try {
     return _decode(json);
   } on BackupException {
@@ -280,6 +318,14 @@ BackupData _decode(Map<String, Object?> json) {
       photo['id'] as String: photo['file'] as String,
   };
 
+  List<PhotoRef> photoRefs(Object? ids) => [
+    for (final id in (ids as List?) ?? const [])
+      PhotoRef(
+        id: id as String,
+        path: photoFiles[id] ?? '$backupPhotoFolder/$id.jpg',
+      ),
+  ];
+
   return BackupData(
     formatVersion: json['formatVersion'] as int,
     exportedAt: instant(json['exportedAt']),
@@ -302,6 +348,35 @@ BackupData _decode(Map<String, Object?> json) {
           layer: ZoneLayer.fromKey(z['layer'] as String?),
         ),
     ],
+    incidents: [
+      for (final i in list('incidents'))
+        Incident(
+          id: i['id'] as String,
+          zoneId: i['zoneId'] as String,
+          label: i['label'] as String,
+          source: IncidentSource.fromKey(i['source'] as String?),
+          candidates: [
+            for (final c in (i['candidates'] as List?) ?? const [])
+              ?IncidentCandidate.fromJson(c),
+          ],
+          planBio: i['planBio'] as String?,
+          planChem: i['planChem'] as String?,
+          status: IncidentStatus.fromKey(i['status'] as String?),
+          photos: photoRefs(i['photoIds']),
+          createdAt: optInstant(i['createdAt']),
+        ),
+    ],
+    movements: [
+      for (final m in list('movements'))
+        StockMovement(
+          id: m['id'] as String,
+          itemId: m['itemId'] as String,
+          qtyDelta: (m['qtyDelta'] as num).toDouble(),
+          reason: MovementReason.fromKey(m['reason'] as String?),
+          taskId: m['taskId'] as String?,
+          at: instant(m['at']),
+        ),
+    ],
     gardenOutline:
         polygonFromJson(
           ((json['garden'] as Map?)?.cast<String, Object?>())?['outline'],
@@ -316,13 +391,7 @@ BackupData _decode(Map<String, Object?> json) {
           date: instant(a['occurredAt']),
           zoneId: a['zoneId'] as String,
           notes: a['notes'] as String?,
-          photos: [
-            for (final id in (a['photoIds'] as List?) ?? const [])
-              PhotoRef(
-                id: id as String,
-                path: photoFiles[id] ?? '$backupPhotoFolder/$id.jpg',
-              ),
-          ],
+          photos: photoRefs(a['photoIds']),
           harvestQty: optNum(a['harvestQty']),
           harvestUnit: a['harvestQty'] == null
               ? null
@@ -363,6 +432,7 @@ BackupData _decode(Map<String, Object?> json) {
           ],
           materials: materials(t['materials']),
           source: TaskSource.fromKey(t['source'] as String?),
+          incidentId: t['incidentId'] as String?,
           createdAt: optInstant(t['createdAt']),
           updatedAt: optInstant(t['updatedAt']),
         ),

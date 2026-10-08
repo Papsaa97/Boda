@@ -8,6 +8,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../activity/domain/activity_type.dart';
 import '../../activity/presentation/screens/activity_form_screen.dart';
 import '../../activity/domain/activity_entity.dart';
+import '../../inventory/presentation/inventory_ui.dart';
 import '../domain/recurrence.dart';
 import '../domain/task_actions.dart';
 import '../domain/task_entity.dart';
@@ -60,16 +61,13 @@ Future<void> completeTask(
     messenger.showSnackBar(SnackBar(content: Text(l.taskSaveFailed)));
     return;
   }
+  final done = closure.next == null
+      ? l.taskDoneSnack(task.title)
+      : l.taskDoneRecurringSnack(task.title, formatDate(closure.next!.due));
+  final stock = consumptionText(l, closure.consumption);
   messenger.showSnackBar(
     SnackBar(
-      content: Text(
-        closure.next == null
-            ? l.taskDoneSnack(task.title)
-            : l.taskDoneRecurringSnack(
-                task.title,
-                formatDate(closure.next!.due),
-              ),
-      ),
+      content: Text(stock == null ? done : '$done\n$stock'),
       duration: const Duration(seconds: 6),
       action: SnackBarAction(
         label: l.taskLogToDiary,

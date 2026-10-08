@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../canvas/presentation/canvas_screen.dart';
+import '../../incidents/presentation/incidents_controller.dart';
+import '../../incidents/presentation/incidents_screen.dart';
 import '../../inventory/presentation/inventory_controller.dart';
 import '../../inventory/presentation/inventory_screen.dart';
 import '../domain/zone_entity.dart';
@@ -182,6 +184,7 @@ class ZonesScreen extends ConsumerWidget {
               ),
               for (final zone in active) tile(zone),
               const _PlanCard(),
+              const _IncidentsCard(),
               if (planned.isNotEmpty) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
@@ -359,6 +362,33 @@ class _PlanCard extends StatelessWidget {
         onTap: () => Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (_) => const CanvasScreen())),
+      ),
+    );
+  }
+}
+
+/// Vstup na problémy na zahradě (V2).
+class _IncidentsCard extends ConsumerWidget {
+  const _IncidentsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final open = ref.watch(openIncidentCountProvider);
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: ListTile(
+        leading: Icon(
+          open > 0 ? Icons.report_problem_outlined : Icons.healing_outlined,
+        ),
+        title: Text(l.incidentsTitle),
+        subtitle: Text(
+          open > 0 ? l.incidentsCardOpen(open) : l.incidentsCardSubtitle,
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const IncidentsScreen())),
       ),
     );
   }

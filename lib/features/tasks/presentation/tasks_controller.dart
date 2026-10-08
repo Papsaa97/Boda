@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
 import '../../../core/telemetry/telemetry.dart';
+import '../../inventory/domain/stock_movement.dart';
+import '../../inventory/presentation/inventory_controller.dart';
 import '../domain/task_actions.dart';
 import '../domain/task_entity.dart';
 
@@ -41,6 +43,7 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
       tools: draft.tools,
       materials: draft.materials,
       source: draft.source,
+      incidentId: draft.incidentId,
     );
     await save(task);
     return task;
@@ -64,12 +67,19 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
       return [...list.where((t) => t.id != id), closure.closed, ?next];
     });
     if (state.hasError) return null;
-    if (status == TaskStatus.done) {
-      ref.read(analyticsProvider).track(AnalyticsEvent.taskCompleted, {
-        'source': task.source.name,
-      });
-    }
-    return closure;
+    if (status != TaskStatus.done) return closure;
+    ref.read(analyticsProvider).track(AnalyticsEvent.taskCompleted, {
+      'source': task.source.name,
+    });
+    // Odpis materiálu (FR-S4). Selhání nevadí: úkol už je hotový.
+    final consumption = await ref
+        .read(inventoryControllerProvider.notifier)
+        .consumeForTask(closure.closed);
+    return TaskClosure(
+      closure.closed,
+      closure.next,
+      consumption: consumption ?? const Consumption(),
+    );
   }
 
   /// Vrátí uzavřený úkol mezi otevřené.
@@ -77,6 +87,12 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
     final task = _find(id);
     if (task == null) return;
     await save(task.copyWith(status: TaskStatus.open, completedAt: () => null));
+    if (state.hasError || task.status != TaskStatus.done) return;
+    try {
+      await ref.read(inventoryControllerProvider.notifier).reverseTask(id);
+    } on Exception catch (e) {
+      debugPrint('Odpis ze skladu se nepodařilo stornovat: $e');
+    }
   }
 
   Future<void> snooze(String id, SnoozeOption option) async {
@@ -91,8 +107,9 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
     if (task == null) return;
     await save(task.copyWith(completedActivityId: () => activityId));
     if (task.materials.isNotEmpty && !state.hasError) {
-      // Spotřebovaný materiál se zapíše k záznamu (odpis ze skladu je
-      // až ve V2, FR-S4). Selhání nevadí: záznam i úkol už jsou uložené.
+      // Spotřebovaný materiál se zapíše i k záznamu (odpis ze skladu
+      // proběhl při dokončení). Selhání nevadí: záznam i úkol už jsou
+      // uložené.
       try {
         await ref
             .read(taskRepositoryProvider)

@@ -1,4 +1,5 @@
 import '../../../core/time/calendar.dart';
+import '../../inventory/domain/stock_movement.dart';
 import 'task_entity.dart';
 
 /// Možnosti odložení úkolu (FR-U3).
@@ -27,10 +28,18 @@ int _daysUntilSaturday(int weekday) {
 
 /// Výsledek uzavření úkolu: uzavřený úkol a případně další výskyt.
 class TaskClosure {
-  const TaskClosure(this.closed, this.next);
+  const TaskClosure(
+    this.closed,
+    this.next, {
+    this.consumption = const Consumption(),
+  });
 
   final TaskEntity closed;
   final TaskEntity? next;
+
+  /// Odpis materiálu ze skladu (FR-S4); prázdný u úkolu bez materiálu
+  /// nebo u přeskočeného úkolu.
+  final Consumption consumption;
 }
 
 /// Uzavře úkol jako hotový nebo přeskočený. U opakovaného úkolu vznikne

@@ -6,6 +6,7 @@ import '../../../core/database/app_database.dart';
 import '../domain/inventory_item.dart';
 import '../domain/inventory_repository.dart';
 import '../domain/shopping_item.dart';
+import '../domain/stock_movement.dart';
 import '../domain/units.dart';
 
 /// Sklad v lokální databázi. Mazání je měkké (`deleted_at`).
@@ -59,7 +60,70 @@ class DriftInventoryRepository implements InventoryRepository {
       InventoryItemsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
     );
   }
+
+  @override
+  Future<List<StockMovement>> movements({
+    String? itemId,
+    String? taskId,
+  }) async {
+    final query = _db.select(_db.inventoryMovements)
+      ..where((m) => m.deletedAt.isNull())
+      ..orderBy([
+        (m) => OrderingTerm(expression: m.at, mode: OrderingMode.desc),
+      ]);
+    if (itemId != null) query.where((m) => m.itemId.equals(itemId));
+    if (taskId != null) query.where((m) => m.taskId.equals(taskId));
+    return [for (final r in await query.get()) stockMovementFromRow(r)];
+  }
+
+  @override
+  Future<void> applyMovements(
+    List<StockMovement> movements, {
+    bool adjustStock = true,
+  }) async {
+    if (movements.isEmpty) return;
+    final now = _clock().toUtc();
+    await _db.transaction(() async {
+      for (final m in movements) {
+        await _db
+            .into(_db.inventoryMovements)
+            .insert(
+              InventoryMovementsCompanion.insert(
+                id: m.id,
+                gardenId: _gardenId,
+                itemId: m.itemId,
+                qtyDelta: m.qtyDelta,
+                reason: m.reason.name,
+                taskId: Value(m.taskId),
+                at: m.at.toUtc(),
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+        if (!adjustStock) continue;
+        await _db.customUpdate(
+          'UPDATE inventory_items SET stock_qty = max(0, stock_qty + ?), '
+          'updated_at = ? WHERE id = ?',
+          variables: [
+            Variable.withReal(m.qtyDelta),
+            Variable.withDateTime(now),
+            Variable.withString(m.itemId),
+          ],
+          updates: {_db.inventoryItems},
+        );
+      }
+    });
+  }
 }
+
+StockMovement stockMovementFromRow(InventoryMovementRow r) => StockMovement(
+  id: r.id,
+  itemId: r.itemId,
+  qtyDelta: r.qtyDelta,
+  reason: MovementReason.fromKey(r.reason),
+  taskId: r.taskId,
+  at: r.at.toLocal(),
+);
 
 InventoryItem inventoryItemFromRow(InventoryItemRow r) {
   final category = InventoryCategory.fromKey(r.category);

@@ -5,6 +5,7 @@ import '../../../core/text/numbers.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/inventory_alerts.dart';
 import '../domain/inventory_item.dart';
+import '../domain/stock_movement.dart';
 import '../domain/units.dart';
 
 IconData inventoryCategoryIcon(InventoryCategory c) => switch (c) {
@@ -86,4 +87,28 @@ String inventorySubtitle(AppLocalizations l, InventoryItem item) {
       break;
   }
   return parts.join(' · ');
+}
+
+String movementReasonLabel(AppLocalizations l, MovementReason r) => switch (r) {
+  MovementReason.purchase => l.movementPurchase,
+  MovementReason.task => l.movementTask,
+  MovementReason.manual => l.movementManual,
+  MovementReason.reversal => l.movementReversal,
+};
+
+/// „Cererit 1,2 kg, Konev 1 ks“.
+String stockLines(AppLocalizations l, List<StockLine> lines) => [
+  for (final line in lines)
+    '${line.itemName} ${formatQty(l, line.qty, line.unit)}',
+].join(', ');
+
+/// Hláška po dokončení úkolu s materiálem (FR-S4); null, když se nic
+/// neodepisovalo.
+String? consumptionText(AppLocalizations l, Consumption c) {
+  final parts = [
+    if (c.consumed.isNotEmpty) l.stockConsumed(stockLines(l, c.consumed)),
+    if (c.shortages.isNotEmpty) l.stockShortage(stockLines(l, c.shortages)),
+    if (c.skipped.isNotEmpty) l.stockSkipped(c.skipped.join(', ')),
+  ];
+  return parts.isEmpty ? null : parts.join(' ');
 }
