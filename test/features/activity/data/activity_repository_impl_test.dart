@@ -60,32 +60,32 @@ void main() {
   });
 
   group('addActivity', () {
-    test('converts ActivityEntity to Hive model and delegates to data source', () async {
-      final entity = ActivityEntity(
-        id: '123',
-        title: 'Nová aktivita',
-        date: DateTime(2024, 5, 3, 7, 45),
-        zoneId: 'Z3',
-        notes: 'Testovací poznámka',
-        imagePath: '/path/to/image2.png',
-      );
+    test(
+      'converts ActivityEntity to Hive model and delegates to data source',
+      () async {
+        final entity = ActivityEntity(
+          id: '123',
+          title: 'Nová aktivita',
+          date: DateTime(2024, 5, 3, 7, 45),
+          zoneId: 'Z3',
+          notes: 'Testovací poznámka',
+          imagePath: '/path/to/image2.png',
+        );
 
-      await repository.addActivity(entity);
+        await repository.addActivity(entity);
 
-      // Verification + capture argumentu
-      final verification = verify(
-        mockLocalDataSource.add(captureAny),
-      );
+        // Verification + capture argumentu
+        final verification = verify(mockLocalDataSource.add(captureAny));
 
-      final capturedModel =
-          verification.captured.single as ActivityHiveModel;
+        final capturedModel = verification.captured.single as ActivityHiveModel;
 
-      expect(capturedModel.id, entity.id);
-      expect(capturedModel.title, entity.title);
-      expect(capturedModel.date, entity.date);
-      expect(capturedModel.zoneId, entity.zoneId);
-      expect(capturedModel.notes, entity.notes);
-      expect(capturedModel.imagePath, entity.imagePath);
-    });
+        expect(capturedModel.id, entity.id);
+        expect(capturedModel.title, entity.title);
+        expect(capturedModel.date, entity.date);
+        expect(capturedModel.zoneId, entity.zoneId);
+        expect(capturedModel.notes, entity.notes);
+        expect(capturedModel.imagePath, entity.imagePath);
+      },
+    );
   });
 }

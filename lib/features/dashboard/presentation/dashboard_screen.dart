@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/di/providers.dart';
+import '../../../core/time/today.dart';
 import '../../../core/formatting/dates.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../activity/presentation/screens/activity_form_screen.dart';
@@ -17,7 +17,7 @@ import '../../zones/presentation/zone_icons.dart';
 final todaySummaryProvider = Provider<AsyncValue<TodaySummary>>((ref) {
   final activities = ref.watch(activityControllerProvider);
   final zones = ref.watch(zonesControllerProvider);
-  final now = ref.watch(clockProvider)();
+  final now = ref.watch(todayProvider);
 
   // Po chybě zápisu nesou stavy chybu i poslední seznam; počítáme z něj.
   if (!activities.hasValue) {
@@ -31,11 +31,13 @@ final todaySummaryProvider = Provider<AsyncValue<TodaySummary>>((ref) {
         : const AsyncLoading();
   }
 
-  return AsyncData(buildTodaySummary(
-    activities: activities.value!,
-    zones: zones.value!,
-    now: now,
-  ));
+  return AsyncData(
+    buildTodaySummary(
+      activities: activities.value!,
+      zones: zones.value!,
+      now: now,
+    ),
+  );
 });
 
 /// Dashboard „Co dnes?“ v podobě bento mřížky.
@@ -45,7 +47,7 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final summaryAsync = ref.watch(todaySummaryProvider);
-    final now = ref.watch(clockProvider)();
+    final now = ref.watch(todayProvider);
     final dateLabel = DateFormat('EEEE d. MMMM', appLocale).format(now);
 
     return Scaffold(
@@ -80,7 +82,11 @@ class DashboardScreen extends ConsumerWidget {
                     value: summary.lastActivity == null
                         ? '–'
                         : formatDaysAgo(
-                            calendarDaysBetween(summary.lastActivity!.date, now)),
+                            calendarDaysBetween(
+                              summary.lastActivity!.date,
+                              now,
+                            ),
+                          ),
                     label: 'poslední záznam',
                   ),
                 ),
@@ -113,8 +119,9 @@ class _HeroCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
-    final ZoneStatus? suggestion =
-        summary.needsAttention.isEmpty ? null : summary.needsAttention.first;
+    final ZoneStatus? suggestion = summary.needsAttention.isEmpty
+        ? null
+        : summary.needsAttention.first;
 
     final String headline;
     final String body;
@@ -142,14 +149,16 @@ class _HeroCard extends StatelessWidget {
           children: [
             Text(
               headline,
-              style: theme.textTheme.titleLarge
-                  ?.copyWith(color: scheme.onPrimaryContainer),
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: scheme.onPrimaryContainer,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               body,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: scheme.onPrimaryContainer),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: scheme.onPrimaryContainer,
+              ),
             ),
             if (summary.today.isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -160,8 +169,9 @@ class _HeroCard extends StatelessWidget {
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => ActivityFormScreen(
-                    initialZoneId:
-                        summary.today.isEmpty ? suggestion?.zone.id : null,
+                    initialZoneId: summary.today.isEmpty
+                        ? suggestion?.zone.id
+                        : null,
                   ),
                 ),
               ),
@@ -176,7 +186,11 @@ class _HeroCard extends StatelessWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.icon, required this.value, required this.label});
+  const _StatCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
 
   final IconData icon;
   final String value;
@@ -217,8 +231,11 @@ class _TipCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.lightbulb_outline,
-                size: 32, color: theme.colorScheme.tertiary),
+            Icon(
+              Icons.lightbulb_outline,
+              size: 32,
+              color: theme.colorScheme.tertiary,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -254,16 +271,21 @@ class _AttentionCard extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text('Zaslouží pozornost', style: theme.textTheme.titleMedium),
+              child: Text(
+                'Zaslouží pozornost',
+                style: theme.textTheme.titleMedium,
+              ),
             ),
             for (final s in statuses)
               ListTile(
                 dense: true,
                 leading: Icon(zoneIcon(s.zone.id)),
                 title: Text(s.zone.name),
-                subtitle: Text(s.daysSince == null
-                    ? 'zatím bez záznamu'
-                    : 'naposledy ${formatDaysAgo(s.daysSince!)}'),
+                subtitle: Text(
+                  s.daysSince == null
+                      ? 'zatím bez záznamu'
+                      : 'naposledy ${formatDaysAgo(s.daysSince!)}',
+                ),
                 trailing: const Icon(Icons.add),
                 onTap: () => _addForZone(context, s.zone),
               ),

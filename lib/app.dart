@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/time/today.dart';
 import 'features/activity/presentation/screens/activity_form_screen.dart';
 import 'features/activity/presentation/screens/timeline_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
@@ -20,7 +21,8 @@ class ZahradnikBodaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.dark,
+      // Podle systému: venku na slunci je světlý motiv čitelnější (spec 10.2).
+      themeMode: ThemeMode.system,
       locale: const Locale('cs'),
       supportedLocales: const [Locale('cs')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
@@ -38,38 +40,54 @@ class AppRoot extends ConsumerWidget {
     final zones = ref.watch(zonesControllerProvider);
     return zones.when(
       skipError: true,
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, _) => Scaffold(
-        body: Center(child: Text('Chyba při načítání zón: $error')),
-      ),
-      data: (list) => list.isEmpty ? const OnboardingScreen() : const HomeShell(),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (error, _) =>
+          Scaffold(body: Center(child: Text('Chyba při načítání zón: $error'))),
+      data: (list) =>
+          list.isEmpty ? const OnboardingScreen() : const HomeShell(),
     );
   }
 }
 
 /// Hlavní obrazovka se spodní navigací: Dnes, Deník, Zóny.
-class HomeShell extends StatefulWidget {
+class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
   @override
-  State<HomeShell> createState() => _HomeShellState();
+  ConsumerState<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends ConsumerState<HomeShell>
+    with WidgetsBindingObserver {
   int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Po návratu do aplikace (třeba druhý den ráno) přepočítat „dnes“.
+    if (state == AppLifecycleState.resumed) {
+      ref.read(todayProvider.notifier).refresh();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _index,
-        children: const [
-          DashboardScreen(),
-          TimelineScreen(),
-          ZonesScreen(),
-        ],
+        children: const [DashboardScreen(), TimelineScreen(), ZonesScreen()],
       ),
       floatingActionButton: _index == 2
           ? null

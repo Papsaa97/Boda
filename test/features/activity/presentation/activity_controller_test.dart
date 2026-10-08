@@ -32,8 +32,12 @@ void main() {
     expect(state, hasLength(1));
     expect(repo.items.values.single.title, 'Zálivka');
 
-    final updated = activity(state.single.id,
-        date: state.single.date, title: 'Zálivka rajčat', zoneId: 'Z2');
+    final updated = activity(
+      state.single.id,
+      date: state.single.date,
+      title: 'Zálivka rajčat',
+      zoneId: 'Z2',
+    );
     await controller.updateActivity(updated);
     state = container.read(activityControllerProvider).value!;
     expect(state.single.title, 'Zálivka rajčat');

@@ -20,8 +20,9 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.zahradnik_boda_mvp01"
+        // Identita aplikace v Google Play. Po prvním nahrání do obchodu
+        // ji už nejde změnit (com.example… obchod odmítá).
+        applicationId = "cz.zahradnikboda.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

@@ -7,8 +7,9 @@ import 'helpers/fakes.dart';
 void main() {
   setUpAll(() => initializeDateFormatting('cs'));
 
-  testWidgets('empty diary suggests a zone on the Co dnes? dashboard',
-      (tester) async {
+  testWidgets('empty diary suggests a zone on the Co dnes? dashboard', (
+    tester,
+  ) async {
     await pumpApp(tester, testOverrides());
 
     expect(find.text('Co dnes?'), findsOneWidget);
@@ -17,8 +18,9 @@ void main() {
     expect(find.text('Zapsat aktivitu'), findsOneWidget);
   });
 
-  testWidgets('adding an activity shows it on the dashboard and timeline',
-      (tester) async {
+  testWidgets('adding an activity shows it on the dashboard and timeline', (
+    tester,
+  ) async {
     final repo = InMemoryActivityRepository();
     await pumpApp(tester, testOverrides(activities: repo));
 
@@ -26,7 +28,9 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(
-        find.widgetWithText(TextFormField, 'Název aktivity'), 'Výsadba česneku');
+      find.widgetWithText(TextFormField, 'Název aktivity'),
+      'Výsadba česneku',
+    );
     await tester.ensureVisible(find.text('Uložit záznam'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Uložit záznam'));
@@ -85,8 +89,12 @@ void main() {
     await tester.tap(find.text('Zóny'));
     await tester.pumpAndSettle();
     final zeleninaTile = find.widgetWithText(ListTile, 'Zelenina');
-    await tester.tap(find.descendant(
-        of: zeleninaTile, matching: find.byTooltip('Smazat zónu')));
+    await tester.tap(
+      find.descendant(
+        of: zeleninaTile,
+        matching: find.byTooltip('Smazat zónu Zelenina'),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(zones.items.containsKey('Z1'), isTrue);
