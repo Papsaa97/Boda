@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/widgets/discard_guard.dart';
 import '../../../../core/di/providers.dart';
 import '../../../../core/formatting/dates.dart';
 import '../../../../core/time/calendar.dart';
@@ -42,6 +43,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   late List<TaskMaterial> _materials;
   final _toolInput = TextEditingController();
   bool _saving = false;
+  late final String _initialState;
 
   static const _durations = [15, 30, 45, 60, 90, 120, 180, 240, 360, 480];
 
@@ -62,7 +64,21 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     _duration = t?.durationEstMin;
     _tools = [...?t?.tools];
     _materials = [...?t?.materials];
+    _initialState = _snapshot();
   }
+
+  String _snapshot() => [
+    _title.text,
+    _notes.text,
+    _due,
+    _remindAt,
+    _zoneId,
+    _frequency,
+    (_months.toList()..sort()).join(','),
+    _duration,
+    _tools.join(','),
+    _materials.map((m) => '${m.itemId}:${m.qty}').join(','),
+  ].join('|');
 
   void _addTool() {
     final tool = _toolInput.text.trim();
@@ -102,7 +118,10 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     final picked = await showDatePicker(
       context: context,
       initialDate: _due,
-      firstDate: DateTime(now.year - 1),
+      // Starý úkol může mít termín před touhle hranicí.
+      firstDate: _due.isBefore(DateTime(now.year - 1))
+          ? _due
+          : DateTime(now.year - 1),
       lastDate: DateTime(now.year + 5),
     );
     if (picked != null) setState(() => _due = dayOnly(picked));
@@ -218,200 +237,211 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
       (z) => z.id == _zoneId && !zoneIds.contains(z.id),
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEdit ? l.taskEditTitle : l.taskNewTitle),
-        actions: [
-          TextButton(
-            onPressed: _saving ? null : _submit,
-            child: Text(l.commonSave),
-          ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            TextFormField(
-              controller: _title,
-              autofocus: !_isEdit,
-              decoration: InputDecoration(
-                labelText: l.taskTitleLabel,
-                hintText: l.taskTitleHint,
-              ),
-              textCapitalization: TextCapitalization.sentences,
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? l.taskTitleRequired : null,
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.event),
-              title: Text(l.taskDueLabel),
-              subtitle: Text(
-                capitalize(DateFormat('EEEE d. M. y', appLocale).format(_due)),
-              ),
-              onTap: _pickDue,
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              secondary: const Icon(Icons.notifications_outlined),
-              title: Text(l.taskReminderLabel),
-              subtitle: Text(
-                _remindAt == null
-                    ? l.taskReminderOff
-                    : l.taskReminderAt(formatMinuteOfDay(_remindAt!)),
-              ),
-              value: _remindAt != null,
-              onChanged: (on) {
-                if (on) {
-                  _pickReminder();
-                } else {
-                  setState(() => _remindAt = null);
-                }
-              },
-            ),
-            if (_remindAt != null)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton(
-                  onPressed: _pickReminder,
-                  child: Text(l.taskReminderChange),
-                ),
-              ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String?>(
-              initialValue: _zoneId,
-              decoration: InputDecoration(labelText: l.taskZoneLabel),
-              isExpanded: true,
-              items: [
-                DropdownMenuItem(value: null, child: Text(l.taskNoZone)),
-                for (final z in [...zones, ...current])
-                  DropdownMenuItem(value: z.id, child: Text(z.name)),
-              ],
-              onChanged: (v) => setState(() => _zoneId = v),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<int?>(
-              initialValue: _duration,
-              isExpanded: true,
-              decoration: InputDecoration(labelText: l.taskDurationLabel),
-              items: [
-                DropdownMenuItem(value: null, child: Text(l.taskDurationNone)),
-                for (final m in {..._durations, ?_duration})
-                  DropdownMenuItem(value: m, child: Text(formatDuration(l, m))),
-              ],
-              onChanged: (v) => setState(() => _duration = v),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<RepeatFrequency?>(
-              initialValue: _frequency,
-              decoration: InputDecoration(labelText: l.taskRepeatLabel),
-              items: [
-                DropdownMenuItem(value: null, child: Text(l.repeatNone)),
-                DropdownMenuItem(
-                  value: RepeatFrequency.weekly,
-                  child: Text(l.repeatWeekly),
-                ),
-                DropdownMenuItem(
-                  value: RepeatFrequency.monthly,
-                  child: Text(l.repeatMonthly),
-                ),
-                DropdownMenuItem(
-                  value: RepeatFrequency.yearly,
-                  child: Text(l.repeatYearly),
-                ),
-              ],
-              onChanged: (v) => setState(() => _frequency = v),
-            ),
-            if (_frequency == RepeatFrequency.weekly ||
-                _frequency == RepeatFrequency.monthly) ...[
-              const SizedBox(height: 12),
-              Text(
-                l.taskRepeatMonthsLabel,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  for (var m = 1; m <= 12; m++)
-                    FilterChip(
-                      label: Text(
-                        DateFormat.MMM(appLocale).format(DateTime(2000, m)),
-                      ),
-                      selected: _months.contains(m),
-                      onSelected: (on) => setState(() {
-                        if (on) {
-                          _months.add(m);
-                        } else {
-                          _months.remove(m);
-                        }
-                      }),
-                    ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 16),
-            Text(
-              l.taskToolsLabel,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            if (_tools.isNotEmpty)
-              Wrap(
-                spacing: 6,
-                children: [
-                  for (final tool in _tools)
-                    InputChip(
-                      label: Text(tool),
-                      deleteButtonTooltipMessage: l.taskToolRemove(tool),
-                      onDeleted: () => setState(() => _tools.remove(tool)),
-                    ),
-                ],
-              ),
-            TextField(
-              controller: _toolInput,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                hintText: l.taskToolsHint,
-                suffixIcon: IconButton(
-                  tooltip: l.taskToolAdd,
-                  icon: const Icon(Icons.add),
-                  onPressed: _addTool,
-                ),
-              ),
-              onSubmitted: (_) => _addTool(),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l.taskMaterialsLabel,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            for (final m in _materials) _materialTile(l, m),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                onPressed: _addMaterial,
-                icon: const Icon(Icons.add),
-                label: Text(l.taskMaterialAdd),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _notes,
-              decoration: InputDecoration(labelText: l.taskNotesLabel),
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: 3,
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
+    return DiscardGuard(
+      hasChanges: () => _snapshot() != _initialState,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEdit ? l.taskEditTitle : l.taskNewTitle),
+          actions: [
+            TextButton(
               onPressed: _saving ? null : _submit,
-              icon: const Icon(Icons.check),
-              label: Text(_isEdit ? l.activitySaveChanges : l.taskSaveNew),
+              child: Text(l.commonSave),
             ),
           ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              TextFormField(
+                controller: _title,
+                autofocus: !_isEdit,
+                decoration: InputDecoration(
+                  labelText: l.taskTitleLabel,
+                  hintText: l.taskTitleHint,
+                ),
+                textCapitalization: TextCapitalization.sentences,
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? l.taskTitleRequired : null,
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.event),
+                title: Text(l.taskDueLabel),
+                subtitle: Text(
+                  capitalize(
+                    DateFormat('EEEE d. M. y', appLocale).format(_due),
+                  ),
+                ),
+                onTap: _pickDue,
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: const Icon(Icons.notifications_outlined),
+                title: Text(l.taskReminderLabel),
+                subtitle: Text(
+                  _remindAt == null
+                      ? l.taskReminderOff
+                      : l.taskReminderAt(formatMinuteOfDay(_remindAt!)),
+                ),
+                value: _remindAt != null,
+                onChanged: (on) {
+                  if (on) {
+                    _pickReminder();
+                  } else {
+                    setState(() => _remindAt = null);
+                  }
+                },
+              ),
+              if (_remindAt != null)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: _pickReminder,
+                    child: Text(l.taskReminderChange),
+                  ),
+                ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String?>(
+                initialValue: _zoneId,
+                decoration: InputDecoration(labelText: l.taskZoneLabel),
+                isExpanded: true,
+                items: [
+                  DropdownMenuItem(value: null, child: Text(l.taskNoZone)),
+                  for (final z in [...zones, ...current])
+                    DropdownMenuItem(value: z.id, child: Text(z.name)),
+                ],
+                onChanged: (v) => setState(() => _zoneId = v),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<int?>(
+                initialValue: _duration,
+                isExpanded: true,
+                decoration: InputDecoration(labelText: l.taskDurationLabel),
+                items: [
+                  DropdownMenuItem(
+                    value: null,
+                    child: Text(l.taskDurationNone),
+                  ),
+                  for (final m in {..._durations, ?_duration})
+                    DropdownMenuItem(
+                      value: m,
+                      child: Text(formatDuration(l, m)),
+                    ),
+                ],
+                onChanged: (v) => setState(() => _duration = v),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<RepeatFrequency?>(
+                initialValue: _frequency,
+                decoration: InputDecoration(labelText: l.taskRepeatLabel),
+                items: [
+                  DropdownMenuItem(value: null, child: Text(l.repeatNone)),
+                  DropdownMenuItem(
+                    value: RepeatFrequency.weekly,
+                    child: Text(l.repeatWeekly),
+                  ),
+                  DropdownMenuItem(
+                    value: RepeatFrequency.monthly,
+                    child: Text(l.repeatMonthly),
+                  ),
+                  DropdownMenuItem(
+                    value: RepeatFrequency.yearly,
+                    child: Text(l.repeatYearly),
+                  ),
+                ],
+                onChanged: (v) => setState(() => _frequency = v),
+              ),
+              if (_frequency == RepeatFrequency.weekly ||
+                  _frequency == RepeatFrequency.monthly) ...[
+                const SizedBox(height: 12),
+                Text(
+                  l.taskRepeatMonthsLabel,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (var m = 1; m <= 12; m++)
+                      FilterChip(
+                        label: Text(
+                          DateFormat.MMM(appLocale).format(DateTime(2000, m)),
+                        ),
+                        selected: _months.contains(m),
+                        onSelected: (on) => setState(() {
+                          if (on) {
+                            _months.add(m);
+                          } else {
+                            _months.remove(m);
+                          }
+                        }),
+                      ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: 16),
+              Text(
+                l.taskToolsLabel,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              if (_tools.isNotEmpty)
+                Wrap(
+                  spacing: 6,
+                  children: [
+                    for (final tool in _tools)
+                      InputChip(
+                        label: Text(tool),
+                        deleteButtonTooltipMessage: l.taskToolRemove(tool),
+                        onDeleted: () => setState(() => _tools.remove(tool)),
+                      ),
+                  ],
+                ),
+              TextField(
+                controller: _toolInput,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  hintText: l.taskToolsHint,
+                  suffixIcon: IconButton(
+                    tooltip: l.taskToolAdd,
+                    icon: const Icon(Icons.add),
+                    onPressed: _addTool,
+                  ),
+                ),
+                onSubmitted: (_) => _addTool(),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l.taskMaterialsLabel,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              for (final m in _materials) _materialTile(l, m),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: _addMaterial,
+                  icon: const Icon(Icons.add),
+                  label: Text(l.taskMaterialAdd),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _notes,
+                decoration: InputDecoration(labelText: l.taskNotesLabel),
+                textCapitalization: TextCapitalization.sentences,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: _saving ? null : _submit,
+                icon: const Icon(Icons.check),
+                label: Text(_isEdit ? l.activitySaveChanges : l.taskSaveNew),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -430,6 +460,7 @@ class _MaterialDialogState extends ConsumerState<_MaterialDialog> {
   final _qty = TextEditingController();
   InventoryItem? _item;
   InventoryUnit? _unit;
+  String? _qtyError;
 
   @override
   void dispose() {
@@ -441,7 +472,13 @@ class _MaterialDialogState extends ConsumerState<_MaterialDialog> {
     final item = _item;
     final unit = _unit;
     final qty = parseDecimal(_qty.text);
-    if (item == null || unit == null || qty == null || qty <= 0) return;
+    if (item == null || unit == null) return;
+    if (qty == null || qty <= 0) {
+      setState(
+        () => _qtyError = AppLocalizations.of(context).taskMaterialQtyInvalid,
+      );
+      return;
+    }
     Navigator.of(
       context,
     ).pop(TaskMaterial(itemId: item.id, qty: qty, unit: unit.name));
@@ -486,7 +523,13 @@ class _MaterialDialogState extends ConsumerState<_MaterialDialog> {
                         ),
                         decoration: InputDecoration(
                           labelText: l.taskMaterialQtyLabel,
+                          errorText: _qtyError,
                         ),
+                        onChanged: (_) {
+                          if (_qtyError != null) {
+                            setState(() => _qtyError = null);
+                          }
+                        },
                         onSubmitted: (_) => _submit(),
                       ),
                     ),

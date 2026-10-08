@@ -10,10 +10,8 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/app/app_info.dart';
 import '../../../core/di/providers.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../activity/presentation/controllers/activity_controller.dart';
+import '../../account/presentation/garden_reload.dart';
 import '../../settings/presentation/settings_controller.dart';
-import '../../tasks/presentation/tasks_controller.dart';
-import '../../zones/presentation/zones_controller.dart';
 import '../data/backup_service.dart';
 import '../domain/backup_format.dart';
 
@@ -131,10 +129,7 @@ Future<void> importBackup(BuildContext context, WidgetRef ref) async {
     final copy = File(path);
     if (copy.existsSync()) await copy.delete();
   }
-  ref
-    ..invalidate(zonesControllerProvider)
-    ..invalidate(activityControllerProvider)
-    ..invalidate(tasksControllerProvider);
+  reloadGardenData(ref.invalidate);
   messenger.showSnackBar(SnackBar(content: Text(l.backupImportDone)));
 }
 

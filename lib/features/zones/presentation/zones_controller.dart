@@ -3,6 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/di/providers.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
+import '../../builds/domain/build_design.dart';
+import '../../builds/presentation/builds_controller.dart';
+import '../../incidents/domain/incident.dart';
+import '../../incidents/presentation/incidents_controller.dart';
+import '../../tasks/domain/task_entity.dart';
+import '../../tasks/presentation/tasks_controller.dart';
 import '../domain/zone_entity.dart';
 import '../domain/zone_rules.dart';
 
@@ -66,17 +72,36 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
   }
 
   /// Smaže zónu, pokud to pravidla dovolí; jinak vrátí důvod a nic nemění.
-  Future<ZoneDeleteBlocker?> deleteZone(String id) async {
-    // Deník nemusí být ještě načtený; pravidlo se nesmí obejít prázdným seznamem.
+  /// Proč zónu nejde smazat, nebo null. Počítá se všechno, co na zónu
+  /// odkazuje: deník, úkoly, problémy a stavby.
+  Future<ZoneDeleteBlocker?> deleteBlocker(String id) async {
+    // Data nemusí být ještě načtená; pravidlo se nesmí obejít prázdným seznamem.
     final List<ActivityEntity> activities =
         ref.read(activityControllerProvider).value ??
         await ref.read(activityControllerProvider.future);
-    final blocker = zoneDeleteBlocker(
+    final List<TaskEntity> tasks =
+        ref.read(tasksControllerProvider).value ??
+        await ref.read(tasksControllerProvider.future);
+    final List<Incident> incidents =
+        ref.read(incidentsControllerProvider).value ??
+        await ref.read(incidentsControllerProvider.future);
+    final List<BuildDesign> builds =
+        ref.read(buildsControllerProvider).value ??
+        await ref.read(buildsControllerProvider.future);
+    return zoneDeleteBlocker(
       zoneId: id,
       activeZoneCount: _activeCount,
       isArchived: _byId(id)?.archived ?? false,
-      activityCount: activities.where((a) => a.zoneId == id).length,
+      linkedCount:
+          activities.where((a) => a.zoneId == id).length +
+          tasks.where((t) => t.zoneId == id).length +
+          incidents.where((i) => i.zoneId == id).length +
+          builds.where((b) => b.zoneId == id).length,
     );
+  }
+
+  Future<ZoneDeleteBlocker?> deleteZone(String id) async {
+    final blocker = await deleteBlocker(id);
     if (blocker != null) return blocker;
 
     final previous = _current;

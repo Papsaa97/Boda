@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/formatting/dates.dart';
 import '../../../core/text/numbers.dart';
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/build_design.dart';
 import '../domain/build_params.dart';
@@ -37,7 +38,7 @@ class BuildsScreen extends ConsumerWidget {
       body: async.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(l.commonErrorWithDetail('$e'))),
+        error: (e, stack) => LoadErrorView(error: e, stack: stack),
         data: (builds) => ListView(
           padding: const EdgeInsets.only(bottom: 96),
           children: [

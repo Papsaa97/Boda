@@ -56,7 +56,10 @@ class StatsScreen extends ConsumerWidget {
               Expanded(
                 child: _Number(
                   value: stats.activeWeeks,
-                  label: l.statsActiveWeeks(stats.weeks.length),
+                  label: l.statsActiveWeeks(
+                    stats.activeWeeks,
+                    stats.weeks.length,
+                  ),
                 ),
               ),
             ],

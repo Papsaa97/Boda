@@ -69,7 +69,7 @@ class SharingScreen extends ConsumerWidget {
             Text(
               e is SharingException
                   ? sharingFailureText(l, e.failure)
-                  : l.commonErrorWithDetail('$e'),
+                  : l.commonLoadFailed,
             ),
             if (e is SharingException &&
                 (e.failure == SharingFailure.offline ||

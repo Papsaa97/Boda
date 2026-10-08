@@ -142,6 +142,18 @@ abstract class AppLocalizations {
   /// **'Pokračovat'**
   String get commonContinue;
 
+  /// No description provided for @commonDiscardTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahodit změny?'**
+  String get commonDiscardTitle;
+
+  /// No description provided for @commonDiscardBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Změny nejsou uložené.'**
+  String get commonDiscardBody;
+
   /// No description provided for @commonUnknownZone.
   ///
   /// In cs, this message translates to:
@@ -153,6 +165,18 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Chyba: {error}'**
   String commonErrorWithDetail(Object error);
+
+  /// No description provided for @commonSaveFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Uložení se nepovedlo. Zkus to znovu.'**
+  String get commonSaveFailed;
+
+  /// No description provided for @commonLoadFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Data se nepodařilo načíst. Zkus aplikaci zavřít a otevřít znovu.'**
+  String get commonLoadFailed;
 
   /// No description provided for @zonesLoadError.
   ///
@@ -355,7 +379,7 @@ abstract class AppLocalizations {
   /// No description provided for @activityTypeLabel.
   ///
   /// In cs, this message translates to:
-  /// **'Co jsi dělal?'**
+  /// **'Co jsi dělal(a)?'**
   String get activityTypeLabel;
 
   /// No description provided for @activityTitleLabel.
@@ -453,6 +477,12 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Vybrat z galerie'**
   String get photoFromGallery;
+
+  /// No description provided for @photoPickFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Fotku se nepodařilo načíst. Zkontroluj, jestli má aplikace přístup k fotoaparátu a fotkám.'**
+  String get photoPickFailed;
 
   /// No description provided for @photoRemove.
   ///
@@ -619,8 +649,8 @@ abstract class AppLocalizations {
   /// No description provided for @zoneCannotDeleteBody.
   ///
   /// In cs, this message translates to:
-  /// **'{name} má v deníku {count, plural, =1{1 záznam} few{{count} záznamy} other{{count} záznamů}}. Můžeš ji archivovat: nebude se nabízet pro nové záznamy, ale záznamy zůstanou.'**
-  String zoneCannotDeleteBody(String name, int count);
+  /// **'K zóně {name} patří záznamy v deníku, úkoly, problémy nebo stavby. Můžeš ji archivovat: nebude se nabízet pro nové záznamy, ale všechno v ní zůstane.'**
+  String zoneCannotDeleteBody(String name);
 
   /// No description provided for @zoneArchive.
   ///
@@ -639,6 +669,18 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Smazat zónu'**
   String get zoneDelete;
+
+  /// No description provided for @zoneDeleteConfirmTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat zónu {name}?'**
+  String zoneDeleteConfirmTitle(String name);
+
+  /// No description provided for @zoneDeleteConfirmBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smaže se i její obrys v plánu zahrady. Tohle nejde vrátit.'**
+  String get zoneDeleteConfirmBody;
 
   /// No description provided for @zoneKeepOne.
   ///
@@ -931,7 +973,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupReminderBody.
   ///
   /// In cs, this message translates to:
-  /// **'Data jsou jen v tomhle telefonu. Záloha zabere chvilku a uložíš ji třeba na Disk nebo do e-mailu.'**
+  /// **'Bez účtu jsou data jen v tomhle telefonu. Záloha zabere chvilku a uložíš ji třeba na Disk nebo do e-mailu.'**
   String get backupReminderBody;
 
   /// No description provided for @backupReminderAction.
@@ -1105,7 +1147,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPrivacy.
   ///
   /// In cs, this message translates to:
-  /// **'Všechna data zůstávají jen v tomhle zařízení. Aplikace nic neodesílá.'**
+  /// **'Deník je v telefonu a funguje bez účtu. Na server jdou jen data, se kterými jsi souhlasil(a): synchronizace, dotazy pro Bóďu, poloha pro počasí a fotky k diagnostice.'**
   String get settingsPrivacy;
 
   /// No description provided for @settingsVersion.
@@ -1141,8 +1183,8 @@ abstract class AppLocalizations {
   /// No description provided for @statsActiveWeeks.
   ///
   /// In cs, this message translates to:
-  /// **'týdnů z {weeks} s aspoň 2 záznamy'**
-  String statsActiveWeeks(int weeks);
+  /// **'{active, plural, one{týden} few{týdny} other{týdnů}} z {weeks} s aspoň 2 záznamy'**
+  String statsActiveWeeks(int active, int weeks);
 
   /// No description provided for @statsPerWeek.
   ///
@@ -1465,7 +1507,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationDigestMore.
   ///
   /// In cs, this message translates to:
-  /// **'a {count} další'**
+  /// **'a {count, plural, one{1 další} few{{count} další} other{{count} dalších}}'**
   String notificationDigestMore(int count);
 
   /// No description provided for @zoneEditTitle.
@@ -2134,6 +2176,18 @@ abstract class AppLocalizations {
   /// **'Smazat koupené'**
   String get shoppingClearDone;
 
+  /// No description provided for @shoppingAlreadyListed.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} už na seznamu je.'**
+  String shoppingAlreadyListed(String name);
+
+  /// No description provided for @shoppingSaveFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nákupní seznam se nepodařilo uložit.'**
+  String get shoppingSaveFailed;
+
   /// No description provided for @shoppingRestocked.
   ///
   /// In cs, this message translates to:
@@ -2283,6 +2337,12 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'{name}: {qty}'**
   String taskMaterialQty(String name, String qty);
+
+  /// No description provided for @taskMaterialQtyInvalid.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej množství větší než 0.'**
+  String get taskMaterialQtyInvalid;
 
   /// No description provided for @taskMaterialMissing.
   ///
@@ -2769,6 +2829,12 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Poslat kód'**
   String get accountSendCode;
+
+  /// No description provided for @accountSignIn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přihlásit se'**
+  String get accountSignIn;
 
   /// No description provided for @accountCodeSent.
   ///
@@ -3856,10 +3922,16 @@ abstract class AppLocalizations {
   /// **'Smazat problém?'**
   String get incidentDeleteTitle;
 
+  /// No description provided for @incidentGone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tenhle problém už neexistuje.'**
+  String get incidentGone;
+
   /// No description provided for @incidentDeleteBody.
   ///
   /// In cs, this message translates to:
-  /// **'Smaže se karta „{label}“ i její fotky. Úkoly kontrol zůstanou.'**
+  /// **'Smaže se karta „{label}“ i její fotky. Otevřené kontroly k ní se přeskočí.'**
   String incidentDeleteBody(String label);
 
   /// No description provided for @weatherTitle.
@@ -4221,6 +4293,12 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Úkol přidán'**
   String get weatherPhenologyTaskAdded;
+
+  /// No description provided for @weatherPhenologyTaskExists.
+  ///
+  /// In cs, this message translates to:
+  /// **'Takový úkol už v seznamu máš.'**
+  String get weatherPhenologyTaskExists;
 
   /// No description provided for @weatherCardNow.
   ///
@@ -4678,6 +4756,12 @@ abstract class AppLocalizations {
   /// **'Zadej název'**
   String get buildsNameRequired;
 
+  /// No description provided for @buildsFixParams.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nejdřív oprav parametry s chybou.'**
+  String get buildsFixParams;
+
   /// No description provided for @buildsZone.
   ///
   /// In cs, this message translates to:
@@ -4761,6 +4845,12 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'{qty} {unit} × {price} Kč'**
   String buildsLineTotal(String qty, String unit, String price);
+
+  /// No description provided for @buildsLineAmount.
+  ///
+  /// In cs, this message translates to:
+  /// **'{amount} Kč'**
+  String buildsLineAmount(String amount);
 
   /// No description provided for @buildsAddToShopping.
   ///
@@ -5419,8 +5509,8 @@ abstract class AppLocalizations {
   /// No description provided for @buildFindingBridgeDeckSpan.
   ///
   /// In cs, this message translates to:
-  /// **'Podlahová prkna by mezi nosníky měla moc velké pole. Zvol {beams} nosníky nebo silnější prkna.'**
-  String buildFindingBridgeDeckSpan(String beams);
+  /// **'Podlahová prkna by mezi nosníky měla moc velké pole. Zvol {beams, plural, one{1 nosník} few{{beams} nosníky} other{{beams} nosníků}} nebo silnější prkna.'**
+  String buildFindingBridgeDeckSpan(int beams);
 
   /// No description provided for @buildFindingShelterRafterFails.
   ///

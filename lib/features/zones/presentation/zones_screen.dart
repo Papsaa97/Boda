@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../weather/presentation/weather_screen.dart';
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../builds/presentation/builds_screen.dart';
@@ -71,21 +72,19 @@ class ZonesScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ZoneEntity zone,
-    int activityCount,
   ) async {
     final messenger = ScaffoldMessenger.of(context);
     final l = AppLocalizations.of(context);
-    final blocker = await ref
-        .read(zonesControllerProvider.notifier)
-        .deleteZone(zone.id);
+    final controller = ref.read(zonesControllerProvider.notifier);
+    final blocker = await controller.deleteBlocker(zone.id);
     if (!context.mounted) return;
     switch (blocker) {
-      case ZoneDeleteBlocker.hasActivities:
+      case ZoneDeleteBlocker.inUse:
         final archive = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: Text(l.zoneCannotDeleteTitle),
-            content: Text(l.zoneCannotDeleteBody(zone.name, activityCount)),
+            content: Text(l.zoneCannotDeleteBody(zone.name)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -102,16 +101,38 @@ class ZonesScreen extends ConsumerWidget {
         if (archive == true && context.mounted) {
           await _setArchived(context, ref, zone, true);
         }
+        return;
       case ZoneDeleteBlocker.lastZone:
         messenger.showSnackBar(SnackBar(content: Text(l.zoneKeepOne)));
+        return;
       case null:
-        if (ref.read(zonesControllerProvider).hasError) {
-          _reportFailure(context, ref);
-        } else {
-          messenger.showSnackBar(
-            SnackBar(content: Text(l.zoneDeleted(zone.name))),
-          );
-        }
+        break;
+    }
+    if (!context.mounted) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.zoneDeleteConfirmTitle(zone.name)),
+        content: Text(l.zoneDeleteConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l.zoneDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    final result = await controller.deleteZone(zone.id);
+    if (!context.mounted || result != null) return;
+    if (ref.read(zonesControllerProvider).hasError) {
+      _reportFailure(context, ref);
+    } else {
+      messenger.showSnackBar(SnackBar(content: Text(l.zoneDeleted(zone.name))));
     }
   }
 
@@ -140,7 +161,7 @@ class ZonesScreen extends ConsumerWidget {
           onSelected: (action) => switch (action) {
             'edit' => _edit(context, zone),
             'archive' => _setArchived(context, ref, zone, !zone.archived),
-            _ => _delete(context, ref, zone, count),
+            _ => _delete(context, ref, zone),
           },
           itemBuilder: (_) => [
             PopupMenuItem(value: 'edit', child: Text(l.zoneEdit)),
@@ -165,8 +186,7 @@ class ZonesScreen extends ConsumerWidget {
       body: zonesAsync.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text(l.commonErrorWithDetail('$error'))),
+        error: (error, stack) => LoadErrorView(error: error, stack: stack),
         data: (zones) {
           final active = zones.where((z) => z.isActive).toList();
           final planned = zones

@@ -79,11 +79,16 @@ class _BuildEditorScreenState extends ConsumerState<BuildEditorScreen> {
 
   Future<void> _save() async {
     final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     if (_name.text.trim().isEmpty) {
       setState(() => _nameError = l.buildsNameRequired);
       return;
     }
-    final messenger = ScaffoldMessenger.of(context);
+    if (_errors.isNotEmpty) {
+      // Pole s chybou drží poslední platnou hodnotu; uložit ji potichu nejde.
+      messenger.showSnackBar(SnackBar(content: Text(l.buildsFixParams)));
+      return;
+    }
     final navigator = Navigator.of(context);
     await ref
         .read(buildsControllerProvider.notifier)
@@ -91,9 +96,7 @@ class _BuildEditorScreenState extends ConsumerState<BuildEditorScreen> {
     if (!mounted) return;
     final state = ref.read(buildsControllerProvider);
     if (state.hasError) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(l.commonErrorWithDetail('${state.error}'))),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l.commonSaveFailed)));
       return;
     }
     _done = true;
@@ -396,7 +399,9 @@ class _BuildEditorScreenState extends ConsumerState<BuildEditorScreen> {
             ? TextStyle(color: Theme.of(context).colorScheme.primary)
             : null,
       ),
-      trailing: Text('${formatDecimal((line.quantity * price).round())} Kč'),
+      trailing: Text(
+        l.buildsLineAmount(formatDecimal((line.quantity * price).round())),
+      ),
       onTap: () => _editPrice(line.material),
     );
   }

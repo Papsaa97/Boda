@@ -37,3 +37,19 @@ String formatDaysAgo(AppLocalizations l, int days) {
 
 String capitalize(String s) =>
     s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
+/// Den v týdnu s předložkou, jak se říká („ve středu 12. 10.“). Intl umí
+/// jen první pád (středa), proto vlastní tabulka.
+String formatWeekdayIn(DateTime date) {
+  const names = [
+    'v pondělí',
+    'v úterý',
+    've středu',
+    've čtvrtek',
+    'v pátek',
+    'v sobotu',
+    'v neděli',
+  ];
+  final day = DateFormat('d. M.', appLocale).format(date);
+  return '${names[date.weekday - 1]} $day';
+}

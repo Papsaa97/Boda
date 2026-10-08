@@ -141,7 +141,9 @@ String findingText(AppLocalizations l, Finding f) {
     FindingCode.bridgeTooHigh => l.buildFindingBridgeTooHigh(_m(v['limit'])),
     FindingCode.bridgeNeedsRailing => l.buildFindingBridgeNeedsRailing,
     FindingCode.bridgeNarrow => l.buildFindingBridgeNarrow,
-    FindingCode.bridgeDeckSpan => l.buildFindingBridgeDeckSpan('${v['beams']}'),
+    FindingCode.bridgeDeckSpan => l.buildFindingBridgeDeckSpan(
+      v['beams'] as int,
+    ),
     FindingCode.shelterRafterFails => switch (v['section']) {
       final String s => l.buildFindingShelterRafterFails(
         v['percent']! as int,

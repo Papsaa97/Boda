@@ -46,3 +46,4 @@ app.*.map.json
 
 # Mistni --dart-define-from-file (adresa a klic projektu Supabase, DECLOG D92)
 /env/
+lib/main_demo.dart

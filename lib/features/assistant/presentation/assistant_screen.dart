@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../account/presentation/account_screen.dart';
 import '../../activity/presentation/screens/activity_form_screen.dart';
 import '../domain/assistant_backend.dart';
 import '../domain/assistant_message.dart';
@@ -165,8 +167,8 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
             child: async.when(
               skipError: true,
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) =>
-                  Center(child: Text(l.commonErrorWithDetail('$error'))),
+              error: (error, stack) =>
+                  LoadErrorView(error: error, stack: stack),
               data: (c) => c.messages.isEmpty
                   ? _EmptyState(onAsk: _ask)
                   : ListView.builder(
@@ -249,6 +251,13 @@ class _DemoBanner extends StatelessWidget {
               style: TextStyle(color: scheme.onTertiaryContainer),
             ),
           ),
+          if (signIn)
+            TextButton(
+              onPressed: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const AccountScreen())),
+              child: Text(AppLocalizations.of(context).accountSignIn),
+            ),
         ],
       ),
     );
@@ -439,8 +448,14 @@ class _AnswerBubble extends ConsumerStatefulWidget {
 }
 
 class _AnswerBubbleState extends ConsumerState<_AnswerBubble> {
-  /// Akce, které uživatel v téhle odpovědi už uložil.
-  final _done = <AssistantAction>{};
+  String _key(AssistantAction action) =>
+      '${widget.message.id}:${widget.message.meta.actions.indexOf(action)}';
+
+  bool _isDone(AssistantAction action) =>
+      ref.watch(appliedActionsProvider).contains(_key(action));
+
+  void _markDone(AssistantAction action) =>
+      ref.read(appliedActionsProvider.notifier).add(_key(action));
 
   Future<void> _apply(AssistantAction action) async {
     final l = AppLocalizations.of(context);
@@ -459,34 +474,30 @@ class _AnswerBubbleState extends ConsumerState<_AnswerBubble> {
             ),
           ),
         );
-        if (saved != null && mounted) setState(() => _done.add(action));
+        if (saved != null && mounted) _markDone(action);
         return;
       case TaskAction():
-        try {
-          await controller.createTask(action);
-          if (!mounted) return;
-          setState(() => _done.add(action));
-          messenger.showSnackBar(
-            SnackBar(content: Text(l.assistantActionTaskDone)),
-          );
-        } on Exception {
-          messenger.showSnackBar(
-            SnackBar(content: Text(l.assistantActionFailed)),
-          );
-        }
+        final ok = await controller.createTask(action);
+        if (!mounted) return;
+        if (ok) _markDone(action);
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              ok ? l.assistantActionTaskDone : l.assistantActionFailed,
+            ),
+          ),
+        );
       case ShoppingAction():
-        try {
-          await controller.addToShopping(action);
-          if (!mounted) return;
-          setState(() => _done.add(action));
-          messenger.showSnackBar(
-            SnackBar(content: Text(l.assistantActionShoppingDone)),
-          );
-        } on Exception {
-          messenger.showSnackBar(
-            SnackBar(content: Text(l.assistantActionFailed)),
-          );
-        }
+        final ok = await controller.addToShopping(action);
+        if (!mounted) return;
+        if (ok) _markDone(action);
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              ok ? l.assistantActionShoppingDone : l.assistantActionFailed,
+            ),
+          ),
+        );
     }
   }
 
@@ -589,9 +600,9 @@ class _AnswerBubbleState extends ConsumerState<_AnswerBubble> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
                     child: OutlinedButton.icon(
-                      onPressed: _done.contains(a) ? null : () => _apply(a),
+                      onPressed: _isDone(a) ? null : () => _apply(a),
                       icon: Icon(
-                        _done.contains(a)
+                        _isDone(a)
                             ? Icons.check
                             : switch (a) {
                                 TaskAction() => Icons.add_task,

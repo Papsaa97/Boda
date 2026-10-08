@@ -199,6 +199,7 @@ class _SignedIn extends ConsumerWidget {
 
   Future<void> _signOut(BuildContext context, WidgetRef ref) async {
     final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     if (!await _confirm(
       context,
       title: l.accountSignOut,
@@ -207,7 +208,11 @@ class _SignedIn extends ConsumerWidget {
     )) {
       return;
     }
-    await ref.read(authServiceProvider).signOut();
+    try {
+      await ref.read(authServiceProvider).signOut();
+    } on AuthFailure catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(authErrorText(l, e.kind))));
+    }
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {

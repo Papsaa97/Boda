@@ -43,7 +43,7 @@ enum BuildTemplate {
         '120x240',
         '140x280',
       ], initial: '100x200'),
-      ChoiceParam('beamCount', ['2', '3', '4'], initial: '3'),
+      ChoiceParam('beamCount', ['2', '3', '4', '5', '6'], initial: '3'),
       ChoiceParam('deckThickness', ['28', '32', '40'], initial: '32'),
       NumberParam('heightAbove', min: 0.1, max: 3, initial: 0.4),
       ToggleParam('railing', initial: false),

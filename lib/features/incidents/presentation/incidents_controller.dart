@@ -90,11 +90,21 @@ class IncidentsController extends AsyncNotifier<List<Incident>> {
     }
   }
 
+  /// Smaže kartu; otevřené kontroly (D+3, D+7) k ní se přeskočí, aby
+  /// nepřipomínaly něco, co už neexistuje.
   Future<void> delete(String id) async {
     await _mutate((list) async {
       await ref.read(incidentRepositoryProvider).delete(id);
       return list.where((i) => i.id != id).toList();
     });
+    if (state.hasError) return;
+    final tasks = ref.read(tasksControllerProvider.notifier);
+    final open = (ref.read(tasksControllerProvider).value ?? const [])
+        .where((t) => t.incidentId == id && t.isOpen)
+        .toList();
+    for (final t in open) {
+      await tasks.close(t.id, TaskStatus.skipped);
+    }
   }
 
   Incident? _find(String id) =>

@@ -431,3 +431,25 @@ Dopad: migrace 0000 až 1000 a všech pět Edge Functions jsou nasazené (`supab
 **D94. Edge Functions běží s `verify_jwt = false`, přihlášení ověřuje jen funkce sama (`auth.getUser`).**
 Proč: nové projekty Supabase podepisují tokeny asymetrickým klíčem (ES256). Starší ověřování v bráně Edge Functions je odmítá, takže Bóďa vracel chybu i přihlášenému uživateli. Všech pět funkcí si uživatele ověřuje samo a bez platného tokenu vrací 401, druhá kontrola v bráně tedy nic nepřidává. Supabase pro nové klíče postupuje stejně. Rozhodl Papi (volba A, 8. 10. 2026).
 Dopad: `supabase/config.toml` má u `boda-chat`, `weather`, `diagnose` a `delete-account` `verify_jwt = false` a nasazuje se s `--no-verify-jwt`. Každá nová funkce pro přihlášené uživatele musí sama volat `authenticateRequest` (`_shared/supabase.ts`) a bez uživatele vrátit 401. Ověřeno: neplatný token dostane 401 `unauthorized`. Složka `env/` (soubory pro `--dart-define-from-file`, D71) je v `.gitignore`, aby se do gitu nedostala adresa a klíč konkrétního projektu Supabase; hodnoty nejsou tajné, ale patří k jednomu počítači.
+
+## 2026-10-08 – Kontrola kvality před vydáním
+
+**D95. Zónu jde smazat jen prázdnou a po potvrzení; „prázdná“ znamená bez záznamů, úkolů, problémů i staveb.**
+Proč: mazání bylo na jedno klepnutí a hlídalo jen deník, takže úkoly, problémy a stavby v zóně osiřely a ukazovaly „Neznámá zóna“. Smazání zóny bere i obrys v plánu, což nejde vrátit.
+Dopad: `zoneDeleteBlocker` dostává součet všech vazeb (`ZoneDeleteBlocker.inUse`), kontrola čte úkoly, problémy a stavby, a před smazáním je potvrzovací dialog. Archivace zůstává cestou pro zónu, která se ještě používá.
+
+**D96. Každý formulář hlídá neuložené změny stejným dialogem (`DiscardGuard`).**
+Proč: úkol, zóna, sklad, problém a poloha zahrady při gestu zpět tiše zahodily rozepsané údaje; deník a návrhy staveb to už hlídaly, každý po svém.
+Dopad: jedna komponenta v `lib/core/widgets/discard_guard.dart` porovnává otisk formuláře při otevření a při odchodu; texty `commonDiscardTitle/Body`. Uložení přes `Navigator.pop` projde bez dotazu.
+
+**D97. Po obnově zálohy a po stažení změn ze serveru se načítají znovu všechna data zahrady (`reloadGardenData`).**
+Proč: obnova zálohy přepisovala i sklad, nákup, problémy, stavby a plán, ale obrazovky si držely stará data, a úprava staré položky by zapsala zpět řádek, který obnova právě smazala. Synchronizace nenačítala stavby.
+Dopad: jeden seznam providerů v `lib/features/account/presentation/garden_reload.dart`, používá ho záloha i synchronizace. Nový provider s daty zahrady se přidává tam.
+
+**D98. Chyby načítání ukazují jednu českou větu, podrobnosti jdou do hlášení chyb; uživatel nikdy nevidí text výjimky.**
+Proč: obrazovky ukazovaly `Chyba: <výjimka>` anglicky a technicky, což spec 10 nechce a nic to neřeší.
+Dopad: `LoadErrorView` (`commonLoadFailed`) a `commonSaveFailed` místo `commonErrorWithDetail`; výjimka jde do `CrashReporter`. Akce Bódi, nákupní seznam, realizace z plánu, kalendář prací a mazání problému teď hlásí neúspěch místo falešného „hotovo“, akce Bódi si pamatuje uložené položky mimo bublinu, aby nešly uložit dvakrát.
+
+**D99. Připomínka zálohy se ukazuje jen bez účtu a text o soukromí říká, co se na server posílá.**
+Proč: FR-E3 chce připomínku jen bez cloudové synchronizace; věta „Aplikace nic neodesílá“ přestala platit od MVP 1.0 (synchronizace, Bóďa, počasí, diagnostika).
+Dopad: karta na „Dnes“ se skryje přihlášenému uživateli; `settingsPrivacy` a `backupReminderBody` popisují skutečný stav. Mazání karty problému přeskočí její otevřené kontroly; „Všechny úkoly“ přepíná záložku (`homeTabProvider`) místo druhé obrazovky bez tlačítka plus.

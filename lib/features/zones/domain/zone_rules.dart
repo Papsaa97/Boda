@@ -21,8 +21,9 @@ ZoneNameError? validateZoneName(
 
 /// Proč zónu nejde smazat.
 enum ZoneDeleteBlocker {
-  /// V zóně jsou záznamy deníku; smazáním by osiřely. Jde ji archivovat.
-  hasActivities,
+  /// K zóně patří záznamy deníku, úkoly, problémy nebo stavby; smazáním
+  /// by osiřely. Jde ji archivovat.
+  inUse,
 
   /// Musí zůstat aspoň jedna aktivní zóna, jinak by nešlo nic zapsat.
   lastZone,
@@ -32,9 +33,9 @@ ZoneDeleteBlocker? zoneDeleteBlocker({
   required String zoneId,
   required int activeZoneCount,
   required bool isArchived,
-  required int activityCount,
+  required int linkedCount,
 }) {
-  if (activityCount > 0) return ZoneDeleteBlocker.hasActivities;
+  if (linkedCount > 0) return ZoneDeleteBlocker.inUse;
   if (!isArchived && activeZoneCount <= 1) return ZoneDeleteBlocker.lastZone;
   return null;
 }

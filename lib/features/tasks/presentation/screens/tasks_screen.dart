@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/time/today.dart';
 import '../../../../core/formatting/dates.dart';
 import '../../../../core/time/calendar.dart';
+import '../../../../core/widgets/load_error_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/task_entity.dart';
 import '../tasks_controller.dart';
@@ -52,8 +53,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       body: tasksAsync.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text(l.commonErrorWithDetail('$error'))),
+        error: (error, stack) => LoadErrorView(error: error, stack: stack),
         data: (tasks) {
           final open = tasks.where((t) => t.isOpen).toList();
           final closed = tasks.where((t) => !t.isOpen).toList()

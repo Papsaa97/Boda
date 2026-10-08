@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/text/numbers.dart';
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/shopping_item.dart';
 import '../domain/units.dart';
@@ -51,10 +52,19 @@ class ShoppingListScreen extends ConsumerWidget {
       context: context,
       builder: (_) => const _AddDialog(),
     );
-    if (result == null) return;
-    await ref
+    if (result == null || !context.mounted) return;
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final added = await ref
         .read(shoppingControllerProvider.notifier)
         .add(name: result.name, qty: result.qty, unit: result.unit);
+    if (!added) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l.shoppingAlreadyListed(result.name.trim()))),
+      );
+    } else if (ref.read(shoppingControllerProvider).hasError) {
+      messenger.showSnackBar(SnackBar(content: Text(l.shoppingSaveFailed)));
+    }
   }
 
   @override
@@ -85,7 +95,7 @@ class ShoppingListScreen extends ConsumerWidget {
       body: itemsAsync.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(l.commonErrorWithDetail('$e'))),
+        error: (e, stack) => LoadErrorView(error: e, stack: stack),
         data: (items) {
           if (items.isEmpty) {
             return Center(

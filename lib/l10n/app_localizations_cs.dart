@@ -33,12 +33,25 @@ class AppLocalizationsCs extends AppLocalizations {
   String get commonContinue => 'Pokračovat';
 
   @override
+  String get commonDiscardTitle => 'Zahodit změny?';
+
+  @override
+  String get commonDiscardBody => 'Změny nejsou uložené.';
+
+  @override
   String get commonUnknownZone => 'Neznámá zóna';
 
   @override
   String commonErrorWithDetail(Object error) {
     return 'Chyba: $error';
   }
+
+  @override
+  String get commonSaveFailed => 'Uložení se nepovedlo. Zkus to znovu.';
+
+  @override
+  String get commonLoadFailed =>
+      'Data se nepodařilo načíst. Zkus aplikaci zavřít a otevřít znovu.';
 
   @override
   String zonesLoadError(Object error) {
@@ -146,7 +159,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get activityDetailTitle => 'Záznam';
 
   @override
-  String get activityTypeLabel => 'Co jsi dělal?';
+  String get activityTypeLabel => 'Co jsi dělal(a)?';
 
   @override
   String get activityTitleLabel => 'Název aktivity';
@@ -195,6 +208,10 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get photoFromGallery => 'Vybrat z galerie';
+
+  @override
+  String get photoPickFailed =>
+      'Fotku se nepodařilo načíst. Zkontroluj, jestli má aplikace přístup k fotoaparátu a fotkám.';
 
   @override
   String get photoRemove => 'Odebrat fotku';
@@ -299,15 +316,8 @@ class AppLocalizationsCs extends AppLocalizations {
   String get zoneCannotDeleteTitle => 'Zónu nejde smazat';
 
   @override
-  String zoneCannotDeleteBody(String name, int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count záznamů',
-      few: '$count záznamy',
-      one: '1 záznam',
-    );
-    return '$name má v deníku $_temp0. Můžeš ji archivovat: nebude se nabízet pro nové záznamy, ale záznamy zůstanou.';
+  String zoneCannotDeleteBody(String name) {
+    return 'K zóně $name patří záznamy v deníku, úkoly, problémy nebo stavby. Můžeš ji archivovat: nebude se nabízet pro nové záznamy, ale všechno v ní zůstane.';
   }
 
   @override
@@ -318,6 +328,15 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get zoneDelete => 'Smazat zónu';
+
+  @override
+  String zoneDeleteConfirmTitle(String name) {
+    return 'Smazat zónu $name?';
+  }
+
+  @override
+  String get zoneDeleteConfirmBody =>
+      'Smaže se i její obrys v plánu zahrady. Tohle nejde vrátit.';
 
   @override
   String get zoneKeepOne => 'Aspoň jedna zóna musí zůstat.';
@@ -538,7 +557,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get backupReminderBody =>
-      'Data jsou jen v tomhle telefonu. Záloha zabere chvilku a uložíš ji třeba na Disk nebo do e-mailu.';
+      'Bez účtu jsou data jen v tomhle telefonu. Záloha zabere chvilku a uložíš ji třeba na Disk nebo do e-mailu.';
 
   @override
   String get backupReminderAction => 'Zálohovat';
@@ -630,7 +649,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get settingsPrivacy =>
-      'Všechna data zůstávají jen v tomhle zařízení. Aplikace nic neodesílá.';
+      'Deník je v telefonu a funguje bez účtu. Na server jdou jen data, se kterými jsi souhlasil(a): synchronizace, dotazy pro Bóďu, poloha pro počasí a fotky k diagnostice.';
 
   @override
   String settingsVersion(String version) {
@@ -650,8 +669,15 @@ class AppLocalizationsCs extends AppLocalizations {
   String get statsThisWeek => 'tento týden';
 
   @override
-  String statsActiveWeeks(int weeks) {
-    return 'týdnů z $weeks s aspoň 2 záznamy';
+  String statsActiveWeeks(int active, int weeks) {
+    String _temp0 = intl.Intl.pluralLogic(
+      active,
+      locale: localeName,
+      other: 'týdnů',
+      few: 'týdny',
+      one: 'týden',
+    );
+    return '$_temp0 z $weeks s aspoň 2 záznamy';
   }
 
   @override
@@ -854,7 +880,14 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String notificationDigestMore(int count) {
-    return 'a $count další';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dalších',
+      few: '$count další',
+      one: '1 další',
+    );
+    return 'a $_temp0';
   }
 
   @override
@@ -1230,6 +1263,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get shoppingClearDone => 'Smazat koupené';
 
   @override
+  String shoppingAlreadyListed(String name) {
+    return '$name už na seznamu je.';
+  }
+
+  @override
+  String get shoppingSaveFailed => 'Nákupní seznam se nepodařilo uložit.';
+
+  @override
   String shoppingRestocked(String name, String qty) {
     return 'Do skladu přidáno: $name +$qty';
   }
@@ -1347,6 +1388,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String taskMaterialQty(String name, String qty) {
     return '$name: $qty';
   }
+
+  @override
+  String get taskMaterialQtyInvalid => 'Zadej množství větší než 0.';
 
   @override
   String get taskMaterialMissing => 'Neznámá položka';
@@ -1665,6 +1709,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get accountSendCode => 'Poslat kód';
+
+  @override
+  String get accountSignIn => 'Přihlásit se';
 
   @override
   String accountCodeSent(String email) {
@@ -2315,8 +2362,11 @@ class AppLocalizationsCs extends AppLocalizations {
   String get incidentDeleteTitle => 'Smazat problém?';
 
   @override
+  String get incidentGone => 'Tenhle problém už neexistuje.';
+
+  @override
   String incidentDeleteBody(String label) {
-    return 'Smaže se karta „$label“ i její fotky. Úkoly kontrol zůstanou.';
+    return 'Smaže se karta „$label“ i její fotky. Otevřené kontroly k ní se přeskočí.';
   }
 
   @override
@@ -2557,6 +2607,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get weatherPhenologyTaskAdded => 'Úkol přidán';
+
+  @override
+  String get weatherPhenologyTaskExists => 'Takový úkol už v seznamu máš.';
 
   @override
   String weatherCardNow(String items) {
@@ -2829,6 +2882,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get buildsNameRequired => 'Zadej název';
 
   @override
+  String get buildsFixParams => 'Nejdřív oprav parametry s chybou.';
+
+  @override
   String get buildsZone => 'Zóna';
 
   @override
@@ -2877,6 +2933,11 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String buildsLineTotal(String qty, String unit, String price) {
     return '$qty $unit × $price Kč';
+  }
+
+  @override
+  String buildsLineAmount(String amount) {
+    return '$amount Kč';
   }
 
   @override
@@ -3296,8 +3357,15 @@ class AppLocalizationsCs extends AppLocalizations {
       'Mostek užší než 0,6 m se špatně přechází. Doporučená šířka je aspoň 0,8 m.';
 
   @override
-  String buildFindingBridgeDeckSpan(String beams) {
-    return 'Podlahová prkna by mezi nosníky měla moc velké pole. Zvol $beams nosníky nebo silnější prkna.';
+  String buildFindingBridgeDeckSpan(int beams) {
+    String _temp0 = intl.Intl.pluralLogic(
+      beams,
+      locale: localeName,
+      other: '$beams nosníků',
+      few: '$beams nosníky',
+      one: '1 nosník',
+    );
+    return 'Podlahová prkna by mezi nosníky měla moc velké pole. Zvol $_temp0 nebo silnější prkna.';
   }
 
   @override

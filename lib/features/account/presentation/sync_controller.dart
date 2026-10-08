@@ -5,14 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/sync/sync_engine.dart';
 import '../../../core/sync/sync_remote.dart';
-import '../../activity/presentation/controllers/activity_controller.dart';
-import '../../assistant/presentation/assistant_controller.dart';
-import '../../incidents/presentation/incidents_controller.dart';
-import '../../inventory/presentation/inventory_controller.dart';
-import '../../tasks/presentation/tasks_controller.dart';
-import '../../weather/presentation/weather_controller.dart';
-import '../../zones/presentation/zones_controller.dart';
 import '../domain/auth_service.dart';
+import 'garden_reload.dart';
 
 /// Proč poslední synchronizace neprošla.
 enum SyncProblem { offline, failed }
@@ -161,17 +155,7 @@ class SyncController extends Notifier<SyncStatus> {
   }
 
   /// Obrazovky načtou data znovu (stažené změny).
-  void _reload() {
-    ref
-      ..invalidate(zonesControllerProvider)
-      ..invalidate(activityControllerProvider)
-      ..invalidate(tasksControllerProvider)
-      ..invalidate(inventoryControllerProvider)
-      ..invalidate(shoppingControllerProvider)
-      ..invalidate(assistantControllerProvider)
-      ..invalidate(incidentsControllerProvider)
-      ..invalidate(weatherControllerProvider);
-  }
+  void _reload() => reloadGardenData(ref.invalidate);
 }
 
 final syncControllerProvider = NotifierProvider<SyncController, SyncStatus>(
