@@ -3,6 +3,8 @@ import 'package:uuid/uuid.dart';
 
 import '../../features/activity/data/drift_activity_repository.dart';
 import '../../features/activity/domain/activity_repository.dart';
+import '../../features/inventory/data/drift_inventory_repository.dart';
+import '../../features/inventory/domain/inventory_repository.dart';
 import '../../features/settings/domain/settings_repository.dart';
 import '../../features/tasks/data/drift_task_repository.dart';
 import '../../features/tasks/domain/task_repository.dart';
@@ -66,6 +68,22 @@ final zoneRepositoryProvider = Provider<ZoneRepository>(
 
 final taskRepositoryProvider = Provider<TaskRepository>(
   (ref) => DriftTaskRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+final inventoryRepositoryProvider = Provider<InventoryRepository>(
+  (ref) => DriftInventoryRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+final shoppingRepositoryProvider = Provider<ShoppingRepository>(
+  (ref) => DriftShoppingRepository(
     ref.watch(databaseProvider),
     ref.watch(gardenIdProvider),
     ref.watch(clockProvider),

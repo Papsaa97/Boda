@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
@@ -35,6 +36,9 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
       remindAt: draft.remindAt,
       rrule: draft.rrule,
       notes: draft.notes,
+      durationEstMin: draft.durationEstMin,
+      tools: draft.tools,
+      materials: draft.materials,
     );
     await save(task);
     return task;
@@ -78,6 +82,17 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
     final task = _find(id);
     if (task == null) return;
     await save(task.copyWith(completedActivityId: () => activityId));
+    if (task.materials.isNotEmpty && !state.hasError) {
+      // Spotřebovaný materiál se zapíše k záznamu (odpis ze skladu je
+      // až ve V2, FR-S4). Selhání nevadí: záznam i úkol už jsou uložené.
+      try {
+        await ref
+            .read(taskRepositoryProvider)
+            .recordMaterialsUsed(task, activityId);
+      } on Exception catch (e) {
+        debugPrint('Materiál k záznamu se nepodařilo zapsat: $e');
+      }
+    }
   }
 
   Future<void> delete(String id) async {

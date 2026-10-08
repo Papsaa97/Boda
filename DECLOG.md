@@ -230,3 +230,45 @@ Dopad: `test/helpers/fakes.dart`, `test/helpers/database.dart`.
 
 **D49. Dart balíček se jmenuje `zahradnik_boda`.**
 Proč: přípona `_mvp01` by se táhla celým projektem. Android `namespace` a názvy desktopových runnerů zůstávají, uživatel je nevidí a `applicationId` je už `cz.zahradnikboda.app` (D35).
+
+## 2026-10-08 – MVP 1.0 Chytrý parťák, část 1: zahrada bez internetu
+
+**D50. MVP 1.0 se dodává v několika PR: nejdřív části, které fungují bez účtu a internetu.**
+Proč: 1.0 je velká fáze (účet, synchronizace, Bóďa, sklad, platby). Menší PR jdou zkontrolovat a vrátit. Spec 4.2 sice řadí 1.0 až po validaci H1 v sezóně 2027, ale Papi chce dotáhnout, co jde, a lokální funkce testerům v 0.x nevadí.
+Dopad: část 1 = schéma v2, vlastnosti zón, sklad, nákupní seznam, úkoly s materiálem, režim víkend, sklizeň a náklady, přehled sezóny. Další části: Bóďa, backend Supabase s účtem a synchronizací, Premium a souhlasy.
+
+**D51. Záložka „Zóny“ se mění na „Zahrada“: zóny, sklad a nákupní seznam pohromadě.**
+Proč: sklad patří k zahradě, pátá záložka zůstane pro Bóďu (spec 10.3) a víc než pět položek spodní navigace Material nedoporučuje.
+Dopad: Zahrada = karta Sklad (s počtem upozornění) + seznam zón; nákupní seznam z obrazovky Skladu. Klepnutí na zónu otevře detail s vlastnostmi a posledními záznamy, úprava je celá obrazovka (název, druh, výměra, půda, pH s datem, oslunění, závlaha, krytí).
+
+**D52. Údaje položky skladu podle kategorie jsou JSON `details`; dávka z obalu je `dosePerM2` + `doseUnit`.**
+Proč: spec 8.1 má `details jsonb`. Dávka na m² z obalu nebo etikety je jediný zdroj čísla pro kalkulátor Bódi (FR-B2), proto ji zadává uživatel přímo u hnojiva nebo přípravku; u přípravku i číslo povolení, ochrannou lhůtu a „povoleno pro neprofesionály“ (FR-B4).
+Dopad: neznámá nebo poškozená data se načtou jako prázdná; nulová dávka = žádná dávka.
+
+**D53. Nákupní seznam je tabulka `shopping_items` (ve spec 8.1 chyběla).**
+Proč: FR-B5 chce z odpovědi Bódi „nákupní seznam“ a hlídač zásob (FR-S3) potřebuje kam docházející položku poslat. Seznam se má synchronizovat, proto tabulka, ne nastavení.
+Dopad: položka může odkazovat na položku skladu; odškrtnutí takové položky s množstvím přičte koupené do skladu (ruční změna stavu, ne odpis z FR-S4). Hlídač ani Bóďa nepřidají položku, která už na seznamu nekoupená je.
+
+**D54. Materiál úkolu se při zápisu do deníku zapíše jako `activity_materials`, stav skladu se nemění.**
+Proč: automatický odpis je až ve V2 (FR-S4); záznam o spotřebě se ale hodí už teď (přehled sezóny, pozdější odpis).
+Dopad: nový výskyt opakovaného úkolu přebírá dobu, nářadí i materiál.
+
+**D55. Hlídač zásob: práh u položky, osiva 60 dní před datem, nářadí podle servisního intervalu.**
+Proč: zimní inventura osiv (spec 11.4) potřebuje vědět dopředu, co koupit; 60 dní pokryje plánování před sezónou.
+Dopad: upozornění na kartě Skladu, v Zahradě a na „Co dnes?“; žádné notifikace (klid, spec 10.1).
+
+**D56. Režim víkend vybírá hladově: úkoly na řadě do 7 dní, zpožděné první, úkol bez odhadu = 30 min.**
+Proč: FR-U8 chce seznam, který se vejde do času; optimální batoh by u pár úkolů nepřinesl nic viditelného a hůř by se vysvětloval.
+Dopad: co se nevejde, je v sekci „Nevejde se“; obrazovka sečte nářadí a materiál „Vezmi s sebou“.
+
+**D57. Přehled sezóny počítá kalendářní rok; v lednu a únoru ukazuje loňský; fotky = poslední z každého měsíce.**
+Proč: FR-D11 je zimní důvod aplikaci otevřít. „Nejlepší fotky“ aplikace posoudit neumí, jedna za měsíc ukáže průběh sezóny.
+Dopad: karta na „Co dnes?“ od listopadu do února, obrazovka i ze Statistiky. Sklizeň v gramech se sčítá do kilogramů.
+
+**D58. Formát zálohy 2 jen přidává nepovinná pole; jeden dekodér čte verze 1 i 2.**
+Proč: vlastnosti zón, sklad, nákupní seznam, sklizeň, náklady a materiál musí přežít výměnu telefonu (FR-E1); záloha z 0.2 se musí dát načíst (FR-E2).
+Dopad: `docs/FORMAT_EXPORTU.md` popisuje verzi 2; test načte zálohu verze 1.
+
+**D59. Navigace zatím zůstává `Navigator`; GoRouter až s první funkcí, která potřebuje adresy (upřesňuje D7, posouvá spec 7.1).**
+Proč: přihlášení Googlem jde nativně (`signInWithIdToken`) a e-mailem jednorázovým kódem, takže návrat z prohlížeče není potřeba; klepnutí na notifikaci otevře aplikaci. Přepis všech obrazovek na GoRouter by teď nic nepřinesl a rozbil by testy.
+Dopad: GoRouter s webovými adresami přijde s plánováním na velké obrazovce (1.1) nebo s odkazy z notifikací na konkrétní úkol.

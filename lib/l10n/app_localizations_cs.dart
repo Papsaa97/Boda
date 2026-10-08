@@ -856,4 +856,606 @@ class AppLocalizationsCs extends AppLocalizations {
   String notificationDigestMore(int count) {
     return 'a $count další';
   }
+
+  @override
+  String get zoneEditTitle => 'Upravit zónu';
+
+  @override
+  String get zoneEdit => 'Upravit';
+
+  @override
+  String get zoneNameLabel => 'Název';
+
+  @override
+  String get zoneAreaLabel => 'Výměra (m²)';
+
+  @override
+  String get zoneAreaHint => 'např. 20';
+
+  @override
+  String get zoneAreaHelper => 'Stačí změřit pásmem: délka × šířka.';
+
+  @override
+  String get zonePhLabel => 'pH půdy';
+
+  @override
+  String get zonePhHint => 'např. 6,5';
+
+  @override
+  String get zonePhMeasuredLabel => 'Změřeno';
+
+  @override
+  String get zonePhMeasuredNone => 'Kdy jsi pH měřil(a)?';
+
+  @override
+  String get zoneSoilLabel => 'Půda';
+
+  @override
+  String get zoneSunLabel => 'Oslunění';
+
+  @override
+  String get zoneIrrigationLabel => 'Závlaha';
+
+  @override
+  String get zoneCoveredLabel => 'Krytá zóna';
+
+  @override
+  String get zoneCoveredHelp => 'Skleník nebo fóliovník';
+
+  @override
+  String get zoneNotSet => 'Nevyplněno';
+
+  @override
+  String get zoneNumberInvalid => 'Zadej číslo, třeba 12,5';
+
+  @override
+  String get zoneAreaOutOfRange => 'Výměra musí být mezi 0 a 100 000 m²';
+
+  @override
+  String get zonePhOutOfRange => 'pH bývá mezi 3 a 10';
+
+  @override
+  String get zoneSoilSandy => 'Písčitá';
+
+  @override
+  String get zoneSoilLoamy => 'Hlinitá';
+
+  @override
+  String get zoneSoilClay => 'Jílovitá';
+
+  @override
+  String get zoneSoilUnknown => 'Nevím';
+
+  @override
+  String get zoneSunFull => 'Plné slunce (6 h a víc)';
+
+  @override
+  String get zoneSunPartShade => 'Polostín (3–6 h)';
+
+  @override
+  String get zoneSunShade => 'Stín (méně než 3 h)';
+
+  @override
+  String get zoneIrrigationNone => 'Žádná';
+
+  @override
+  String get zoneIrrigationManual => 'Konev nebo hadice';
+
+  @override
+  String get zoneIrrigationDrip => 'Kapková';
+
+  @override
+  String get zoneIrrigationSprinkler => 'Postřikovač';
+
+  @override
+  String get zonePropertiesTitle => 'Vlastnosti';
+
+  @override
+  String get zonePropertiesEmpty =>
+      'Doplň výměru a půdu. Bóďa pak spočítá dávky přesně pro tuhle zónu.';
+
+  @override
+  String zoneAreaValue(String area) {
+    return '$area m²';
+  }
+
+  @override
+  String zonePhValue(String ph) {
+    return 'pH $ph';
+  }
+
+  @override
+  String zonePhValueDated(String ph, String date) {
+    return 'pH $ph ($date)';
+  }
+
+  @override
+  String get zoneRecentActivities => 'Poslední záznamy';
+
+  @override
+  String get zoneNoActivities => 'V téhle zóně zatím nic zapsaného.';
+
+  @override
+  String get zoneCoveredYes => 'Krytá (skleník, fóliovník)';
+
+  @override
+  String get inventoryTitle => 'Sklad';
+
+  @override
+  String get inventoryEmptyTitle => 'Sklad je zatím prázdný';
+
+  @override
+  String get inventoryEmptyBody =>
+      'Zapiš osiva, hnojiva, přípravky a nářadí, co máš doma. Bóďa pak radí s tím, co máš, a hlídá, co dochází.';
+
+  @override
+  String get inventoryAdd => 'Přidat do skladu';
+
+  @override
+  String get inventoryNewTitle => 'Nová položka';
+
+  @override
+  String get inventoryEditTitle => 'Upravit položku';
+
+  @override
+  String get inventoryCategoryLabel => 'Kategorie';
+
+  @override
+  String get inventoryCategorySeed => 'Osiva';
+
+  @override
+  String get inventoryCategoryFertilizer => 'Hnojiva';
+
+  @override
+  String get inventoryCategoryPlantProtection => 'Přípravky na ochranu rostlin';
+
+  @override
+  String get inventoryCategoryTool => 'Nářadí';
+
+  @override
+  String get inventoryCategoryOther => 'Ostatní';
+
+  @override
+  String get inventoryNameLabel => 'Název';
+
+  @override
+  String get inventoryNameRequired => 'Zadej název';
+
+  @override
+  String get inventoryUnitLabel => 'Jednotka';
+
+  @override
+  String get inventoryStockLabel => 'Množství doma';
+
+  @override
+  String get inventoryThresholdLabel => 'Upozornit, když klesne na';
+
+  @override
+  String get inventoryThresholdHelper => 'Nech prázdné, když hlídat nechceš.';
+
+  @override
+  String get inventoryUnitG => 'g';
+
+  @override
+  String get inventoryUnitKg => 'kg';
+
+  @override
+  String get inventoryUnitMl => 'ml';
+
+  @override
+  String get inventoryUnitL => 'l';
+
+  @override
+  String get inventoryUnitKs => 'ks';
+
+  @override
+  String get inventoryUnitPack => 'bal.';
+
+  @override
+  String get inventorySpeciesLabel => 'Druh (např. rajče)';
+
+  @override
+  String get inventoryVarietyLabel => 'Odrůda';
+
+  @override
+  String get inventoryLotLabel => 'Šarže';
+
+  @override
+  String get inventoryBestBeforeLabel => 'Spotřebovat do';
+
+  @override
+  String get inventoryDateNone => 'Nezadáno';
+
+  @override
+  String get inventoryNpkLabel => 'Živiny N-P-K (%)';
+
+  @override
+  String get inventoryNLabel => 'N';
+
+  @override
+  String get inventoryPLabel => 'P';
+
+  @override
+  String get inventoryKLabel => 'K';
+
+  @override
+  String get inventoryFormLabel => 'Forma';
+
+  @override
+  String get inventoryFormGranular => 'Granule';
+
+  @override
+  String get inventoryFormLiquid => 'Tekuté';
+
+  @override
+  String get inventoryFormPowder => 'Prášek';
+
+  @override
+  String get inventoryFormOrganic => 'Organické';
+
+  @override
+  String get inventoryDoseLabel => 'Dávka na 1 m² podle obalu';
+
+  @override
+  String get inventoryDoseHelper =>
+      'Opiš z obalu. Z tohohle čísla Bóďa počítá množství na zónu.';
+
+  @override
+  String get inventoryLabelWarning =>
+      'Údaje opiš přesně z etikety. Bóďa doporučí jen přípravek povolený pro neprofesionální uživatele a dávku nikdy neodhaduje.';
+
+  @override
+  String get inventoryActiveSubstanceLabel => 'Účinná látka';
+
+  @override
+  String get inventoryAuthorizationLabel => 'Číslo povolení';
+
+  @override
+  String get inventoryPhiLabel => 'Ochranná lhůta do sklizně (dny)';
+
+  @override
+  String get inventoryNonProfessionalLabel =>
+      'Povoleno pro neprofesionální uživatele';
+
+  @override
+  String get inventoryConditionLabel => 'Stav';
+
+  @override
+  String get inventoryConditionGood => 'V pořádku';
+
+  @override
+  String get inventoryConditionNeedsService => 'Potřebuje servis';
+
+  @override
+  String get inventoryConditionBroken => 'Rozbité';
+
+  @override
+  String get inventoryServiceIntervalLabel => 'Servis každých (dní)';
+
+  @override
+  String get inventoryLastServiceLabel => 'Poslední servis';
+
+  @override
+  String get inventoryNumberInvalid => 'Zadej kladné číslo';
+
+  @override
+  String get inventoryDeleteTitle => 'Smazat položku?';
+
+  @override
+  String inventoryDeleteBody(String name) {
+    return '$name zmizí ze skladu.';
+  }
+
+  @override
+  String inventoryDeleted(String name) {
+    return '$name smazáno';
+  }
+
+  @override
+  String get inventorySaveFailed => 'Sklad se nepodařilo uložit.';
+
+  @override
+  String inventoryStock(String qty, String unit) {
+    return '$qty $unit';
+  }
+
+  @override
+  String inventoryPhi(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dní',
+      few: '$count dny',
+      one: '1 den',
+    );
+    return 'ochranná lhůta $_temp0';
+  }
+
+  @override
+  String inventoryBestBefore(String date) {
+    return 'do $date';
+  }
+
+  @override
+  String get inventoryAlertsTitle => 'Hlídač zásob';
+
+  @override
+  String inventoryAlertLowStock(String name, String qty) {
+    return '$name: dochází ($qty)';
+  }
+
+  @override
+  String inventoryAlertSeedExpired(String name, String date) {
+    return '$name: osivo je po datu ($date)';
+  }
+
+  @override
+  String inventoryAlertSeedExpiringSoon(String name, String date) {
+    return '$name: osivo vydrží do $date';
+  }
+
+  @override
+  String inventoryAlertToolService(String name) {
+    return '$name: čas na servis';
+  }
+
+  @override
+  String get inventoryToShoppingList => 'Na nákupní seznam';
+
+  @override
+  String inventoryAddedToShopping(String name) {
+    return '$name je na nákupním seznamu';
+  }
+
+  @override
+  String get shoppingTitle => 'Nákupní seznam';
+
+  @override
+  String get shoppingEmptyTitle => 'Nic nechybí';
+
+  @override
+  String get shoppingEmptyBody =>
+      'Sem přidáš, co koupit. Plní ho i Bóďa a hlídač zásob.';
+
+  @override
+  String get shoppingAdd => 'Přidat na seznam';
+
+  @override
+  String get shoppingNameLabel => 'Co koupit';
+
+  @override
+  String get shoppingQtyLabel => 'Množství (nepovinné)';
+
+  @override
+  String get shoppingClearDone => 'Smazat koupené';
+
+  @override
+  String shoppingRestocked(String name, String qty) {
+    return 'Do skladu přidáno: $name +$qty';
+  }
+
+  @override
+  String get shoppingFromBoda => 'od Bódi';
+
+  @override
+  String get shoppingFromLowStock => 'dochází';
+
+  @override
+  String shoppingCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count položek',
+      few: '$count položky',
+      one: '1 položka',
+      zero: 'prázdný',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get navGarden => 'Zahrada';
+
+  @override
+  String get gardenZonesSection => 'Zóny';
+
+  @override
+  String get gardenInventoryCard => 'Sklad';
+
+  @override
+  String gardenInventorySummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count položek',
+      few: '$count položky',
+      one: '1 položka',
+      zero: 'Zatím prázdný',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gardenAlertsSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count upozornění',
+      few: '$count upozornění',
+      one: '1 upozornění',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String durationHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String durationHoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String get taskDurationLabel => 'Odhad doby';
+
+  @override
+  String get taskDurationNone => 'Neuvedeno';
+
+  @override
+  String get taskToolsLabel => 'Nářadí';
+
+  @override
+  String get taskToolsHint => 'Přidej nářadí, např. rýč';
+
+  @override
+  String get taskToolAdd => 'Přidat nářadí';
+
+  @override
+  String taskToolRemove(String name) {
+    return 'Odebrat $name';
+  }
+
+  @override
+  String get taskMaterialsLabel => 'Materiál ze skladu';
+
+  @override
+  String get taskMaterialAdd => 'Přidat materiál';
+
+  @override
+  String taskMaterialRemove(String name) {
+    return 'Odebrat $name';
+  }
+
+  @override
+  String get taskMaterialItemLabel => 'Položka skladu';
+
+  @override
+  String get taskMaterialQtyLabel => 'Množství';
+
+  @override
+  String get taskMaterialNoInventory =>
+      'Ve skladu zatím nic není. Přidej položky v záložce Zahrada → Sklad.';
+
+  @override
+  String taskMaterialQty(String name, String qty) {
+    return '$name: $qty';
+  }
+
+  @override
+  String get taskMaterialMissing => 'Neznámá položka';
+
+  @override
+  String get weekendTitle => 'Víkend na chalupě';
+
+  @override
+  String get weekendTooltip => 'Víkend na chalupě';
+
+  @override
+  String weekendAvailable(int hours) {
+    return 'Kolik máš času: $hours h';
+  }
+
+  @override
+  String weekendSummary(int count, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Stihneš $count úkolů',
+      few: 'Stihneš $count úkoly',
+      one: 'Stihneš 1 úkol',
+      zero: 'Nic se nevejde',
+    );
+    return '$_temp0 ($time)';
+  }
+
+  @override
+  String get weekendNothing =>
+      'Na příští týden nic otevřeného nemáš. Užij si chalupu.';
+
+  @override
+  String get weekendTakeAlong => 'Vezmi s sebou';
+
+  @override
+  String get weekendLeftOver => 'Nevejde se';
+
+  @override
+  String get weekendEstimated => 'odhad';
+
+  @override
+  String get weekendHint =>
+      'Úkoly na řadě do týdne, nejdřív zpožděné. Doba bez odhadu se počítá jako 30 min.';
+
+  @override
+  String get activityHarvestLabel => 'Sklizeno';
+
+  @override
+  String get activityCostLabel => 'Náklady v Kč (nepovinné)';
+
+  @override
+  String activityHarvestValue(String qty) {
+    return 'Sklizeno $qty';
+  }
+
+  @override
+  String activityCostValue(String amount) {
+    return 'Náklady $amount Kč';
+  }
+
+  @override
+  String seasonTitle(int year) {
+    return 'Tvoje sezóna $year';
+  }
+
+  @override
+  String get seasonCardBody =>
+      'Zima je čas ohlédnout se. Kolik jsi toho letos zapsal(a) a sklidil(a)?';
+
+  @override
+  String get seasonCardAction => 'Ukázat sezónu';
+
+  @override
+  String get seasonEmpty => 'V tomhle roce zatím nic zapsaného.';
+
+  @override
+  String get seasonActivities => 'záznamů';
+
+  @override
+  String get seasonActiveDays => 'dní na zahradě';
+
+  @override
+  String get seasonHarvestTitle => 'Sklizeň';
+
+  @override
+  String get seasonHarvestNone => 'Sklizeň s množstvím zatím nezapsaná.';
+
+  @override
+  String get seasonCostTitle => 'Náklady';
+
+  @override
+  String get seasonTopZones => 'Nejvíc práce';
+
+  @override
+  String get seasonPhotos => 'Fotky sezóny';
+
+  @override
+  String get seasonOpen => 'Přehled sezóny';
+
+  @override
+  String dashboardInventoryAlerts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Hlídač zásob: $count upozornění',
+      few: 'Hlídač zásob: $count upozornění',
+      one: 'Hlídač zásob: 1 upozornění',
+    );
+    return '$_temp0';
+  }
 }

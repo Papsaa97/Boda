@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
@@ -21,24 +23,95 @@ class DriftTaskRepository implements TaskRepository {
               ..where((t) => t.deletedAt.isNull())
               ..orderBy([(t) => OrderingTerm(expression: t.due)]))
             .get();
-    return [for (final r in rows) taskFromRow(r)];
+    final materialRows = await (_db.select(
+      _db.taskMaterials,
+    )..where((m) => m.deletedAt.isNull())).get();
+    final materials = <String, List<TaskMaterial>>{};
+    for (final m in materialRows) {
+      (materials[m.taskId] ??= []).add(
+        TaskMaterial(itemId: m.itemId, qty: m.qty, unit: m.unit),
+      );
+    }
+    return [for (final r in rows) taskFromRow(r, materials[r.id] ?? const [])];
   }
 
   @override
   Future<void> saveTask(TaskEntity task) async {
     final now = _clock().toUtc();
     final row = taskToCompanion(task, gardenId: _gardenId, now: now);
-    await _db
-        .into(_db.tasks)
-        .insert(
-          row,
-          onConflict: DoUpdate(
-            (_) => row.copyWith(
-              createdAt: const Value.absent(),
-              deletedAt: const Value(null),
+    await _db.transaction(() async {
+      await _db
+          .into(_db.tasks)
+          .insert(
+            row,
+            onConflict: DoUpdate(
+              (_) => row.copyWith(
+                createdAt: const Value.absent(),
+                deletedAt: const Value(null),
+              ),
             ),
-          ),
+          );
+      await _saveMaterials(task, now);
+    });
+  }
+
+  /// Materiál úkolu: odebraný se měkce smaže, ostatní se uloží.
+  Future<void> _saveMaterials(TaskEntity task, DateTime now) async {
+    final keep = {for (final m in task.materials) m.itemId};
+    await (_db.update(_db.taskMaterials)..where(
+          (m) =>
+              m.taskId.equals(task.id) &
+              m.deletedAt.isNull() &
+              m.itemId.isNotIn(keep),
+        ))
+        .write(
+          TaskMaterialsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
         );
+    for (final m in task.materials) {
+      final companion = TaskMaterialsCompanion(
+        qty: Value(m.qty),
+        unit: Value(m.unit),
+        updatedAt: Value(now),
+        deletedAt: const Value(null),
+      );
+      await _db
+          .into(_db.taskMaterials)
+          .insert(
+            companion.copyWith(
+              taskId: Value(task.id),
+              itemId: Value(m.itemId),
+              gardenId: Value(_gardenId),
+              createdAt: Value(now),
+            ),
+            onConflict: DoUpdate((_) => companion),
+          );
+    }
+  }
+
+  @override
+  Future<void> recordMaterialsUsed(TaskEntity task, String activityId) async {
+    final now = _clock().toUtc();
+    await _db.transaction(() async {
+      for (final m in task.materials) {
+        final companion = ActivityMaterialsCompanion(
+          qty: Value(m.qty),
+          unit: Value(m.unit),
+          updatedAt: Value(now),
+          deletedAt: const Value(null),
+        );
+        await _db
+            .into(_db.activityMaterials)
+            .insert(
+              companion.copyWith(
+                activityId: Value(activityId),
+                itemId: Value(m.itemId),
+                gardenId: Value(_gardenId),
+                createdAt: Value(now),
+              ),
+              onConflict: DoUpdate((_) => companion),
+            );
+      }
+    });
   }
 
   @override
@@ -50,21 +123,25 @@ class DriftTaskRepository implements TaskRepository {
   }
 }
 
-TaskEntity taskFromRow(TaskRow r) => TaskEntity(
-  id: r.id,
-  title: r.title,
-  zoneId: r.zoneId,
-  due: parseDateKey(r.due) ?? dayOnly(r.createdAt.toLocal()),
-  remindAt: r.remindAt,
-  rrule: r.rrule,
-  snoozedUntil: parseDateKey(r.snoozedUntil),
-  status: TaskStatus.fromKey(r.status),
-  notes: r.notes,
-  completedAt: r.completedAt?.toLocal(),
-  completedActivityId: r.completedActivityId,
-  createdAt: r.createdAt.toLocal(),
-  updatedAt: r.updatedAt.toLocal(),
-);
+TaskEntity taskFromRow(TaskRow r, [List<TaskMaterial> materials = const []]) =>
+    TaskEntity(
+      id: r.id,
+      title: r.title,
+      zoneId: r.zoneId,
+      due: parseDateKey(r.due) ?? dayOnly(r.createdAt.toLocal()),
+      remindAt: r.remindAt,
+      rrule: r.rrule,
+      snoozedUntil: parseDateKey(r.snoozedUntil),
+      status: TaskStatus.fromKey(r.status),
+      notes: r.notes,
+      completedAt: r.completedAt?.toLocal(),
+      completedActivityId: r.completedActivityId,
+      durationEstMin: r.durationEstMin,
+      tools: decodeTools(r.tools),
+      materials: materials,
+      createdAt: r.createdAt.toLocal(),
+      updatedAt: r.updatedAt.toLocal(),
+    );
 
 TasksCompanion taskToCompanion(
   TaskEntity t, {
@@ -85,6 +162,25 @@ TasksCompanion taskToCompanion(
   notes: Value(t.notes),
   completedAt: Value(t.completedAt?.toUtc()),
   completedActivityId: Value(t.completedActivityId),
+  durationEstMin: Value(t.durationEstMin),
+  tools: Value(t.tools.isEmpty ? null : jsonEncode(t.tools)),
   createdAt: (t.createdAt ?? now).toUtc(),
   updatedAt: now,
 );
+
+/// Nářadí uložené jako JSON pole; poškozený text = žádné nářadí.
+List<String> decodeTools(String? json) {
+  if (json == null) return const [];
+  try {
+    final decoded = jsonDecode(json);
+    if (decoded is List) {
+      return [
+        for (final t in decoded)
+          if (t is String) t,
+      ];
+    }
+  } on FormatException {
+    // Poškozená hodnota se ignoruje.
+  }
+  return const [];
+}

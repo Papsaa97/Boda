@@ -323,7 +323,7 @@ On-device model (TF Lite / Core ML) je v NÁPADNÍKU: vyžaduje vlastní trénov
 | Aplikace | **Flutter** (Android, iOS, web) | Android první (většina českého trhu, testování bez Macu); iOS od 1.0; web jako doplněk (plánování na velké obrazovce od 1.1). Na webu se Flutter vykresluje přes CanvasKit/Skwasm; na mobilu přes Impeller. Plátno je `CustomPainter`. |
 | Architektura | **Feature-first clean architecture** | `lib/features/<feature>/{domain,data,presentation}`, sdílené věci v `lib/core`. Domain nezávisí na Flutteru ani na databázi. |
 | Stav | **Riverpod**, `AsyncNotifier`/`Notifier`, zápisy přes `AsyncValue.guard()` | `StateNotifier` se v novém kódu nepoužívá (v Riverpodu je legacy). Riverpod 3 je v kódu od 0.1 (DECLOG D33); generátor `@riverpod` je po odchodu z Hive možný, ale volitelný. |
-| Navigace | `Navigator` v 0.x, **GoRouter** od 1.0 | Deep linky z notifikací, návrat z přihlášení (OAuth) a webové URL. |
+| Navigace | `Navigator`; **GoRouter** s první funkcí, která potřebuje adresy (DECLOG D59) | Webové URL (1.1), odkazy z notifikací na konkrétní úkol. Přihlášení jde bez návratu z prohlížeče (nativní Google, e-mailový kód). |
 | Lokální data | **Drift (SQLite)** od 0.2 | Relační model 1 : 1 se serverovou databází (stejné tabulky a sloupce), transakce (sklad, outbox), fulltext přes FTS5, typované migrace s testy. Na webu přes WebAssembly. Nahrazuje `hive` 2.x, který se neudržuje (DECLOG D26). |
 | Backend (od 1.0) | **Supabase**: PostgreSQL s řádkovým zabezpečením (RLS), Auth, Storage, Edge Functions | Region EU (Frankfurt). Projekty `dev` a `prod`, lokální vývoj přes Supabase CLI. Schéma jako SQL migrace v gitu. Open source, data jdou kdykoli odnést (standardní PostgreSQL). DECLOG D24. |
 | Synchronizace (1.0) | **Vlastní outbox** nad Drift → Supabase | Kap. 7.4. Záložní varianta, pokud vlastní synchronizace nebude stačit (sdílení ve V2): PowerSync. |
@@ -444,6 +444,9 @@ inventory_items
                       #   fertilizer      { n, p, k, form }
                       #   plantProtection { activeSubstance, authorizationNo, phiDays, nonProfessional }  (povinné, check)
                       #   tool            { condition, serviceIntervalDays, lastServiceAt }
+
+shopping_items                 # 1.0, nákupní seznam (DECLOG D53)
+  garden_id, name, qty?, unit?, item_id? → inventory_items, done bool, source: 'user' | 'boda' | 'lowStock'
 
 inventory_movements            # V2: odpis; jen přibývají, nemění se
   item_id → inventory_items, qty_delta, reason: 'purchase' | 'task' | 'manual' | 'reversal', task_id?, at

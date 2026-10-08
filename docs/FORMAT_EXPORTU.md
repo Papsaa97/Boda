@@ -1,4 +1,4 @@
-# Formát exportu deníku (verze 1)
+# Formát exportu deníku (verze 2)
 
 Záloha z aplikace Zahradník Bóďa (FR-E1, FR-E2, specifikace kap. 8.4). Formát je veřejný, aby data šla kdykoli přečíst i bez aplikace.
 
@@ -21,12 +21,24 @@ boda-export-2026-10-07.zip
 
 ```json
 {
-  "formatVersion": 1,
+  "formatVersion": 2,
   "app": "zahradnik_boda",
-  "appVersion": "0.2.0",
+  "appVersion": "1.0.0",
   "exportedAt": "2026-10-07T08:00:00.000Z",
   "zones": [
-    { "id": "…", "name": "Zelenina", "type": "vegetable", "archived": false }
+    {
+      "id": "…",
+      "name": "Zelenina",
+      "type": "vegetable",
+      "archived": false,
+      "areaM2": 20,
+      "soilTexture": "loamy",
+      "ph": 6.6,
+      "phMeasuredAt": "2026-04-01",
+      "sunExposure": "fullSun",
+      "irrigation": "drip",
+      "covered": false
+    }
   ],
   "activities": [
     {
@@ -38,6 +50,10 @@ boda-export-2026-10-07.zip
       "zoneId": "…",
       "notes": "Jonagold, 2 bedny",
       "photoIds": ["…"],
+      "harvestQty": 24.5,
+      "harvestUnit": "kg",
+      "costCzk": null,
+      "materials": [],
       "createdAt": "2026-09-20T15:01:12.000Z",
       "updatedAt": "2026-09-20T15:01:12.000Z"
     }
@@ -55,9 +71,26 @@ boda-export-2026-10-07.zip
       "notes": null,
       "completedAt": null,
       "completedActivityId": null,
+      "durationEstMin": 45,
+      "tools": ["Klíč na hadice"],
+      "materials": [{ "itemId": "…", "qty": 1.2, "unit": "kg" }],
       "createdAt": "…",
       "updatedAt": "…"
     }
+  ],
+  "inventory": [
+    {
+      "id": "…",
+      "category": "fertilizer",
+      "name": "Cererit",
+      "unit": "kg",
+      "stockQty": 2.5,
+      "lowStockThreshold": 1,
+      "details": { "n": 12, "p": 11, "k": 18, "form": "granular", "dosePerM2": 60, "doseUnit": "g" }
+    }
+  ],
+  "shopping": [
+    { "id": "…", "name": "Cererit", "qty": 5, "unit": "kg", "itemId": "…", "done": false, "source": "lowStock" }
   ],
   "photos": [
     { "id": "…", "file": "photos/….jpg" }
@@ -83,6 +116,16 @@ boda-export-2026-10-07.zip
 | `tasks[].rrule` | text | Opakování jako podmnožina iCalendar RRULE: `FREQ=WEEKLY\|MONTHLY\|YEARLY`, volitelně `BYMONTH`, `BYMONTHDAY`. |
 | `tasks[].status` | text | `open`, `done`, `skipped`. |
 | `photos[].file` | text | Cesta k souboru uvnitř ZIP, vždy ve složce `photos/`. |
+| `zones[].areaM2`, `ph` | číslo | Výměra v m², pH půdy (od verze 2). |
+| `zones[].soilTexture`, `sunExposure`, `irrigation` | text | Číselníky z kap. 8.3 (od verze 2). |
+| `zones[].phMeasuredAt` | `YYYY-MM-DD` | Den měření pH. |
+| `zones[].covered` | bool | Skleník, fóliovník. |
+| `activities[].harvestQty`, `harvestUnit` | číslo, text | Sklizeň (`kg`, `g`, `ks`), od verze 2. |
+| `activities[].costCzk` | číslo | Náklady v Kč. |
+| `activities[].materials`, `tasks[].materials` | pole | Materiál ze skladu: `itemId`, `qty`, `unit` (`g`, `kg`, `ml`, `l`, `ks`, `pack`). |
+| `tasks[].durationEstMin`, `tools` | číslo, text[] | Odhad doby v minutách a nářadí. |
+| `inventory[]` | pole | Sklad: `category` (`seed`, `fertilizer`, `plantProtection`, `tool`, `other`), `unit`, `stockQty`, `lowStockThreshold`, `details` podle kategorie (osivo: `species`, `variety`, `lot`, `bestBefore`; hnojivo: `n`, `p`, `k`, `form`, `dosePerM2`, `doseUnit`; přípravek: `activeSubstance`, `authorizationNo`, `phiDays`, `nonProfessional`, `dosePerM2`, `doseUnit`; nářadí: `condition`, `serviceIntervalDays`, `lastServiceAt`). |
+| `shopping[]` | pole | Nákupní seznam: `name`, `qty`, `unit`, `itemId` (položka skladu), `done`, `source` (`user`, `boda`, `lowStock`). |
 
 Nepovinná pole mohou chybět nebo být `null`.
 
@@ -91,7 +134,8 @@ Nepovinná pole mohou chybět nebo být `null`.
 * Varianta **„nahradit vše“** s potvrzením: zóny, záznamy, úkoly a fotky v aplikaci se smažou a nahradí obsahem zálohy (FR-E2).
 * Před nahrazením se záloha zkontroluje: musí jít o ZIP s `data.json`, záznam musí odkazovat na zónu ze zálohy a cesta k fotce nesmí vést mimo `photos/`. Při chybě zůstanou data beze změny.
 * Fotka, která v ZIP chybí, se vynechá; záznam zůstane.
-* Úkol odkazující na neexistující zónu se načte bez zóny.
+* Úkol odkazující na neexistující zónu se načte bez zóny; materiál nebo nákup odkazující na neexistující položku skladu se vynechá (nákup zůstane bez odkazu).
+* Záloha verze 1 (MVP 0.2) se načte celá, nová pole zůstanou prázdná.
 
 ## Změna formátu
 

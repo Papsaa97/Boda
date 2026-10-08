@@ -82,7 +82,7 @@ void main() {
     final zones = InMemoryZoneRepository();
     await pumpApp(tester, testOverrides(activities: repo, zones: zones));
 
-    await tester.tap(find.text('Zóny'));
+    await tester.tap(find.text('Zahrada'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Další akce pro Zelenina'));
     await tester.pumpAndSettle();

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
+import '../../../core/time/calendar.dart';
 import '../domain/zone_entity.dart';
 import '../domain/zone_repository.dart';
 
@@ -40,6 +41,13 @@ class DriftZoneRepository implements ZoneRepository {
             name: zone.name,
             type: Value(zone.type.name),
             archived: Value(zone.archived),
+            areaM2: Value(zone.areaM2),
+            soilTexture: Value(zone.soilTexture?.name),
+            ph: Value(zone.ph),
+            phMeasuredAt: Value(_dateKey(zone.phMeasuredAt)),
+            sunExposure: Value(zone.sunExposure?.name),
+            irrigation: Value(zone.irrigation?.name),
+            covered: Value(zone.covered),
             createdAt: now,
             updatedAt: now,
           ),
@@ -48,6 +56,13 @@ class DriftZoneRepository implements ZoneRepository {
               name: Value(zone.name),
               type: Value(zone.type.name),
               archived: Value(zone.archived),
+              areaM2: Value(zone.areaM2),
+              soilTexture: Value(zone.soilTexture?.name),
+              ph: Value(zone.ph),
+              phMeasuredAt: Value(_dateKey(zone.phMeasuredAt)),
+              sunExposure: Value(zone.sunExposure?.name),
+              irrigation: Value(zone.irrigation?.name),
+              covered: Value(zone.covered),
               updatedAt: Value(now),
               deletedAt: const Value(null),
             ),
@@ -64,9 +79,18 @@ class DriftZoneRepository implements ZoneRepository {
   }
 }
 
+String? _dateKey(DateTime? d) => d == null ? null : formatDateKey(d);
+
 ZoneEntity zoneFromRow(ZoneRow r) => ZoneEntity(
   id: r.id,
   name: r.name,
   type: ZoneType.fromKey(r.type),
   archived: r.archived,
+  areaM2: r.areaM2,
+  soilTexture: SoilTexture.fromKey(r.soilTexture),
+  ph: r.ph,
+  phMeasuredAt: parseDateKey(r.phMeasuredAt),
+  sunExposure: SunExposure.fromKey(r.sunExposure),
+  irrigation: Irrigation.fromKey(r.irrigation),
+  covered: r.covered,
 );

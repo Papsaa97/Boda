@@ -80,6 +80,7 @@ class TaskTile extends ConsumerWidget {
       if (task.status == TaskStatus.skipped) l.taskStatusSkipped,
       ?zoneName,
       if (recurrence != null) recurrenceLabel(l, recurrence),
+      if (task.durationEstMin != null) formatDuration(l, task.durationEstMin!),
     ].join(' · ');
 
     return ListTile(

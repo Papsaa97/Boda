@@ -13,6 +13,7 @@ import '../../../zones/domain/zone_entity.dart';
 import '../../../zones/presentation/zones_controller.dart';
 import '../../domain/activity_entity.dart';
 import '../../domain/activity_type.dart';
+import '../../../../core/text/numbers.dart';
 import '../activity_type_ui.dart';
 import '../controllers/activity_controller.dart';
 import '../widgets/activity_photo.dart';
@@ -68,6 +69,9 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
   late final TextEditingController _titleController;
   late final TextEditingController _notesController;
   late final TextEditingController _dateController;
+  late final TextEditingController _harvestController;
+  late final TextEditingController _costController;
+  late String _harvestUnit;
 
   late DateTime _date;
   late ActivityType _type;
@@ -114,6 +118,10 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
         _PhotoItem.saved(photo),
     ];
     _dateController = TextEditingController(text: formatDateTime(_date));
+    String num(double? v) => v == null ? '' : formatDecimal(v);
+    _harvestController = TextEditingController(text: num(initial?.harvestQty));
+    _harvestUnit = initial?.harvestUnit ?? harvestUnits.first;
+    _costController = TextEditingController(text: num(initial?.costCzk));
   }
 
   @override
@@ -121,6 +129,8 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     _titleController.dispose();
     _notesController.dispose();
     _dateController.dispose();
+    _harvestController.dispose();
+    _costController.dispose();
     super.dispose();
   }
 
@@ -138,6 +148,17 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     return zones.isEmpty ? null : zones.first.id;
   }
 
+  /// Sklizeň se ukládá jen u typu Sklizeň.
+  double? _harvestQty() => _type == ActivityType.harvest
+      ? parseDecimal(_harvestController.text)
+      : null;
+
+  String? _numberError(AppLocalizations l, String? v) {
+    if (v == null || v.trim().isEmpty) return null;
+    final n = parseDecimal(v);
+    return n == null || n < 0 ? l.inventoryNumberInvalid : null;
+  }
+
   bool _hasChanges() {
     final initial = widget.initial;
     final notes = _notesController.text.trim();
@@ -145,9 +166,13 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     if (initial == null) {
       return (title.isNotEmpty && title != _autoTitle) ||
           notes.isNotEmpty ||
-          _photos.isNotEmpty;
+          _photos.isNotEmpty ||
+          _harvestController.text.trim().isNotEmpty ||
+          _costController.text.trim().isNotEmpty;
     }
     return title != initial.title ||
+        _harvestQty() != initial.harvestQty ||
+        parseDecimal(_costController.text) != initial.costCzk ||
         notes != (initial.notes ?? '') ||
         _type != initial.type ||
         _date != initial.date ||
@@ -317,6 +342,10 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     final notesText = _notesController.text.trim();
     final notes = notesText.isEmpty ? null : notesText;
 
+    final harvestQty = _harvestQty();
+    final harvestUnit = harvestQty == null ? null : _harvestUnit;
+    final cost = parseDecimal(_costController.text);
+
     final initial = widget.initial;
     ActivityEntity? saved;
     if (initial == null) {
@@ -327,6 +356,9 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
         zoneId: zoneId,
         notes: notes,
         photos: photos,
+        harvestQty: harvestQty,
+        harvestUnit: harvestUnit,
+        costCzk: cost,
       );
     } else {
       final updated = initial.copyWith(
@@ -337,6 +369,9 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
         notes: notes,
         clearNotes: notes == null,
         photos: photos,
+        harvestQty: () => harvestQty,
+        harvestUnit: () => harvestUnit,
+        costCzk: () => cost,
       );
       await controller.updateActivity(updated);
       if (!ref.read(activityControllerProvider).hasError) saved = updated;
@@ -468,12 +503,62 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
                 validator: (value) =>
                     value == null ? l.activityZoneRequired : null,
               ),
+              if (_type == ActivityType.harvest) ...[
+                const SizedBox(height: 16),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: TextFormField(
+                        controller: _harvestController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: l.activityHarvestLabel,
+                        ),
+                        validator: (v) => _numberError(l, v),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: DropdownButtonFormField<String>(
+                        initialValue: _harvestUnit,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: l.inventoryUnitLabel,
+                        ),
+                        items: [
+                          for (final u in harvestUnits)
+                            DropdownMenuItem(
+                              value: u,
+                              child: Text(harvestUnitLabel(l, u)),
+                            ),
+                        ],
+                        onChanged: (u) =>
+                            setState(() => _harvestUnit = u ?? _harvestUnit),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 16),
               TextFormField(
                 controller: _notesController,
                 decoration: InputDecoration(labelText: l.activityNotesLabel),
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _costController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(labelText: l.activityCostLabel),
+                validator: (v) => _numberError(l, v),
               ),
               // Na webu fotky nejsou (prohlížeč nemá trvalou složku).
               if (!kIsWeb) ...[const SizedBox(height: 16), ..._photoSection(l)],

@@ -8,6 +8,7 @@ import '../../../../core/time/calendar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/task_entity.dart';
 import '../tasks_controller.dart';
+import 'weekend_screen.dart';
 import '../widgets/task_tile.dart';
 
 /// Úkoly: týdenní pruh s počty a seznam po skupinách (po termínu, dnes,
@@ -36,7 +37,18 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     final today = dayOnly(now);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.navTasks)),
+      appBar: AppBar(
+        title: Text(l.navTasks),
+        actions: [
+          IconButton(
+            tooltip: l.weekendTooltip,
+            icon: const Icon(Icons.cabin_outlined),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const WeekendScreen())),
+          ),
+        ],
+      ),
       body: tasksAsync.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),

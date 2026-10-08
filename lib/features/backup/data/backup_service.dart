@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart' show InsertMode, Value;
 import 'package:path/path.dart' as p;
 
 import '../../../core/database/app_database.dart';
@@ -10,6 +10,8 @@ import '../../../core/photos/photo_storage.dart';
 import '../../../core/time/calendar.dart';
 import '../../activity/data/drift_activity_repository.dart';
 import '../../activity/domain/activity_entity.dart';
+import '../../inventory/data/drift_inventory_repository.dart';
+import '../../inventory/domain/shopping_item.dart';
 import '../../tasks/data/drift_task_repository.dart';
 import '../../zones/data/drift_zone_repository.dart';
 import '../domain/backup_format.dart';
@@ -56,6 +58,19 @@ class BackupService {
       _gardenId,
       _clock,
     ).getAllTasks();
+    final inventory = await DriftInventoryRepository(
+      _db,
+      _gardenId,
+      _clock,
+    ).getAll();
+    final shopping = await DriftShoppingRepository(
+      _db,
+      _gardenId,
+      _clock,
+    ).getAll();
+    final materialRows = await (_db.select(
+      _db.activityMaterials,
+    )..where((m) => m.deletedAt.isNull())).get();
     return BackupData(
       formatVersion: backupFormatVersion,
       exportedAt: _clock(),
@@ -72,6 +87,17 @@ class BackupService {
           ),
       ],
       tasks: tasks,
+      inventory: inventory,
+      shopping: shopping,
+      activityMaterials: [
+        for (final m in materialRows)
+          ActivityMaterialRecord(
+            activityId: m.activityId,
+            itemId: m.itemId,
+            qty: m.qty,
+            unit: m.unit,
+          ),
+      ],
     );
   }
 
@@ -137,10 +163,18 @@ class BackupService {
     final now = _clock().toUtc();
     final zoneIds = {for (final z in data.zones) z.id};
 
+    final itemIds = {for (final i in data.inventory) i.id};
+    final activityIds = {for (final a in data.activities) a.id};
+
     await _db.transaction(() async {
+      // Pořadí kvůli cizím klíčům: nejdřív tabulky, které odkazují.
+      await _db.delete(_db.taskMaterials).go();
+      await _db.delete(_db.activityMaterials).go();
+      await _db.delete(_db.shoppingItems).go();
       await _db.delete(_db.photos).go();
       await _db.delete(_db.activities).go();
       await _db.delete(_db.tasks).go();
+      await _db.delete(_db.inventoryItems).go();
       await _db.delete(_db.zones).go();
 
       var order = 0;
@@ -155,10 +189,40 @@ class BackupService {
                 type: Value(z.type.name),
                 archived: Value(z.archived),
                 sortOrder: Value(order++),
+                areaM2: Value(z.areaM2),
+                soilTexture: Value(z.soilTexture?.name),
+                ph: Value(z.ph),
+                phMeasuredAt: Value(
+                  z.phMeasuredAt == null
+                      ? null
+                      : formatDateKey(z.phMeasuredAt!),
+                ),
+                sunExposure: Value(z.sunExposure?.name),
+                irrigation: Value(z.irrigation?.name),
+                covered: Value(z.covered),
                 createdAt: now,
                 updatedAt: now,
               ),
             );
+      }
+      final inventory = DriftInventoryRepository(_db, _gardenId, _clock);
+      for (final i in data.inventory) {
+        await inventory.save(i);
+      }
+      final shopping = DriftShoppingRepository(_db, _gardenId, _clock);
+      for (final s in data.shopping) {
+        await shopping.save(
+          s.itemId == null || itemIds.contains(s.itemId)
+              ? s
+              : ShoppingItem(
+                  id: s.id,
+                  name: s.name,
+                  qty: s.qty,
+                  unit: s.unit,
+                  done: s.done,
+                  source: s.source,
+                ),
+        );
       }
       final activities = DriftActivityRepository(_db, _gardenId, _clock);
       for (final a in data.activities) {
@@ -175,11 +239,38 @@ class BackupService {
       final tasks = DriftTaskRepository(_db, _gardenId, _clock);
       for (final t in data.tasks) {
         final zoneId = t.zoneId;
+        // Úkol bez existující zóny se načte bez zóny, materiál bez
+        // položky skladu se vynechá.
         await tasks.saveTask(
-          zoneId == null || zoneIds.contains(zoneId)
-              ? t
-              : t.copyWith(zoneId: () => null),
+          t.copyWith(
+            zoneId: () =>
+                zoneId == null || zoneIds.contains(zoneId) ? zoneId : null,
+            materials: [
+              for (final m in t.materials)
+                if (itemIds.contains(m.itemId)) m,
+            ],
+          ),
         );
+      }
+      for (final m in data.activityMaterials) {
+        if (!itemIds.contains(m.itemId) ||
+            !activityIds.contains(m.activityId)) {
+          continue;
+        }
+        await _db
+            .into(_db.activityMaterials)
+            .insert(
+              ActivityMaterialsCompanion.insert(
+                activityId: m.activityId,
+                itemId: m.itemId,
+                gardenId: _gardenId,
+                qty: m.qty,
+                unit: m.unit,
+                createdAt: now,
+                updatedAt: now,
+              ),
+              mode: InsertMode.insertOrReplace,
+            );
       }
     });
 

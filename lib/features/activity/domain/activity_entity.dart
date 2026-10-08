@@ -34,6 +34,13 @@ class ActivityEntity extends Equatable {
   /// Fotky v pořadí, v jakém je uživatel přidal.
   final List<PhotoRef> photos;
 
+  /// Sklizené množství (FR-D9) v jednotce [harvestUnit] (`kg`, `g`, `ks`).
+  final double? harvestQty;
+  final String? harvestUnit;
+
+  /// Náklady v Kč (FR-D9).
+  final double? costCzk;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -45,6 +52,9 @@ class ActivityEntity extends Equatable {
     this.type = ActivityType.other,
     this.notes,
     this.photos = const [],
+    this.harvestQty,
+    this.harvestUnit,
+    this.costCzk,
     this.createdAt,
     this.updatedAt,
   });
@@ -53,7 +63,8 @@ class ActivityEntity extends Equatable {
   PhotoRef? get coverPhoto => photos.isEmpty ? null : photos.first;
 
   /// Kopie se změněnými poli. Poznámku jde vymazat přes [clearNotes]
-  /// (samotné `null` znamená „beze změny“).
+  /// (samotné `null` znamená „beze změny“); sklizeň a náklady přes
+  /// funkci vracející null.
   ActivityEntity copyWith({
     String? id,
     ActivityType? type,
@@ -63,6 +74,9 @@ class ActivityEntity extends Equatable {
     String? notes,
     bool clearNotes = false,
     List<PhotoRef>? photos,
+    double? Function()? harvestQty,
+    String? Function()? harvestUnit,
+    double? Function()? costCzk,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -74,6 +88,9 @@ class ActivityEntity extends Equatable {
       zoneId: zoneId ?? this.zoneId,
       notes: clearNotes ? null : (notes ?? this.notes),
       photos: photos ?? this.photos,
+      harvestQty: harvestQty == null ? this.harvestQty : harvestQty(),
+      harvestUnit: harvestUnit == null ? this.harvestUnit : harvestUnit(),
+      costCzk: costCzk == null ? this.costCzk : costCzk(),
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -88,6 +105,9 @@ class ActivityEntity extends Equatable {
     zoneId,
     notes,
     photos,
+    harvestQty,
+    harvestUnit,
+    costCzk,
     createdAt,
     updatedAt,
   ];
