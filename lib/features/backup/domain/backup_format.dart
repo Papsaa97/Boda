@@ -169,6 +169,7 @@ Map<String, Object?> encodeBackup(BackupData data) {
           'completedActivityId': t.completedActivityId,
           'durationEstMin': t.durationEstMin,
           'tools': t.tools,
+          'source': t.source.name,
           'materials': [
             for (final m in t.materials)
               {'itemId': m.itemId, 'qty': m.qty, 'unit': m.unit},
@@ -340,6 +341,7 @@ BackupData _decode(Map<String, Object?> json) {
               tool as String,
           ],
           materials: materials(t['materials']),
+          source: TaskSource.fromKey(t['source'] as String?),
           createdAt: optInstant(t['createdAt']),
           updatedAt: optInstant(t['updatedAt']),
         ),

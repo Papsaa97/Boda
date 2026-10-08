@@ -24,6 +24,16 @@ enum InventoryUnit {
     return null;
   }
 
+  /// Značka jednotky v textu (do výpočtů pro Bóďu, mimo lokalizaci UI).
+  String get symbol => switch (this) {
+    g => 'g',
+    kg => 'kg',
+    ml => 'ml',
+    l => 'l',
+    ks => 'ks',
+    pack => 'bal.',
+  };
+
   /// Jednotky, na které jde tahle převést (včetně sebe).
   List<InventoryUnit> get compatible => [
     for (final u in values)

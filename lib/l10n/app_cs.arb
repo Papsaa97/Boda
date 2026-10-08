@@ -854,5 +854,150 @@
         "type": "int"
       }
     }
-  }
+  },
+  "navAssistant": "Bóďa",
+  "assistantTitle": "Bóďa",
+  "assistantNewConversation": "Nový rozhovor",
+  "assistantDeleteConversation": "Smazat rozhovor",
+  "assistantDeleteConfirmTitle": "Smazat rozhovor?",
+  "assistantDeleteConfirmBody": "Dotazy i odpovědi z tohoto rozhovoru zmizí z telefonu.",
+  "assistantDemoBanner": "Ukázkový režim bez AI. Bóďa zatím jen spočítá dávky z tvých údajů a shrne, co o zahradě ví. Skutečné rady přijdou po přihlášení k účtu.",
+  "assistantDemoLabel": "Ukázkový režim",
+  "assistantUsage": "Tento měsíc {used} z {limit} dotazů",
+  "@assistantUsage": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "assistantPendingBanner": "{count, plural, =1{1 dotaz čeká na připojení} few{{count} dotazy čekají na připojení} other{{count} dotazů čeká na připojení}}",
+  "@assistantPendingBanner": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assistantSendPending": "Odeslat",
+  "assistantEmptyTitle": "Zeptej se Bódi na svou zahradu",
+  "assistantEmptyBody": "Bóďa vidí tvé zóny, poslední záznamy, úkoly a sklad. Dávky hnojiv počítá z údajů na obalu a výměry zóny.",
+  "assistantSuggestionDose": "Kolik hnojiva dát na zeleninu?",
+  "assistantSuggestionWeek": "Co mám tento týden na zahradě udělat?",
+  "assistantSuggestionStock": "Co mi dochází ve skladu?",
+  "assistantInputHint": "Napiš dotaz…",
+  "assistantSend": "Odeslat dotaz",
+  "assistantThinking": "Bóďa přemýšlí…",
+  "assistantStatusPending": "Čeká na připojení. Odešle se, až budeš online.",
+  "assistantRetry": "Zkusit znovu",
+  "assistantFailureNotSignedIn": "Pro dotazy na Bóďu je potřeba se přihlásit k účtu.",
+  "assistantFailureLimit": "Tento měsíc máš vyčerpané dotazy ({limit}). Další přibudou 1. dne v měsíci.",
+  "@assistantFailureLimit": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "assistantFailureNotConfigured": "Bóďa teď není dostupný, server nemá dokončené nastavení.",
+  "assistantFailureUpstream": "Bóďa teď neodpovídá. Zkus to za chvíli.",
+  "assistantSourcesTitle": "Z čeho vycházím",
+  "assistantSourcesZones": "Zóny: {zones}",
+  "@assistantSourcesZones": {
+    "placeholders": {
+      "zones": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantSourcesCounts": "Záznamy z deníku: {activities} · otevřené úkoly: {tasks} · položky skladu: {items}",
+  "@assistantSourcesCounts": {
+    "placeholders": {
+      "activities": {
+        "type": "int"
+      },
+      "tasks": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
+  "assistantSourcesCalculations": "Výpočty",
+  "assistantSourcesNone": "Bez výpočtů dávek. Dávku spočítám, když má zóna výměru a hnojivo dávku na m² z obalu.",
+  "assistantCalculationLine": "{label}: {result} ({source})",
+  "@assistantCalculationLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "result": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantWarningUnverifiedDose": "Číslo {text} nepochází z výpočtu ani z etikety. Než ho použiješ, ověř ho na obalu.",
+  "@assistantWarningUnverifiedDose": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantWarningProfessionalOnly": "{product} není povolený pro neprofesionální uživatele. Nepoužívej ho.",
+  "@assistantWarningProfessionalOnly": {
+    "placeholders": {
+      "product": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantWarningMissingPhi": "U přípravku {product} chybí ochranná lhůta do sklizně. Najdeš ji na etiketě.",
+  "@assistantWarningMissingPhi": {
+    "placeholders": {
+      "product": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantActionTask": "Přidat úkol: {title}",
+  "@assistantActionTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantActionShopping": "Na nákupní seznam: {name}",
+  "@assistantActionShopping": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantActionActivity": "Zapsat do deníku: {title}",
+  "@assistantActionActivity": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantActionTaskDone": "Úkol přidán",
+  "assistantActionShoppingDone": "Přidáno na nákupní seznam",
+  "assistantActionFailed": "Akci se nepodařilo uložit.",
+  "assistantFeedbackUp": "Dobrá odpověď",
+  "assistantFeedbackDown": "Špatná odpověď",
+  "assistantFeedbackCommentTitle": "Co bylo špatně?",
+  "assistantFeedbackCommentHint": "Nepovinné. Pomůže to Bóďu zlepšit.",
+  "assistantFeedbackThanks": "Díky za zpětnou vazbu.",
+  "assistantSaveFailed": "Rozhovor se nepodařilo uložit."
 }

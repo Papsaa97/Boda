@@ -5958,6 +5958,1103 @@ class ShoppingItemsCompanion extends UpdateCompanion<ShoppingItemRow> {
   }
 }
 
+class $AssistantThreadsTable extends AssistantThreads
+    with TableInfo<$AssistantThreadsTable, AssistantThreadRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AssistantThreadsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gardenIdMeta = const VerificationMeta(
+    'gardenId',
+  );
+  @override
+  late final GeneratedColumn<String> gardenId = GeneratedColumn<String>(
+    'garden_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES gardens (id)',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    gardenId,
+    title,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'assistant_threads';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AssistantThreadRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('garden_id')) {
+      context.handle(
+        _gardenIdMeta,
+        gardenId.isAcceptableOrUnknown(data['garden_id']!, _gardenIdMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AssistantThreadRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AssistantThreadRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      gardenId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}garden_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $AssistantThreadsTable createAlias(String alias) {
+    return $AssistantThreadsTable(attachedDatabase, alias);
+  }
+}
+
+class AssistantThreadRow extends DataClass
+    implements Insertable<AssistantThreadRow> {
+  final String id;
+  final String? gardenId;
+  final String? title;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const AssistantThreadRow({
+    required this.id,
+    this.gardenId,
+    this.title,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || gardenId != null) {
+      map['garden_id'] = Variable<String>(gardenId);
+    }
+    if (!nullToAbsent || title != null) {
+      map['title'] = Variable<String>(title);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  AssistantThreadsCompanion toCompanion(bool nullToAbsent) {
+    return AssistantThreadsCompanion(
+      id: Value(id),
+      gardenId: gardenId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gardenId),
+      title: title == null && nullToAbsent
+          ? const Value.absent()
+          : Value(title),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory AssistantThreadRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AssistantThreadRow(
+      id: serializer.fromJson<String>(json['id']),
+      gardenId: serializer.fromJson<String?>(json['gardenId']),
+      title: serializer.fromJson<String?>(json['title']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'gardenId': serializer.toJson<String?>(gardenId),
+      'title': serializer.toJson<String?>(title),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  AssistantThreadRow copyWith({
+    String? id,
+    Value<String?> gardenId = const Value.absent(),
+    Value<String?> title = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => AssistantThreadRow(
+    id: id ?? this.id,
+    gardenId: gardenId.present ? gardenId.value : this.gardenId,
+    title: title.present ? title.value : this.title,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  AssistantThreadRow copyWithCompanion(AssistantThreadsCompanion data) {
+    return AssistantThreadRow(
+      id: data.id.present ? data.id.value : this.id,
+      gardenId: data.gardenId.present ? data.gardenId.value : this.gardenId,
+      title: data.title.present ? data.title.value : this.title,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AssistantThreadRow(')
+          ..write('id: $id, ')
+          ..write('gardenId: $gardenId, ')
+          ..write('title: $title, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, gardenId, title, createdAt, updatedAt, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AssistantThreadRow &&
+          other.id == this.id &&
+          other.gardenId == this.gardenId &&
+          other.title == this.title &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class AssistantThreadsCompanion extends UpdateCompanion<AssistantThreadRow> {
+  final Value<String> id;
+  final Value<String?> gardenId;
+  final Value<String?> title;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const AssistantThreadsCompanion({
+    this.id = const Value.absent(),
+    this.gardenId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AssistantThreadsCompanion.insert({
+    required String id,
+    this.gardenId = const Value.absent(),
+    this.title = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<AssistantThreadRow> custom({
+    Expression<String>? id,
+    Expression<String>? gardenId,
+    Expression<String>? title,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (gardenId != null) 'garden_id': gardenId,
+      if (title != null) 'title': title,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AssistantThreadsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? gardenId,
+    Value<String?>? title,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return AssistantThreadsCompanion(
+      id: id ?? this.id,
+      gardenId: gardenId ?? this.gardenId,
+      title: title ?? this.title,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (gardenId.present) {
+      map['garden_id'] = Variable<String>(gardenId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AssistantThreadsCompanion(')
+          ..write('id: $id, ')
+          ..write('gardenId: $gardenId, ')
+          ..write('title: $title, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AssistantMessagesTable extends AssistantMessages
+    with TableInfo<$AssistantMessagesTable, AssistantMessageRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AssistantMessagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _threadIdMeta = const VerificationMeta(
+    'threadId',
+  );
+  @override
+  late final GeneratedColumn<String> threadId = GeneratedColumn<String>(
+    'thread_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES assistant_threads (id)',
+    ),
+  );
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+    'role',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contextSummaryMeta = const VerificationMeta(
+    'contextSummary',
+  );
+  @override
+  late final GeneratedColumn<String> contextSummary = GeneratedColumn<String>(
+    'context_summary',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('sent'),
+  );
+  static const VerificationMeta _feedbackMeta = const VerificationMeta(
+    'feedback',
+  );
+  @override
+  late final GeneratedColumn<String> feedback = GeneratedColumn<String>(
+    'feedback',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _feedbackCommentMeta = const VerificationMeta(
+    'feedbackComment',
+  );
+  @override
+  late final GeneratedColumn<String> feedbackComment = GeneratedColumn<String>(
+    'feedback_comment',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    threadId,
+    role,
+    body,
+    contextSummary,
+    status,
+    feedback,
+    feedbackComment,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'assistant_messages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AssistantMessageRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('thread_id')) {
+      context.handle(
+        _threadIdMeta,
+        threadId.isAcceptableOrUnknown(data['thread_id']!, _threadIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_threadIdMeta);
+    }
+    if (data.containsKey('role')) {
+      context.handle(
+        _roleMeta,
+        role.isAcceptableOrUnknown(data['role']!, _roleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_roleMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('context_summary')) {
+      context.handle(
+        _contextSummaryMeta,
+        contextSummary.isAcceptableOrUnknown(
+          data['context_summary']!,
+          _contextSummaryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('feedback')) {
+      context.handle(
+        _feedbackMeta,
+        feedback.isAcceptableOrUnknown(data['feedback']!, _feedbackMeta),
+      );
+    }
+    if (data.containsKey('feedback_comment')) {
+      context.handle(
+        _feedbackCommentMeta,
+        feedbackComment.isAcceptableOrUnknown(
+          data['feedback_comment']!,
+          _feedbackCommentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AssistantMessageRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AssistantMessageRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      threadId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}thread_id'],
+      )!,
+      role: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}role'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      contextSummary: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}context_summary'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      feedback: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}feedback'],
+      ),
+      feedbackComment: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}feedback_comment'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $AssistantMessagesTable createAlias(String alias) {
+    return $AssistantMessagesTable(attachedDatabase, alias);
+  }
+}
+
+class AssistantMessageRow extends DataClass
+    implements Insertable<AssistantMessageRow> {
+  final String id;
+  final String threadId;
+
+  /// `user` nebo `assistant`.
+  final String role;
+
+  /// Na serveru sloupec `text` (synchronizace ho přejmenuje); `text` by se
+  /// v generovaném kódu Driftu tloukl s metodou `Table.text()`.
+  final String body;
+
+  /// Z čeho Bóďa vycházel, akce, upozornění a čerpání limitu (JSON).
+  final String? contextSummary;
+
+  /// Dotaz bez připojení čeká na odeslání (FR-B7): `pending`, `sent`,
+  /// `failed`. Jen v telefonu.
+  final String status;
+
+  /// `up` / `down` (FR-B6).
+  final String? feedback;
+  final String? feedbackComment;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const AssistantMessageRow({
+    required this.id,
+    required this.threadId,
+    required this.role,
+    required this.body,
+    this.contextSummary,
+    required this.status,
+    this.feedback,
+    this.feedbackComment,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['thread_id'] = Variable<String>(threadId);
+    map['role'] = Variable<String>(role);
+    map['body'] = Variable<String>(body);
+    if (!nullToAbsent || contextSummary != null) {
+      map['context_summary'] = Variable<String>(contextSummary);
+    }
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || feedback != null) {
+      map['feedback'] = Variable<String>(feedback);
+    }
+    if (!nullToAbsent || feedbackComment != null) {
+      map['feedback_comment'] = Variable<String>(feedbackComment);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  AssistantMessagesCompanion toCompanion(bool nullToAbsent) {
+    return AssistantMessagesCompanion(
+      id: Value(id),
+      threadId: Value(threadId),
+      role: Value(role),
+      body: Value(body),
+      contextSummary: contextSummary == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contextSummary),
+      status: Value(status),
+      feedback: feedback == null && nullToAbsent
+          ? const Value.absent()
+          : Value(feedback),
+      feedbackComment: feedbackComment == null && nullToAbsent
+          ? const Value.absent()
+          : Value(feedbackComment),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory AssistantMessageRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AssistantMessageRow(
+      id: serializer.fromJson<String>(json['id']),
+      threadId: serializer.fromJson<String>(json['threadId']),
+      role: serializer.fromJson<String>(json['role']),
+      body: serializer.fromJson<String>(json['body']),
+      contextSummary: serializer.fromJson<String?>(json['contextSummary']),
+      status: serializer.fromJson<String>(json['status']),
+      feedback: serializer.fromJson<String?>(json['feedback']),
+      feedbackComment: serializer.fromJson<String?>(json['feedbackComment']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'threadId': serializer.toJson<String>(threadId),
+      'role': serializer.toJson<String>(role),
+      'body': serializer.toJson<String>(body),
+      'contextSummary': serializer.toJson<String?>(contextSummary),
+      'status': serializer.toJson<String>(status),
+      'feedback': serializer.toJson<String?>(feedback),
+      'feedbackComment': serializer.toJson<String?>(feedbackComment),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  AssistantMessageRow copyWith({
+    String? id,
+    String? threadId,
+    String? role,
+    String? body,
+    Value<String?> contextSummary = const Value.absent(),
+    String? status,
+    Value<String?> feedback = const Value.absent(),
+    Value<String?> feedbackComment = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => AssistantMessageRow(
+    id: id ?? this.id,
+    threadId: threadId ?? this.threadId,
+    role: role ?? this.role,
+    body: body ?? this.body,
+    contextSummary: contextSummary.present
+        ? contextSummary.value
+        : this.contextSummary,
+    status: status ?? this.status,
+    feedback: feedback.present ? feedback.value : this.feedback,
+    feedbackComment: feedbackComment.present
+        ? feedbackComment.value
+        : this.feedbackComment,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  AssistantMessageRow copyWithCompanion(AssistantMessagesCompanion data) {
+    return AssistantMessageRow(
+      id: data.id.present ? data.id.value : this.id,
+      threadId: data.threadId.present ? data.threadId.value : this.threadId,
+      role: data.role.present ? data.role.value : this.role,
+      body: data.body.present ? data.body.value : this.body,
+      contextSummary: data.contextSummary.present
+          ? data.contextSummary.value
+          : this.contextSummary,
+      status: data.status.present ? data.status.value : this.status,
+      feedback: data.feedback.present ? data.feedback.value : this.feedback,
+      feedbackComment: data.feedbackComment.present
+          ? data.feedbackComment.value
+          : this.feedbackComment,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AssistantMessageRow(')
+          ..write('id: $id, ')
+          ..write('threadId: $threadId, ')
+          ..write('role: $role, ')
+          ..write('body: $body, ')
+          ..write('contextSummary: $contextSummary, ')
+          ..write('status: $status, ')
+          ..write('feedback: $feedback, ')
+          ..write('feedbackComment: $feedbackComment, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    threadId,
+    role,
+    body,
+    contextSummary,
+    status,
+    feedback,
+    feedbackComment,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AssistantMessageRow &&
+          other.id == this.id &&
+          other.threadId == this.threadId &&
+          other.role == this.role &&
+          other.body == this.body &&
+          other.contextSummary == this.contextSummary &&
+          other.status == this.status &&
+          other.feedback == this.feedback &&
+          other.feedbackComment == this.feedbackComment &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class AssistantMessagesCompanion extends UpdateCompanion<AssistantMessageRow> {
+  final Value<String> id;
+  final Value<String> threadId;
+  final Value<String> role;
+  final Value<String> body;
+  final Value<String?> contextSummary;
+  final Value<String> status;
+  final Value<String?> feedback;
+  final Value<String?> feedbackComment;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const AssistantMessagesCompanion({
+    this.id = const Value.absent(),
+    this.threadId = const Value.absent(),
+    this.role = const Value.absent(),
+    this.body = const Value.absent(),
+    this.contextSummary = const Value.absent(),
+    this.status = const Value.absent(),
+    this.feedback = const Value.absent(),
+    this.feedbackComment = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AssistantMessagesCompanion.insert({
+    required String id,
+    required String threadId,
+    required String role,
+    required String body,
+    this.contextSummary = const Value.absent(),
+    this.status = const Value.absent(),
+    this.feedback = const Value.absent(),
+    this.feedbackComment = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       threadId = Value(threadId),
+       role = Value(role),
+       body = Value(body),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<AssistantMessageRow> custom({
+    Expression<String>? id,
+    Expression<String>? threadId,
+    Expression<String>? role,
+    Expression<String>? body,
+    Expression<String>? contextSummary,
+    Expression<String>? status,
+    Expression<String>? feedback,
+    Expression<String>? feedbackComment,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (threadId != null) 'thread_id': threadId,
+      if (role != null) 'role': role,
+      if (body != null) 'body': body,
+      if (contextSummary != null) 'context_summary': contextSummary,
+      if (status != null) 'status': status,
+      if (feedback != null) 'feedback': feedback,
+      if (feedbackComment != null) 'feedback_comment': feedbackComment,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AssistantMessagesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? threadId,
+    Value<String>? role,
+    Value<String>? body,
+    Value<String?>? contextSummary,
+    Value<String>? status,
+    Value<String?>? feedback,
+    Value<String?>? feedbackComment,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return AssistantMessagesCompanion(
+      id: id ?? this.id,
+      threadId: threadId ?? this.threadId,
+      role: role ?? this.role,
+      body: body ?? this.body,
+      contextSummary: contextSummary ?? this.contextSummary,
+      status: status ?? this.status,
+      feedback: feedback ?? this.feedback,
+      feedbackComment: feedbackComment ?? this.feedbackComment,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (threadId.present) {
+      map['thread_id'] = Variable<String>(threadId.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (contextSummary.present) {
+      map['context_summary'] = Variable<String>(contextSummary.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (feedback.present) {
+      map['feedback'] = Variable<String>(feedback.value);
+    }
+    if (feedbackComment.present) {
+      map['feedback_comment'] = Variable<String>(feedbackComment.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AssistantMessagesCompanion(')
+          ..write('id: $id, ')
+          ..write('threadId: $threadId, ')
+          ..write('role: $role, ')
+          ..write('body: $body, ')
+          ..write('contextSummary: $contextSummary, ')
+          ..write('status: $status, ')
+          ..write('feedback: $feedback, ')
+          ..write('feedbackComment: $feedbackComment, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $SettingEntriesTable extends SettingEntries
     with TableInfo<$SettingEntriesTable, SettingRow> {
   @override
@@ -6179,6 +7276,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ActivityMaterialsTable activityMaterials =
       $ActivityMaterialsTable(this);
   late final $ShoppingItemsTable shoppingItems = $ShoppingItemsTable(this);
+  late final $AssistantThreadsTable assistantThreads = $AssistantThreadsTable(
+    this,
+  );
+  late final $AssistantMessagesTable assistantMessages =
+      $AssistantMessagesTable(this);
   late final $SettingEntriesTable settingEntries = $SettingEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -6194,6 +7296,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     taskMaterials,
     activityMaterials,
     shoppingItems,
+    assistantThreads,
+    assistantMessages,
     settingEntries,
   ];
   @override
@@ -6367,6 +7471,26 @@ final class $$GardensTableReferences
     ).filter((f) => f.gardenId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_shoppingItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$AssistantThreadsTable, List<AssistantThreadRow>>
+  _assistantThreadsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.assistantThreads,
+    aliasName: 'gardens__id__assistant_threads__garden_id',
+  );
+
+  $$AssistantThreadsTableProcessedTableManager get assistantThreadsRefs {
+    final manager = $$AssistantThreadsTableTableManager(
+      $_db,
+      $_db.assistantThreads,
+    ).filter((f) => f.gardenId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _assistantThreadsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -6593,6 +7717,31 @@ class $$GardensTableFilterComposer
           }) => $$ShoppingItemsTableFilterComposer(
             $db: $db,
             $table: $db.shoppingItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> assistantThreadsRefs(
+    Expression<bool> Function($$AssistantThreadsTableFilterComposer f) f,
+  ) {
+    final $$AssistantThreadsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.assistantThreads,
+      getReferencedColumn: (t) => t.gardenId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AssistantThreadsTableFilterComposer(
+            $db: $db,
+            $table: $db.assistantThreads,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6854,6 +8003,31 @@ class $$GardensTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> assistantThreadsRefs<T extends Object>(
+    Expression<T> Function($$AssistantThreadsTableAnnotationComposer a) f,
+  ) {
+    final $$AssistantThreadsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.assistantThreads,
+      getReferencedColumn: (t) => t.gardenId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AssistantThreadsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.assistantThreads,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$GardensTableTableManager
@@ -6878,6 +8052,7 @@ class $$GardensTableTableManager
             bool taskMaterialsRefs,
             bool activityMaterialsRefs,
             bool shoppingItemsRefs,
+            bool assistantThreadsRefs,
           })
         > {
   $$GardensTableTableManager(_$AppDatabase db, $GardensTable table)
@@ -6937,6 +8112,7 @@ class $$GardensTableTableManager
                 taskMaterialsRefs = false,
                 activityMaterialsRefs = false,
                 shoppingItemsRefs = false,
+                assistantThreadsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -6949,6 +8125,7 @@ class $$GardensTableTableManager
                     if (taskMaterialsRefs) db.taskMaterials,
                     if (activityMaterialsRefs) db.activityMaterials,
                     if (shoppingItemsRefs) db.shoppingItems,
+                    if (assistantThreadsRefs) db.assistantThreads,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -7113,6 +8290,27 @@ class $$GardensTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (assistantThreadsRefs)
+                        await $_getPrefetchedData<
+                          GardenRow,
+                          $GardensTable,
+                          AssistantThreadRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$GardensTableReferences
+                              ._assistantThreadsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GardensTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).assistantThreadsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gardenId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -7142,6 +8340,7 @@ typedef $$GardensTableProcessedTableManager =
         bool taskMaterialsRefs,
         bool activityMaterialsRefs,
         bool shoppingItemsRefs,
+        bool assistantThreadsRefs,
       })
     >;
 typedef $$ZonesTableCreateCompanionBuilder =
@@ -12256,6 +13455,908 @@ typedef $$ShoppingItemsTableProcessedTableManager =
       ShoppingItemRow,
       PrefetchHooks Function({bool gardenId, bool itemId})
     >;
+typedef $$AssistantThreadsTableCreateCompanionBuilder =
+    AssistantThreadsCompanion Function({
+      required String id,
+      Value<String?> gardenId,
+      Value<String?> title,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$AssistantThreadsTableUpdateCompanionBuilder =
+    AssistantThreadsCompanion Function({
+      Value<String> id,
+      Value<String?> gardenId,
+      Value<String?> title,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+
+final class $$AssistantThreadsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AssistantThreadsTable,
+          AssistantThreadRow
+        > {
+  $$AssistantThreadsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $GardensTable _gardenIdTable(_$AppDatabase db) =>
+      db.gardens.createAlias('assistant_threads__garden_id__gardens__id');
+
+  $$GardensTableProcessedTableManager? get gardenId {
+    final $_column = $_itemColumn<String>('garden_id');
+    if ($_column == null) return null;
+    final manager = $$GardensTableTableManager(
+      $_db,
+      $_db.gardens,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gardenIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$AssistantMessagesTable, List<AssistantMessageRow>>
+  _assistantMessagesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.assistantMessages,
+        aliasName: 'assistant_threads__id__assistant_messages__thread_id',
+      );
+
+  $$AssistantMessagesTableProcessedTableManager get assistantMessagesRefs {
+    final manager = $$AssistantMessagesTableTableManager(
+      $_db,
+      $_db.assistantMessages,
+    ).filter((f) => f.threadId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _assistantMessagesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$AssistantThreadsTableFilterComposer
+    extends Composer<_$AppDatabase, $AssistantThreadsTable> {
+  $$AssistantThreadsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GardensTableFilterComposer get gardenId {
+    final $$GardensTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableFilterComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> assistantMessagesRefs(
+    Expression<bool> Function($$AssistantMessagesTableFilterComposer f) f,
+  ) {
+    final $$AssistantMessagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.assistantMessages,
+      getReferencedColumn: (t) => t.threadId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AssistantMessagesTableFilterComposer(
+            $db: $db,
+            $table: $db.assistantMessages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$AssistantThreadsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AssistantThreadsTable> {
+  $$AssistantThreadsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GardensTableOrderingComposer get gardenId {
+    final $$GardensTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableOrderingComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AssistantThreadsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AssistantThreadsTable> {
+  $$AssistantThreadsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$GardensTableAnnotationComposer get gardenId {
+    final $$GardensTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> assistantMessagesRefs<T extends Object>(
+    Expression<T> Function($$AssistantMessagesTableAnnotationComposer a) f,
+  ) {
+    final $$AssistantMessagesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.assistantMessages,
+          getReferencedColumn: (t) => t.threadId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AssistantMessagesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.assistantMessages,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AssistantThreadsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AssistantThreadsTable,
+          AssistantThreadRow,
+          $$AssistantThreadsTableFilterComposer,
+          $$AssistantThreadsTableOrderingComposer,
+          $$AssistantThreadsTableAnnotationComposer,
+          $$AssistantThreadsTableCreateCompanionBuilder,
+          $$AssistantThreadsTableUpdateCompanionBuilder,
+          (AssistantThreadRow, $$AssistantThreadsTableReferences),
+          AssistantThreadRow,
+          PrefetchHooks Function({bool gardenId, bool assistantMessagesRefs})
+        > {
+  $$AssistantThreadsTableTableManager(
+    _$AppDatabase db,
+    $AssistantThreadsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AssistantThreadsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AssistantThreadsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AssistantThreadsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> gardenId = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AssistantThreadsCompanion(
+                id: id,
+                gardenId: gardenId,
+                title: title,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> gardenId = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AssistantThreadsCompanion.insert(
+                id: id,
+                gardenId: gardenId,
+                title: title,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AssistantThreadsTable, AssistantThreadRow>(
+                    table,
+                  ),
+                  $$AssistantThreadsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({gardenId = false, assistantMessagesRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (assistantMessagesRefs) db.assistantMessages,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (gardenId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.gardenId,
+                                    referencedTable:
+                                        $$AssistantThreadsTableReferences
+                                            ._gardenIdTable(db),
+                                    referencedColumn:
+                                        $$AssistantThreadsTableReferences
+                                            ._gardenIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (assistantMessagesRefs)
+                        await $_getPrefetchedData<
+                          AssistantThreadRow,
+                          $AssistantThreadsTable,
+                          AssistantMessageRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$AssistantThreadsTableReferences
+                              ._assistantMessagesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AssistantThreadsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).assistantMessagesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.threadId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AssistantThreadsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AssistantThreadsTable,
+      AssistantThreadRow,
+      $$AssistantThreadsTableFilterComposer,
+      $$AssistantThreadsTableOrderingComposer,
+      $$AssistantThreadsTableAnnotationComposer,
+      $$AssistantThreadsTableCreateCompanionBuilder,
+      $$AssistantThreadsTableUpdateCompanionBuilder,
+      (AssistantThreadRow, $$AssistantThreadsTableReferences),
+      AssistantThreadRow,
+      PrefetchHooks Function({bool gardenId, bool assistantMessagesRefs})
+    >;
+typedef $$AssistantMessagesTableCreateCompanionBuilder =
+    AssistantMessagesCompanion Function({
+      required String id,
+      required String threadId,
+      required String role,
+      required String body,
+      Value<String?> contextSummary,
+      Value<String> status,
+      Value<String?> feedback,
+      Value<String?> feedbackComment,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$AssistantMessagesTableUpdateCompanionBuilder =
+    AssistantMessagesCompanion Function({
+      Value<String> id,
+      Value<String> threadId,
+      Value<String> role,
+      Value<String> body,
+      Value<String?> contextSummary,
+      Value<String> status,
+      Value<String?> feedback,
+      Value<String?> feedbackComment,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+
+final class $$AssistantMessagesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AssistantMessagesTable,
+          AssistantMessageRow
+        > {
+  $$AssistantMessagesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $AssistantThreadsTable _threadIdTable(_$AppDatabase db) => db
+      .assistantThreads
+      .createAlias('assistant_messages__thread_id__assistant_threads__id');
+
+  $$AssistantThreadsTableProcessedTableManager get threadId {
+    final $_column = $_itemColumn<String>('thread_id')!;
+
+    final manager = $$AssistantThreadsTableTableManager(
+      $_db,
+      $_db.assistantThreads,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_threadIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AssistantMessagesTableFilterComposer
+    extends Composer<_$AppDatabase, $AssistantMessagesTable> {
+  $$AssistantMessagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contextSummary => $composableBuilder(
+    column: $table.contextSummary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get feedback => $composableBuilder(
+    column: $table.feedback,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get feedbackComment => $composableBuilder(
+    column: $table.feedbackComment,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AssistantThreadsTableFilterComposer get threadId {
+    final $$AssistantThreadsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.threadId,
+      referencedTable: $db.assistantThreads,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AssistantThreadsTableFilterComposer(
+            $db: $db,
+            $table: $db.assistantThreads,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AssistantMessagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AssistantMessagesTable> {
+  $$AssistantMessagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contextSummary => $composableBuilder(
+    column: $table.contextSummary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get feedback => $composableBuilder(
+    column: $table.feedback,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get feedbackComment => $composableBuilder(
+    column: $table.feedbackComment,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AssistantThreadsTableOrderingComposer get threadId {
+    final $$AssistantThreadsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.threadId,
+      referencedTable: $db.assistantThreads,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AssistantThreadsTableOrderingComposer(
+            $db: $db,
+            $table: $db.assistantThreads,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AssistantMessagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AssistantMessagesTable> {
+  $$AssistantMessagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<String> get contextSummary => $composableBuilder(
+    column: $table.contextSummary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get feedback =>
+      $composableBuilder(column: $table.feedback, builder: (column) => column);
+
+  GeneratedColumn<String> get feedbackComment => $composableBuilder(
+    column: $table.feedbackComment,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$AssistantThreadsTableAnnotationComposer get threadId {
+    final $$AssistantThreadsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.threadId,
+      referencedTable: $db.assistantThreads,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AssistantThreadsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.assistantThreads,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AssistantMessagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AssistantMessagesTable,
+          AssistantMessageRow,
+          $$AssistantMessagesTableFilterComposer,
+          $$AssistantMessagesTableOrderingComposer,
+          $$AssistantMessagesTableAnnotationComposer,
+          $$AssistantMessagesTableCreateCompanionBuilder,
+          $$AssistantMessagesTableUpdateCompanionBuilder,
+          (AssistantMessageRow, $$AssistantMessagesTableReferences),
+          AssistantMessageRow,
+          PrefetchHooks Function({bool threadId})
+        > {
+  $$AssistantMessagesTableTableManager(
+    _$AppDatabase db,
+    $AssistantMessagesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AssistantMessagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AssistantMessagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AssistantMessagesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> threadId = const Value.absent(),
+                Value<String> role = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<String?> contextSummary = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> feedback = const Value.absent(),
+                Value<String?> feedbackComment = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AssistantMessagesCompanion(
+                id: id,
+                threadId: threadId,
+                role: role,
+                body: body,
+                contextSummary: contextSummary,
+                status: status,
+                feedback: feedback,
+                feedbackComment: feedbackComment,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String threadId,
+                required String role,
+                required String body,
+                Value<String?> contextSummary = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> feedback = const Value.absent(),
+                Value<String?> feedbackComment = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AssistantMessagesCompanion.insert(
+                id: id,
+                threadId: threadId,
+                role: role,
+                body: body,
+                contextSummary: contextSummary,
+                status: status,
+                feedback: feedback,
+                feedbackComment: feedbackComment,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AssistantMessagesTable, AssistantMessageRow>(
+                    table,
+                  ),
+                  $$AssistantMessagesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({threadId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (threadId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.threadId,
+                                referencedTable:
+                                    $$AssistantMessagesTableReferences
+                                        ._threadIdTable(db),
+                                referencedColumn:
+                                    $$AssistantMessagesTableReferences
+                                        ._threadIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AssistantMessagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AssistantMessagesTable,
+      AssistantMessageRow,
+      $$AssistantMessagesTableFilterComposer,
+      $$AssistantMessagesTableOrderingComposer,
+      $$AssistantMessagesTableAnnotationComposer,
+      $$AssistantMessagesTableCreateCompanionBuilder,
+      $$AssistantMessagesTableUpdateCompanionBuilder,
+      (AssistantMessageRow, $$AssistantMessagesTableReferences),
+      AssistantMessageRow,
+      PrefetchHooks Function({bool threadId})
+    >;
 typedef $$SettingEntriesTableCreateCompanionBuilder =
     SettingEntriesCompanion Function({
       required String key,
@@ -12429,6 +14530,10 @@ class $AppDatabaseManager {
       $$ActivityMaterialsTableTableManager(_db, _db.activityMaterials);
   $$ShoppingItemsTableTableManager get shoppingItems =>
       $$ShoppingItemsTableTableManager(_db, _db.shoppingItems);
+  $$AssistantThreadsTableTableManager get assistantThreads =>
+      $$AssistantThreadsTableTableManager(_db, _db.assistantThreads);
+  $$AssistantMessagesTableTableManager get assistantMessages =>
+      $$AssistantMessagesTableTableManager(_db, _db.assistantMessages);
   $$SettingEntriesTableTableManager get settingEntries =>
       $$SettingEntriesTableTableManager(_db, _db.settingEntries);
 }

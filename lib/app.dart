@@ -5,6 +5,7 @@ import 'core/theme/app_theme.dart';
 import 'core/time/today.dart';
 import 'features/activity/presentation/screens/activity_form_screen.dart';
 import 'features/activity/presentation/screens/timeline_screen.dart';
+import 'features/assistant/presentation/assistant_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/onboarding/presentation/onboarding_screen.dart';
 import 'features/settings/domain/app_settings.dart';
@@ -63,7 +64,7 @@ class AppRoot extends ConsumerWidget {
   }
 }
 
-/// Hlavní obrazovka se spodní navigací: Dnes, Deník, Úkoly, Zahrada.
+/// Hlavní obrazovka se spodní navigací: Dnes, Deník, Bóďa, Úkoly, Zahrada.
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
@@ -99,7 +100,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final fab = switch (_index) {
-      2 => FloatingActionButton(
+      3 => FloatingActionButton(
         heroTag: 'add-task',
         tooltip: l.newTaskTooltip,
         onPressed: () => Navigator.of(
@@ -107,7 +108,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
         ).push(MaterialPageRoute(builder: (_) => const TaskFormScreen())),
         child: const Icon(Icons.add_task),
       ),
-      3 => null,
+      2 || 4 => null,
       _ => FloatingActionButton(
         heroTag: 'add-activity',
         tooltip: l.newActivityTooltip,
@@ -124,6 +125,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
         children: const [
           DashboardScreen(),
           TimelineScreen(),
+          AssistantScreen(),
           TasksScreen(),
           ZonesScreen(),
         ],
@@ -142,6 +144,11 @@ class _HomeShellState extends ConsumerState<HomeShell>
             icon: const Icon(Icons.menu_book_outlined),
             selectedIcon: const Icon(Icons.menu_book),
             label: l.navDiary,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.forum_outlined),
+            selectedIcon: const Icon(Icons.forum),
+            label: l.navAssistant,
           ),
           NavigationDestination(
             icon: const Icon(Icons.task_alt_outlined),

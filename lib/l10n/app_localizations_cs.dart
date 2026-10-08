@@ -1458,4 +1458,182 @@ class AppLocalizationsCs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get navAssistant => 'Bóďa';
+
+  @override
+  String get assistantTitle => 'Bóďa';
+
+  @override
+  String get assistantNewConversation => 'Nový rozhovor';
+
+  @override
+  String get assistantDeleteConversation => 'Smazat rozhovor';
+
+  @override
+  String get assistantDeleteConfirmTitle => 'Smazat rozhovor?';
+
+  @override
+  String get assistantDeleteConfirmBody =>
+      'Dotazy i odpovědi z tohoto rozhovoru zmizí z telefonu.';
+
+  @override
+  String get assistantDemoBanner =>
+      'Ukázkový režim bez AI. Bóďa zatím jen spočítá dávky z tvých údajů a shrne, co o zahradě ví. Skutečné rady přijdou po přihlášení k účtu.';
+
+  @override
+  String get assistantDemoLabel => 'Ukázkový režim';
+
+  @override
+  String assistantUsage(int used, int limit) {
+    return 'Tento měsíc $used z $limit dotazů';
+  }
+
+  @override
+  String assistantPendingBanner(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dotazů čeká na připojení',
+      few: '$count dotazy čekají na připojení',
+      one: '1 dotaz čeká na připojení',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get assistantSendPending => 'Odeslat';
+
+  @override
+  String get assistantEmptyTitle => 'Zeptej se Bódi na svou zahradu';
+
+  @override
+  String get assistantEmptyBody =>
+      'Bóďa vidí tvé zóny, poslední záznamy, úkoly a sklad. Dávky hnojiv počítá z údajů na obalu a výměry zóny.';
+
+  @override
+  String get assistantSuggestionDose => 'Kolik hnojiva dát na zeleninu?';
+
+  @override
+  String get assistantSuggestionWeek => 'Co mám tento týden na zahradě udělat?';
+
+  @override
+  String get assistantSuggestionStock => 'Co mi dochází ve skladu?';
+
+  @override
+  String get assistantInputHint => 'Napiš dotaz…';
+
+  @override
+  String get assistantSend => 'Odeslat dotaz';
+
+  @override
+  String get assistantThinking => 'Bóďa přemýšlí…';
+
+  @override
+  String get assistantStatusPending =>
+      'Čeká na připojení. Odešle se, až budeš online.';
+
+  @override
+  String get assistantRetry => 'Zkusit znovu';
+
+  @override
+  String get assistantFailureNotSignedIn =>
+      'Pro dotazy na Bóďu je potřeba se přihlásit k účtu.';
+
+  @override
+  String assistantFailureLimit(int limit) {
+    return 'Tento měsíc máš vyčerpané dotazy ($limit). Další přibudou 1. dne v měsíci.';
+  }
+
+  @override
+  String get assistantFailureNotConfigured =>
+      'Bóďa teď není dostupný, server nemá dokončené nastavení.';
+
+  @override
+  String get assistantFailureUpstream =>
+      'Bóďa teď neodpovídá. Zkus to za chvíli.';
+
+  @override
+  String get assistantSourcesTitle => 'Z čeho vycházím';
+
+  @override
+  String assistantSourcesZones(String zones) {
+    return 'Zóny: $zones';
+  }
+
+  @override
+  String assistantSourcesCounts(int activities, int tasks, int items) {
+    return 'Záznamy z deníku: $activities · otevřené úkoly: $tasks · položky skladu: $items';
+  }
+
+  @override
+  String get assistantSourcesCalculations => 'Výpočty';
+
+  @override
+  String get assistantSourcesNone =>
+      'Bez výpočtů dávek. Dávku spočítám, když má zóna výměru a hnojivo dávku na m² z obalu.';
+
+  @override
+  String assistantCalculationLine(String label, String result, String source) {
+    return '$label: $result ($source)';
+  }
+
+  @override
+  String assistantWarningUnverifiedDose(String text) {
+    return 'Číslo $text nepochází z výpočtu ani z etikety. Než ho použiješ, ověř ho na obalu.';
+  }
+
+  @override
+  String assistantWarningProfessionalOnly(String product) {
+    return '$product není povolený pro neprofesionální uživatele. Nepoužívej ho.';
+  }
+
+  @override
+  String assistantWarningMissingPhi(String product) {
+    return 'U přípravku $product chybí ochranná lhůta do sklizně. Najdeš ji na etiketě.';
+  }
+
+  @override
+  String assistantActionTask(String title) {
+    return 'Přidat úkol: $title';
+  }
+
+  @override
+  String assistantActionShopping(String name) {
+    return 'Na nákupní seznam: $name';
+  }
+
+  @override
+  String assistantActionActivity(String title) {
+    return 'Zapsat do deníku: $title';
+  }
+
+  @override
+  String get assistantActionTaskDone => 'Úkol přidán';
+
+  @override
+  String get assistantActionShoppingDone => 'Přidáno na nákupní seznam';
+
+  @override
+  String get assistantActionFailed => 'Akci se nepodařilo uložit.';
+
+  @override
+  String get assistantFeedbackUp => 'Dobrá odpověď';
+
+  @override
+  String get assistantFeedbackDown => 'Špatná odpověď';
+
+  @override
+  String get assistantFeedbackCommentTitle => 'Co bylo špatně?';
+
+  @override
+  String get assistantFeedbackCommentHint =>
+      'Nepovinné. Pomůže to Bóďu zlepšit.';
+
+  @override
+  String get assistantFeedbackThanks => 'Díky za zpětnou vazbu.';
+
+  @override
+  String get assistantSaveFailed => 'Rozhovor se nepodařilo uložit.';
 }

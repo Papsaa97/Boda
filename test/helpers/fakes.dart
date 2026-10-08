@@ -10,6 +10,8 @@ import 'package:zahradnik_boda/core/photos/photo_storage.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_entity.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_repository.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_type.dart';
+import 'package:zahradnik_boda/features/assistant/domain/assistant_backend.dart';
+import 'package:zahradnik_boda/features/assistant/domain/assistant_message.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_repository.dart';
 import 'package:zahradnik_boda/features/inventory/domain/shopping_item.dart';
@@ -137,6 +139,34 @@ class InMemoryShoppingRepository implements ShoppingRepository {
   Future<void> clearDone() async => items.removeWhere((_, s) => s.done);
 }
 
+class InMemoryAssistantRepository implements AssistantRepository {
+  final Map<String, AssistantThread> threads = {};
+  final Map<String, AssistantMessage> items = {};
+
+  @override
+  Future<AssistantThread?> latestThread() async => threads.values.lastOrNull;
+
+  @override
+  Future<void> saveThread(AssistantThread thread) async =>
+      threads[thread.id] = thread;
+
+  @override
+  Future<List<AssistantMessage>> messages(String threadId) async => [
+    for (final m in items.values)
+      if (m.threadId == threadId) m,
+  ]..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+  @override
+  Future<void> saveMessage(AssistantMessage message) async =>
+      items[message.id] = message;
+
+  @override
+  Future<void> deleteThread(String threadId) async {
+    threads.remove(threadId);
+    items.removeWhere((_, m) => m.threadId == threadId);
+  }
+}
+
 class InMemorySettingsRepository implements SettingsRepository {
   InMemorySettingsRepository([this.current = const AppSettings()]);
 
@@ -159,6 +189,8 @@ ProviderContainer makeContainer({
   InMemorySettingsRepository? settings,
   InMemoryInventoryRepository? inventory,
   InMemoryShoppingRepository? shopping,
+  InMemoryAssistantRepository? assistant,
+  AssistantBackend? backend,
   DateTime Function()? clock,
 }) {
   return ProviderContainer(
@@ -169,6 +201,8 @@ ProviderContainer makeContainer({
       settings: settings,
       inventory: inventory,
       shopping: shopping,
+      assistant: assistant,
+      backend: backend,
       clock: clock,
     ),
   );
@@ -187,9 +221,15 @@ List<Override> testOverrides({
   InMemorySettingsRepository? settings,
   InMemoryInventoryRepository? inventory,
   InMemoryShoppingRepository? shopping,
+  InMemoryAssistantRepository? assistant,
+  AssistantBackend? backend,
   DateTime Function()? clock,
 }) {
   return [
+    assistantRepositoryProvider.overrideWithValue(
+      assistant ?? InMemoryAssistantRepository(),
+    ),
+    if (backend != null) assistantBackendProvider.overrideWithValue(backend),
     inventoryRepositoryProvider.overrideWithValue(
       inventory ?? InMemoryInventoryRepository(),
     ),

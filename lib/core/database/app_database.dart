@@ -213,6 +213,52 @@ class ShoppingItems extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Rozhovor s Bóďou (spec 8.1 `assistant_threads`, ve výchozím stavu jen
+/// v telefonu).
+@DataClassName('AssistantThreadRow')
+class AssistantThreads extends Table {
+  TextColumn get id => text()();
+  TextColumn get gardenId => text().nullable().references(Gardens, #id)();
+  TextColumn get title => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Zpráva v rozhovoru s Bóďou.
+@DataClassName('AssistantMessageRow')
+class AssistantMessages extends Table {
+  TextColumn get id => text()();
+  TextColumn get threadId => text().references(AssistantThreads, #id)();
+
+  /// `user` nebo `assistant`.
+  TextColumn get role => text()();
+
+  /// Na serveru sloupec `text` (synchronizace ho přejmenuje); `text` by se
+  /// v generovaném kódu Driftu tloukl s metodou `Table.text()`.
+  TextColumn get body => text()();
+
+  /// Z čeho Bóďa vycházel, akce, upozornění a čerpání limitu (JSON).
+  TextColumn get contextSummary => text().nullable()();
+
+  /// Dotaz bez připojení čeká na odeslání (FR-B7): `pending`, `sent`,
+  /// `failed`. Jen v telefonu.
+  TextColumn get status => text().withDefault(const Constant('sent'))();
+
+  /// `up` / `down` (FR-B6).
+  TextColumn get feedback => text().nullable()();
+  TextColumn get feedbackComment => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Nastavení a příznaky aplikace (klíč → hodnota). V 1.0 se nastavení
 /// synchronizuje jako `profiles.settings`.
 @DataClassName('SettingRow')
@@ -238,6 +284,8 @@ class SettingEntries extends Table {
     TaskMaterials,
     ActivityMaterials,
     ShoppingItems,
+    AssistantThreads,
+    AssistantMessages,
     SettingEntries,
   ],
 )
@@ -245,7 +293,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -267,6 +315,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(schema.taskMaterials);
         await m.createTable(schema.activityMaterials);
         await m.createTable(schema.shoppingItems);
+      },
+      // 1.0: rozhovory s Bóďou.
+      from2To3: (m, schema) async {
+        await m.createTable(schema.assistantThreads);
+        await m.createTable(schema.assistantMessages);
       },
     ),
     beforeOpen: (details) async {

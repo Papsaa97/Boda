@@ -39,6 +39,7 @@ class TasksController extends AsyncNotifier<List<TaskEntity>> {
       durationEstMin: draft.durationEstMin,
       tools: draft.tools,
       materials: draft.materials,
+      source: draft.source,
     );
     await save(task);
     return task;

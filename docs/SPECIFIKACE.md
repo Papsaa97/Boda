@@ -456,7 +456,8 @@ incidents                      # V2; kontroly D+3 a D+7 jsou úkoly s incident_i
   status: 'open' | 'resolved'
 
 assistant_threads, assistant_messages                  # 1.0, ve výchozím stavu jen lokálně
-  role, text, context_summary?, feedback?: 'up' | 'down', created_at
+  role, text, context_summary?, feedback?: 'up' | 'down', feedback_comment?, created_at
+                      # v telefonu navíc stav dotazu pending/sent/failed (DECLOG D65, D66)
 ```
 
 **Zabezpečení (RLS, princip):**

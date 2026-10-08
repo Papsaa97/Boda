@@ -73,6 +73,7 @@ boda-export-2026-10-07.zip
       "completedActivityId": null,
       "durationEstMin": 45,
       "tools": ["Klíč na hadice"],
+      "source": "user",
       "materials": [{ "itemId": "…", "qty": 1.2, "unit": "kg" }],
       "createdAt": "…",
       "updatedAt": "…"
@@ -124,6 +125,7 @@ boda-export-2026-10-07.zip
 | `activities[].costCzk` | číslo | Náklady v Kč. |
 | `activities[].materials`, `tasks[].materials` | pole | Materiál ze skladu: `itemId`, `qty`, `unit` (`g`, `kg`, `ml`, `l`, `ks`, `pack`). |
 | `tasks[].durationEstMin`, `tools` | číslo, text[] | Odhad doby v minutách a nářadí. |
+| `tasks[].source` | text | Kdo úkol založil: `user`, `boda` (z odpovědi Bódi), `weather`. Chybí-li, bere se `user`. |
 | `inventory[]` | pole | Sklad: `category` (`seed`, `fertilizer`, `plantProtection`, `tool`, `other`), `unit`, `stockQty`, `lowStockThreshold`, `details` podle kategorie (osivo: `species`, `variety`, `lot`, `bestBefore`; hnojivo: `n`, `p`, `k`, `form`, `dosePerM2`, `doseUnit`; přípravek: `activeSubstance`, `authorizationNo`, `phiDays`, `nonProfessional`, `dosePerM2`, `doseUnit`; nářadí: `condition`, `serviceIntervalDays`, `lastServiceAt`). |
 | `shopping[]` | pole | Nákupní seznam: `name`, `qty`, `unit`, `itemId` (položka skladu), `done`, `source` (`user`, `boda`, `lowStock`). |
 

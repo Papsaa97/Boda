@@ -2,6 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../features/activity/data/drift_activity_repository.dart';
+import '../../features/assistant/data/demo_assistant_backend.dart';
+import '../../features/assistant/data/drift_assistant_repository.dart';
+import '../../features/assistant/domain/assistant_backend.dart';
+import '../../features/assistant/domain/assistant_message.dart';
 import '../../features/activity/domain/activity_repository.dart';
 import '../../features/inventory/data/drift_inventory_repository.dart';
 import '../../features/inventory/domain/inventory_repository.dart';
@@ -88,4 +92,17 @@ final shoppingRepositoryProvider = Provider<ShoppingRepository>(
     ref.watch(gardenIdProvider),
     ref.watch(clockProvider),
   ),
+);
+
+final assistantRepositoryProvider = Provider<AssistantRepository>(
+  (ref) => DriftAssistantRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+/// Kam Bóďa posílá dotazy. Do připojení účtu ukázkový režim bez AI.
+final assistantBackendProvider = Provider<AssistantBackend>(
+  (ref) => const DemoAssistantBackend(),
 );
