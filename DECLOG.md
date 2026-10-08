@@ -113,8 +113,8 @@ Proč: Papiho pravidlo „vždy vyber pro danou věc ten správný předmět“.
 Dopad: pro každou část se volí nástroj, který se na ni hodí nejlépe; změna = záznam v DECLOGu s důvodem; neměnit kvůli změně samotné. Pravidlo je v kap. 7.1 specifikace.
 
 **D26. Lokální databáze je od MVP 0.2 Drift (SQLite), ne `hive_ce` (nahrazuje D17, uzavírá otevřenou otázku z D15).**
-Proč: se Supabase je serverová databáze relační a Drift umí stejné tabulky a sloupce v telefonu (výchozí snake_case jako PostgreSQL). MVP 0.2 potřebuje fulltext (FTS5) a filtry, 1.0 transakce (sklad, outbox ve stejné transakci jako změna). Přechod `hive` → `hive_ce` teď a `hive_ce` → Drift před 1.0 by znamenal dvě migrace, z toho druhou na skutečných datech testerů; jedna migrace teď proběhne dřív, než testeři začnou zapisovat (konec února 2027). Drift má typované migrace s testy proti snímkům schématu a funguje i na webu (WebAssembly).
-Dopad: MVP 0.2 převede data z Hive jednorázově při prvním spuštění (s testem). Odpadá kolize generátorů z D2.
+Proč: se Supabase je serverová databáze relační a Drift umí stejné tabulky a sloupce v telefonu (výchozí snake_case jako PostgreSQL). MVP 0.2 potřebuje fulltext (FTS5) a filtry, 1.0 transakce (sklad, outbox ve stejné transakci jako změna). Přechod na Drift až před 1.0 by znamenal převádět skutečná data testerů; v MVP 0.2 proběhne dřív, než testeři začnou zapisovat (konec února 2027). `hive_ce` v kódu od 0.1 (D33) čte soubory Hive beze změny, takže převod do Driftu je jediná skutečná migrace dat. Drift má typované migrace s testy proti snímkům schématu a funguje i na webu (WebAssembly).
+Dopad: MVP 0.2 převede data z Hive (`hive_ce`) jednorázově při prvním spuštění (s testem). Odpadá kolize generátorů z D2.
 
 **D27. Synchronizace je vlastní outbox nad Driftem; PowerSync je záložní varianta (upřesňuje D15).**
 Proč: Supabase nemá offline SDK, takže nějakou synchronizační vrstvu potřebujeme tak jako tak. Pro deník jednoho uživatele stačí outbox, `upsert` podle UUID a „poslední zápis vyhrává“; další placená služba by byla zbytečná. Stahuje se podle času serveru (`server_updated_at`), aby nevadily rozdílně nastavené hodiny telefonů; trigger na serveru odmítne starší zápis.
@@ -146,7 +146,7 @@ Dopad: kap. 7.1 a 9 (seznam zpracovatelů); balíčky se přidávají až ve fá
 | --- | --- | --- |
 | Flutter (Android, iOS, web) | ponecháno | Jeden kód pro všechny platformy, existující kód MVP 0.1, dobrá podpora Driftu, Supabase i Sentry. |
 | Feature-first clean architecture | ponecháno | Repozitáře v domain vrstvě dovolují vyměnit Hive za Drift bez zásahu do UI. |
-| Riverpod (`AsyncNotifier`) | ponecháno; Riverpod 3 a `@riverpod` volitelně | Funguje a je v kódu; po odchodu z Hive generátory nekolidují, přechod není nutný. |
+| Riverpod (`AsyncNotifier`) | ponecháno; Riverpod 3 je v kódu od 0.1 (D33), `@riverpod` volitelně | Funguje a je v kódu; po odchodu z Hive generátory nekolidují, generátor není nutný. |
 | Navigace: `Navigator` v 0.x, GoRouter od 1.0 | ponecháno | GoRouter je oficiální balíček Flutteru; v 1.0 jsou potřeba deep linky (notifikace, návrat z přihlášení). |
 | Lokální notifikace `flutter_local_notifications` | ponecháno | Standard pro plánované notifikace bez serveru, udržovaný. |
 | Geometrie: vlastní výpočet ploch + `turf` | ponecháno s upřesněním | `turf` jen na rovinné predikáty; jeho geodetické funkce počítají ve stupních, plátno má lokální metry (kap. 5.1). |

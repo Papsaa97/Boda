@@ -680,7 +680,7 @@ Papi rozhodl: backend bude Supabase a technologie ve specifikaci jsou předloha,
 | # | Kapitola | Změna | Důvod |
 | --- | --- | --- | --- |
 | 1 | 7.1, 8, 9, 12 | Firebase → **Supabase** (PostgreSQL + RLS, Auth, Storage, Edge Functions); schéma Firestore převedeno na tabulky PostgreSQL; pravidla Firestore → RLS s testy pgTAP | Data deníku, zón a skladu jsou relační; SQL, transakce a joiny; předvídatelná cena místo platby za každé čtení a zápis; open source a přenositelná data. |
-| 2 | 4.2, 7.1, 8.2 | Lokální databáze: `hive_ce` → **Drift (SQLite)** už od 0.2 | Model 1 : 1 se serverem, FTS5 pro fulltext, transakce pro sklad a outbox; jedna migrace dat před příchodem testerů místo dvou. |
+| 2 | 4.2, 7.1, 8.2 | Lokální databáze: `hive_ce` → **Drift (SQLite)** už od 0.2 | Model 1 : 1 se serverem, FTS5 pro fulltext, transakce pro sklad a outbox; jediná migrace dat proběhne před příchodem testerů (`hive_ce` čte soubory Hive beze změny). |
 | 3 | 7.4 | Synchronizace: vlastní outbox s `server_updated_at` a triggerem „poslední zápis vyhrává“; PowerSync jako záložní varianta | Supabase nemá offline SDK; čas serveru řeší rozdílné hodiny telefonů. |
 | 4 | 7.1 | Doplněny konkrétní volby: Sentry, PostHog (EU), RevenueCat, FCM jen jako doručovací kanál push | Crashlytics a Firebase Analytics odpadly s Firebase; platby a analytika ve spec neměly technologii. |
 | 5 | 5.1 | `turf` jen pro rovinné predikáty, ne geodetickou plochu | Plátno má lokální souřadnice v metrech, geodetické funkce počítají ve stupních. |
