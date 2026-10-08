@@ -10,6 +10,8 @@ import '../../../core/photos/photo_storage.dart';
 import '../../../core/time/calendar.dart';
 import '../../activity/data/drift_activity_repository.dart';
 import '../../activity/domain/activity_entity.dart';
+import '../../canvas/data/drift_plan_repository.dart';
+import '../../canvas/domain/geometry.dart';
 import '../../inventory/data/drift_inventory_repository.dart';
 import '../../inventory/domain/shopping_item.dart';
 import '../../tasks/data/drift_task_repository.dart';
@@ -71,11 +73,17 @@ class BackupService {
     final materialRows = await (_db.select(
       _db.activityMaterials,
     )..where((m) => m.deletedAt.isNull())).get();
+    final outline = await DriftPlanRepository(
+      _db,
+      _gardenId,
+      _clock,
+    ).loadOutline();
     return BackupData(
       formatVersion: backupFormatVersion,
       exportedAt: _clock(),
       appVersion: appVersion,
       zones: zones,
+      gardenOutline: outline,
       // Fotky, jejichž soubor zmizel, se do zálohy nedají přibalit.
       activities: [
         for (final a in activities)
@@ -200,11 +208,22 @@ class BackupService {
                 sunExposure: Value(z.sunExposure?.name),
                 irrigation: Value(z.irrigation?.name),
                 covered: Value(z.covered),
+                polygon: Value(
+                  z.polygon == null
+                      ? null
+                      : jsonEncode(polygonToJson(z.polygon!)),
+                ),
+                layer: Value(z.layer.name),
                 createdAt: now,
                 updatedAt: now,
               ),
             );
       }
+      await DriftPlanRepository(
+        _db,
+        _gardenId,
+        _clock,
+      ).saveOutline(data.gardenOutline);
       final inventory = DriftInventoryRepository(_db, _gardenId, _clock);
       for (final i in data.inventory) {
         await inventory.save(i);

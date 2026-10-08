@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
+import '../../canvas/presentation/canvas_screen.dart';
 import '../../inventory/presentation/inventory_controller.dart';
 import '../../inventory/presentation/inventory_screen.dart';
 import '../domain/zone_entity.dart';
@@ -163,7 +164,10 @@ class ZonesScreen extends ConsumerWidget {
         error: (error, _) =>
             Center(child: Text(l.commonErrorWithDetail('$error'))),
         data: (zones) {
-          final active = zones.where((z) => !z.archived).toList();
+          final active = zones.where((z) => z.isActive).toList();
+          final planned = zones
+              .where((z) => z.isPlanned && !z.archived)
+              .toList();
           final archived = zones.where((z) => z.archived).toList();
           return ListView(
             padding: const EdgeInsets.only(bottom: 96),
@@ -177,6 +181,17 @@ class ZonesScreen extends ConsumerWidget {
                 ),
               ),
               for (final zone in active) tile(zone),
+              const _PlanCard(),
+              if (planned.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                  child: Text(
+                    l.zonePlannedSection,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                for (final zone in planned) tile(zone),
+              ],
               if (archived.isNotEmpty) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
@@ -257,6 +272,7 @@ class _ZoneDialogState extends State<_ZoneDialog> {
           const SizedBox(height: 16),
           DropdownButtonFormField<ZoneType>(
             initialValue: _type,
+            isExpanded: true,
             decoration: InputDecoration(labelText: l.zoneTypeLabel),
             items: [
               for (final type in ZoneType.values)
@@ -266,7 +282,12 @@ class _ZoneDialogState extends State<_ZoneDialog> {
                     children: [
                       Icon(zoneIcon(type), size: 20),
                       const SizedBox(width: 12),
-                      Text(zoneTypeLabel(l, type)),
+                      Expanded(
+                        child: Text(
+                          zoneTypeLabel(l, type),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -316,6 +337,28 @@ class _InventoryCard extends ConsumerWidget {
         onTap: () => Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (_) => const InventoryScreen())),
+      ),
+    );
+  }
+}
+
+/// Vstup na plán zahrady (1.1).
+class _PlanCard extends StatelessWidget {
+  const _PlanCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: ListTile(
+        leading: const Icon(Icons.map_outlined),
+        title: Text(l.canvasTitle),
+        subtitle: Text(l.canvasCardSubtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const CanvasScreen())),
       ),
     );
   }

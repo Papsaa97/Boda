@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../canvas/domain/geometry.dart';
+
 /// Druh zóny (číselník `zone.type`, spec kap. 8.3). Podle něj se volí
 /// ikona; v 1.0 i výchozí rady Bódi.
 enum ZoneType {
@@ -46,6 +48,15 @@ enum Irrigation {
   static Irrigation? fromKey(String? key) => _byName(values, key);
 }
 
+/// Vrstva plánu zahrady (FR-P5): co v zahradě je, nebo co se teprve
+/// plánuje. Zóna v návrhu se nenabízí pro záznamy a úkoly.
+enum ZoneLayer {
+  reality,
+  plan;
+
+  static ZoneLayer fromKey(String? key) => key == plan.name ? plan : reality;
+}
+
 T? _byName<T extends Enum>(List<T> values, String? key) {
   for (final v in values) {
     if (v.name == key) return v;
@@ -56,8 +67,8 @@ T? _byName<T extends Enum>(List<T> values, String? key) {
 /// Zóna zahrady, ke které se váže záznam v deníku.
 ///
 /// Od 1.0 nese vlastnosti zadané formulářem (výměra, půda, oslunění,
-/// závlaha); z nich Bóďa a kalkulátor počítají dávky. Polygon na plátně
-/// přijde v 1.1.
+/// závlaha); z nich Bóďa a kalkulátor počítají dávky. Od 1.1 může mít
+/// tvar na plánu zahrady a patřit do vrstvy Návrh.
 class ZoneEntity extends Equatable {
   /// UUID v4 (zóny z verze 0.1 měly id Z1–Z7, při převodu do databáze
   /// dostaly UUID).
@@ -82,6 +93,10 @@ class ZoneEntity extends Equatable {
   /// Krytá zóna (skleník, fóliovník).
   final bool covered;
 
+  /// Tvar na plánu zahrady v metrech (1.1); null = zóna na plánu není.
+  final List<Pt>? polygon;
+  final ZoneLayer layer;
+
   const ZoneEntity({
     required this.id,
     required this.name,
@@ -94,7 +109,15 @@ class ZoneEntity extends Equatable {
     this.sunExposure,
     this.irrigation,
     this.covered = false,
+    this.polygon,
+    this.layer = ZoneLayer.reality,
   });
+
+  /// Zóna jen v návrhu (FR-P5).
+  bool get isPlanned => layer == ZoneLayer.plan;
+
+  /// Nabízí se pro nové záznamy a úkoly: není archivovaná ani v návrhu.
+  bool get isActive => !archived && !isPlanned;
 
   /// Má zóna vyplněnou aspoň jednu vlastnost?
   bool get hasProperties =>
@@ -116,6 +139,8 @@ class ZoneEntity extends Equatable {
     SunExposure? Function()? sunExposure,
     Irrigation? Function()? irrigation,
     bool? covered,
+    List<Pt>? Function()? polygon,
+    ZoneLayer? layer,
   }) => ZoneEntity(
     id: id,
     name: name ?? this.name,
@@ -128,6 +153,8 @@ class ZoneEntity extends Equatable {
     sunExposure: sunExposure == null ? this.sunExposure : sunExposure(),
     irrigation: irrigation == null ? this.irrigation : irrigation(),
     covered: covered ?? this.covered,
+    polygon: polygon == null ? this.polygon : polygon(),
+    layer: layer ?? this.layer,
   );
 
   @override
@@ -143,6 +170,8 @@ class ZoneEntity extends Equatable {
     sunExposure,
     irrigation,
     covered,
+    polygon,
+    layer,
   ];
 }
 

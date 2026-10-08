@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/time/calendar.dart';
+import '../../canvas/domain/geometry.dart';
 import '../domain/zone_entity.dart';
 import '../domain/zone_repository.dart';
 
@@ -48,6 +51,8 @@ class DriftZoneRepository implements ZoneRepository {
             sunExposure: Value(zone.sunExposure?.name),
             irrigation: Value(zone.irrigation?.name),
             covered: Value(zone.covered),
+            polygon: Value(_polygon(zone)),
+            layer: Value(zone.layer.name),
             createdAt: now,
             updatedAt: now,
           ),
@@ -63,6 +68,8 @@ class DriftZoneRepository implements ZoneRepository {
               sunExposure: Value(zone.sunExposure?.name),
               irrigation: Value(zone.irrigation?.name),
               covered: Value(zone.covered),
+              polygon: Value(_polygon(zone)),
+              layer: Value(zone.layer.name),
               updatedAt: Value(now),
               deletedAt: const Value(null),
             ),
@@ -79,6 +86,11 @@ class DriftZoneRepository implements ZoneRepository {
   }
 }
 
+String? _polygon(ZoneEntity zone) {
+  final polygon = zone.polygon;
+  return polygon == null ? null : jsonEncode(polygonToJson(polygon));
+}
+
 String? _dateKey(DateTime? d) => d == null ? null : formatDateKey(d);
 
 ZoneEntity zoneFromRow(ZoneRow r) => ZoneEntity(
@@ -93,4 +105,14 @@ ZoneEntity zoneFromRow(ZoneRow r) => ZoneEntity(
   sunExposure: SunExposure.fromKey(r.sunExposure),
   irrigation: Irrigation.fromKey(r.irrigation),
   covered: r.covered,
+  polygon: r.polygon == null ? null : _decodePolygon(r.polygon!),
+  layer: ZoneLayer.fromKey(r.layer),
 );
+
+List<Pt>? _decodePolygon(String json) {
+  try {
+    return polygonFromJson(jsonDecode(json));
+  } on FormatException {
+    return null;
+  }
+}

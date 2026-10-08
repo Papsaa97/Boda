@@ -4,6 +4,7 @@ import '../../../core/time/calendar.dart';
 import '../../../core/time/time_zone.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../activity/domain/activity_type.dart';
+import '../../canvas/domain/geometry.dart';
 import '../../inventory/domain/inventory_item.dart';
 import '../../inventory/domain/shopping_item.dart';
 import '../../inventory/domain/units.dart';
@@ -14,7 +15,7 @@ import '../../zones/domain/zone_entity.dart';
 ///
 /// Při změně formátu verzi zvýšit, starší verze dál umět načíst
 /// v [decodeBackup] (FR-E2) a doplnit test.
-const backupFormatVersion = 2;
+const backupFormatVersion = 3;
 
 /// Složka s fotkami uvnitř ZIP souboru.
 const backupPhotoFolder = 'photos';
@@ -69,6 +70,7 @@ class BackupData {
     this.inventory = const [],
     this.shopping = const [],
     this.activityMaterials = const [],
+    this.gardenOutline = const [],
   });
 
   final int formatVersion;
@@ -82,6 +84,10 @@ class BackupData {
   final List<InventoryItem> inventory;
   final List<ShoppingItem> shopping;
   final List<ActivityMaterialRecord> activityMaterials;
+
+  /// Od verze 3 formátu (MVP 1.1): obrys zahrady v metrech; prázdný,
+  /// když plán není nakreslený.
+  final List<Pt> gardenOutline;
 
   /// Všechny fotky, na které záznamy odkazují.
   List<PhotoRef> get photos => [for (final a in activities) ...a.photos];
@@ -124,8 +130,15 @@ Map<String, Object?> encodeBackup(BackupData data) {
           'sunExposure': z.sunExposure?.name,
           'irrigation': z.irrigation?.name,
           'covered': z.covered,
+          'polygon': z.polygon == null ? null : polygonToJson(z.polygon!),
+          'layer': z.layer.name,
         },
     ],
+    'garden': {
+      'outline': data.gardenOutline.isEmpty
+          ? null
+          : polygonToJson(data.gardenOutline),
+    },
     'activities': [
       for (final a in data.activities)
         {
@@ -218,8 +231,9 @@ BackupData decodeBackup(Map<String, Object?> json) {
   if (version > backupFormatVersion) {
     throw BackupException(BackupError.tooNew, 'formatVersion $version');
   }
-  // Verze 2 jen přidala nepovinná pole (vlastnosti zón, sklad, nákupní
-  // seznam, sklizeň, materiál), takže jeden dekodér čte obě verze.
+  // Verze 2 a 3 jen přidaly nepovinná pole (vlastnosti zón, sklad,
+  // nákupní seznam, sklizeň, materiál; plán zahrady), takže jeden
+  // dekodér čte všechny verze.
   try {
     return _decode(json);
   } on BackupException {
@@ -284,8 +298,15 @@ BackupData _decode(Map<String, Object?> json) {
           sunExposure: SunExposure.fromKey(z['sunExposure'] as String?),
           irrigation: Irrigation.fromKey(z['irrigation'] as String?),
           covered: z['covered'] as bool? ?? false,
+          polygon: polygonFromJson(z['polygon']),
+          layer: ZoneLayer.fromKey(z['layer'] as String?),
         ),
     ],
+    gardenOutline:
+        polygonFromJson(
+          ((json['garden'] as Map?)?.cast<String, Object?>())?['outline'],
+        ) ??
+        const [],
     activities: [
       for (final a in list('activities'))
         ActivityEntity(

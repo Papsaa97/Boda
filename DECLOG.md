@@ -346,3 +346,25 @@ Dopad: `CrashReporter` zachytí chyby Flutteru i nezachycené výjimky (zatím j
 **D76. Verze 1.0.0 = kód MVP 1.0 hotový; vydání čeká na účty a testy na zařízeních.**
 Proč: zbývající kroky (Supabase projekty, klíč k modelu, RevenueCat, obchody, podpis, iOS build na Macu, testeři) nejdou udělat bez Papiho.
 Dopad: build bez `--dart-define` je dál offline deník; s backendem je to celé MVP 1.0. Definice hotovo z kap. 4 (referenční dotazy ≥ 80 %, souběžná úprava na dvou zařízeních, RLS testy, smazání účtu) je ověřená automatickými testy kromě hodnocení referenčních dotazů, které potřebuje skutečný model.
+
+## 2026-10-08 – MVP 1.1 2D plátno
+
+**D77. Plán zahrady má souřadnice v metrech a synchronizuje se s ostatními daty.**
+Proč: kalibrace (FR-P2) přepočítá rovnou body plánu, takže výměry a délky jsou v metrech bez dalšího převodu; plán je součást digitálního modelu zahrady a má být i na druhém telefonu.
+Dopad: obrys je v `gardens.bounds` jako `{"outline": [[x, y], …]}`, tvar zóny v `zones.polygon`, vrstva v `zones.layer` (Drift schéma 5). `gardens.scale_meters_per_unit` zůstává nevyužitý. Funkce `sync_push` od migrace `20261008000600` zapisuje i tyto sloupce (pgTAP `07_plan_sync`). Záloha má formát 3 s nepovinnými poli `polygon`, `layer` a `garden.outline`.
+
+**D78. Podklad plánu (fotka plánku, snímek mapy) zůstává jen v telefonu.**
+Proč: FR-P3 je pomůcka pro kreslení; obrázky map mohou mít licenci, která nedovoluje je ukládat k nám, a nahrávání by stálo data i úložiště.
+Dopad: obrázek se zkopíruje do `plan/` ve složce aplikace a jeho měřítko a poloha jsou v nastavení telefonu (`canvas_background`). Nesynchronizuje se ani nezálohuje; kalibrace ho posune a zvětší spolu s plánem a jde vrátit.
+
+**D79. Zóna z Návrhu se v deníku, kalkulačce dávek a u Bódi nenabízí, dokud se nezrealizuje.**
+Proč: záhon, který zatím neexistuje, by v rychlém zápisu a ve výpočtu dávek mátl.
+Dopad: `ZoneEntity.isActive` = nearchivovaná a ve vrstvě Realita. V seznamu zón má Návrh vlastní sekci. „Zrealizovat“ přesune zónu do Reality a zapíše do deníku záznam typu Jiné.
+
+**D80. Výměra z plánu se nastaví sama jen zóně bez výměry; zadanou výměru přepíše až po potvrzení.**
+Proč: FR-P4 („přepíše ručně zadanou výměru s potvrzením“); výměru z 1.0 mohl uživatel změřit přesněji, než ji nakreslil.
+Dopad: když se plocha z plánu liší o víc než 1 %, plátno nabídne „Použít“. Zóna na plátně je stejný záznam jako zóna v seznamu (stejné `id`), tvar jde odebrat a zóna zůstane.
+
+**D81. Geometrie: plochy, délky a kalibrace počítá vlastní kód, „bod v polygonu“ a „polygon v polygonu“ balíček `turf`.**
+Proč: spec 5.1; geodetické funkce `turf` počítají ve stupních a na metrové souřadnice se nehodí. Ořez a sjednocení polygonů zatím nikdo nepotřebuje, knihovnu pro ně nevybírám.
+Dopad: zóna přesahující obrys se uloží, plátno jen upozorní. Historie zpět/znovu drží 20 kroků; tah uzlem je jeden krok. Plynulost 60 fps s 300 uzly ověří až test na telefonu střední třídy (definice hotovo, kap. 4); kreslení je jeden `CustomPainter` bez widgetů na uzel.

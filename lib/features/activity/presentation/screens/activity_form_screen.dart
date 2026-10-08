@@ -138,7 +138,7 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
   /// je mezitím archivovaná.
   List<ZoneEntity> _selectableZones(List<ZoneEntity> all) => [
     for (final z in all)
-      if (!z.archived || z.id == widget.initial?.zoneId) z,
+      if (z.isActive || z.id == widget.initial?.zoneId) z,
   ];
 
   /// Zóna, která se opravdu uloží: vybraná, pokud ještě jde vybrat,

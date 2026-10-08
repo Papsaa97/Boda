@@ -11,6 +11,8 @@ import 'package:zahradnik_boda/features/activity/domain/activity_entity.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_type.dart';
 import 'package:zahradnik_boda/features/backup/data/backup_service.dart';
 import 'package:zahradnik_boda/features/backup/domain/backup_format.dart';
+import 'package:zahradnik_boda/features/canvas/data/drift_plan_repository.dart';
+import 'package:zahradnik_boda/features/canvas/domain/geometry.dart';
 import 'package:zahradnik_boda/features/inventory/data/drift_inventory_repository.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
 import 'package:zahradnik_boda/features/inventory/domain/shopping_item.dart';
@@ -55,9 +57,13 @@ class _Device {
       DriftInventoryRepository(db, gardenId, clock);
   DriftShoppingRepository get shopping =>
       DriftShoppingRepository(db, gardenId, clock);
+  DriftPlanRepository get plan => DriftPlanRepository(db, gardenId, clock);
 
   static DateTime clock() => testNow;
 }
+
+const _bed = [Pt(0, 0), Pt(5, 0), Pt(5, 4), Pt(0, 4)];
+const _outline = [Pt(-1, -1), Pt(20.5, -1), Pt(20.5, 10.25), Pt(-1, 10.25)];
 
 void main() {
   late Directory dir;
@@ -75,8 +81,19 @@ void main() {
         sunExposure: () => SunExposure.fullSun,
         irrigation: () => Irrigation.drip,
         covered: true,
+        polygon: () => _bed,
       ),
     );
+    await d.zones.saveZone(
+      const ZoneEntity(
+        id: 'P1',
+        name: 'Nový skleník',
+        type: ZoneType.greenhouse,
+        polygon: [Pt(12, 0), Pt(15, 0), Pt(15, 4), Pt(12, 4)],
+        layer: ZoneLayer.plan,
+      ),
+    );
+    await d.plan.saveOutline(_outline);
     await d.inventory.save(
       const InventoryItem(
         id: 'i1',
@@ -185,7 +202,11 @@ void main() {
       await fresh.backup.restore(zip, data);
 
       final zones = await fresh.zones.getAllZones();
-      expect(zones.map((z) => z.id), unorderedEquals(['Z1', 'Z3']));
+      expect(zones.map((z) => z.id), unorderedEquals(['Z1', 'Z3', 'P1']));
+      final planned = zones.firstWhere((z) => z.id == 'P1');
+      expect(planned.layer, ZoneLayer.plan);
+      expect(planned.polygon, hasLength(4));
+      expect(await fresh.plan.loadOutline(), _outline);
       expect(zones.firstWhere((z) => z.id == 'Z3').archived, isTrue);
       final z1 = zones.firstWhere((z) => z.id == 'Z1');
       expect(z1.type, ZoneType.vegetable);
@@ -196,6 +217,8 @@ void main() {
       expect(z1.sunExposure, SunExposure.fullSun);
       expect(z1.irrigation, Irrigation.drip);
       expect(z1.covered, isTrue);
+      expect(z1.polygon, _bed);
+      expect(z1.layer, ZoneLayer.reality);
 
       final activities = await fresh.activities.getAllActivities();
       final a1 = activities.firstWhere((a) => a.id == 'a1');
@@ -246,7 +269,13 @@ void main() {
     final json =
         jsonDecode(utf8.decode(archive.find('data.json')!.content))
             as Map<String, Object?>;
-    expect(json['formatVersion'], 2);
+    expect(json['formatVersion'], 3);
+    expect((json['garden'] as Map)['outline'], [
+      [-1, -1],
+      [20.5, -1],
+      [20.5, 10.25],
+      [-1, 10.25],
+    ]);
     expect(json['appVersion'], '0.2.0');
     final a1 = (json['activities'] as List).cast<Map>().firstWhere(
       (a) => a['id'] == 'a1',
@@ -275,6 +304,8 @@ void main() {
     );
     expect(z1['soilTexture'], 'loamy');
     expect(z1['phMeasuredAt'], '2026-04-01');
+    expect(z1['layer'], 'reality');
+    expect(z1['polygon'], hasLength(4));
     await phone.db.close();
   });
 
@@ -308,6 +339,9 @@ void main() {
     expect(data.tasks.single.materials, isEmpty);
     expect(data.inventory, isEmpty);
     expect(data.shopping, isEmpty);
+    expect(data.zones.single.polygon, isNull);
+    expect(data.zones.single.layer, ZoneLayer.reality);
+    expect(data.gardenOutline, isEmpty);
   });
 
   group('broken files are rejected without touching data', () {

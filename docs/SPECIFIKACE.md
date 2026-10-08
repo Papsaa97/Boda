@@ -209,6 +209,8 @@ Každý požadavek má ID pro odkazování v PR a testech. Sloupec **Fáze** ř�
 
 **Výpočty:** souřadnice plátna jsou lokální v metrech (rovina), výměra polygonu se počítá shoelace vzorcem ve vlastním kódu (pár řádků, plně pokryté testy). Pro rovinné predikáty (bod v polygonu, obsahuje, protíná) použít existující Dart port Turf (balíček `turf`), ne vlastní port; jeho **geodetické** funkce (plocha, délka) na lokální metrové souřadnice nepoužívat, počítají se zeměpisnými stupni. Pokud bude potřeba ořez a sjednocení polygonů, vybrat udržovanou knihovnu pro rovinný ořez až v 1.1 (DECLOG). Izoláty jen pokud měření ukáže, že výpočet blokuje UI (pro 300 uzlů to nehrozí).
 
+> Stav implementace (2026-10-08): hotovo podle DECLOG D77–D81. Body plánu jsou rovnou v metrech (kalibrace je přepočítá), obrys je v `gardens.bounds`, tvar a vrstva zóny v `zones.polygon` a `zones.layer`, podklad zůstává jen v telefonu.
+
 ### 5.2 Asistent Bóďa (MVP 1.0)
 
 **Princip: jazykový model radí a vysvětluje, kód počítá.** Jazykové modely dělají chyby v číslech. Všechny dávky, plochy a množství proto počítá deterministický **kalkulátor** v aplikaci/backendu a model dostane výsledek jako vstup (nebo ho zavolá jako nástroj). Model nikdy sám nevymýšlí číslo dávky.

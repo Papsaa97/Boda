@@ -3309,6 +3309,330 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Víc dotazů s Premium'**
   String get assistantLimitPremium;
+
+  /// No description provided for @canvasTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Plán zahrady'**
+  String get canvasTitle;
+
+  /// No description provided for @canvasCardSubtitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Obrys, zóny na mapě a jejich výměry'**
+  String get canvasCardSubtitle;
+
+  /// No description provided for @zonePlannedSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'V návrhu (plán zahrady)'**
+  String get zonePlannedSection;
+
+  /// No description provided for @canvasToolSelect.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vybrat'**
+  String get canvasToolSelect;
+
+  /// No description provided for @canvasToolOutline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Obrys'**
+  String get canvasToolOutline;
+
+  /// No description provided for @canvasToolZone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zóna'**
+  String get canvasToolZone;
+
+  /// No description provided for @canvasToolCalibrate.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kalibrovat'**
+  String get canvasToolCalibrate;
+
+  /// No description provided for @canvasToolMeasure.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kontrola'**
+  String get canvasToolMeasure;
+
+  /// No description provided for @canvasUndo.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zpět'**
+  String get canvasUndo;
+
+  /// No description provided for @canvasRedo.
+  ///
+  /// In cs, this message translates to:
+  /// **'Znovu'**
+  String get canvasRedo;
+
+  /// No description provided for @canvasLayerReality.
+  ///
+  /// In cs, this message translates to:
+  /// **'Realita'**
+  String get canvasLayerReality;
+
+  /// No description provided for @canvasLayerPlan.
+  ///
+  /// In cs, this message translates to:
+  /// **'Návrh'**
+  String get canvasLayerPlan;
+
+  /// No description provided for @canvasLayerBoth.
+  ///
+  /// In cs, this message translates to:
+  /// **'Obojí'**
+  String get canvasLayerBoth;
+
+  /// No description provided for @canvasSnap.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přitahovat k mřížce (0,5 m)'**
+  String get canvasSnap;
+
+  /// No description provided for @canvasEmptyHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Začni obrysem zahrady: vyber Obrys a klepáním přidávej rohy. Mřížka má čtverce 1 m.'**
+  String get canvasEmptyHint;
+
+  /// No description provided for @canvasHintOutline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Klepáním přidávej rohy obrysu. Uzavřeš ho klepnutím na první bod nebo tlačítkem Hotovo.'**
+  String get canvasHintOutline;
+
+  /// No description provided for @canvasHintZone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Klepáním přidávej rohy zóny. Uzavřeš ji klepnutím na první bod nebo tlačítkem Hotovo.'**
+  String get canvasHintZone;
+
+  /// No description provided for @canvasHintEdit.
+  ///
+  /// In cs, this message translates to:
+  /// **'Táhni uzlem. Klepnutím na malý bod uprostřed hrany přidáš uzel.'**
+  String get canvasHintEdit;
+
+  /// No description provided for @canvasHintCalibrate.
+  ///
+  /// In cs, this message translates to:
+  /// **'Klepni na začátek a konec úsečky, jejíž délku znáš (třeba plot nebo stěna domu).'**
+  String get canvasHintCalibrate;
+
+  /// No description provided for @canvasHintMeasure.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pro kontrolu klepni na začátek a konec jiné známé vzdálenosti.'**
+  String get canvasHintMeasure;
+
+  /// No description provided for @canvasDone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hotovo'**
+  String get canvasDone;
+
+  /// No description provided for @canvasDiscard.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahodit'**
+  String get canvasDiscard;
+
+  /// No description provided for @canvasEditNodes.
+  ///
+  /// In cs, this message translates to:
+  /// **'Upravit uzly'**
+  String get canvasEditNodes;
+
+  /// No description provided for @canvasEditDone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hotovo s úpravou'**
+  String get canvasEditDone;
+
+  /// No description provided for @canvasDeleteVertex.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat uzel'**
+  String get canvasDeleteVertex;
+
+  /// No description provided for @canvasRemoveShape.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odebrat z plánu'**
+  String get canvasRemoveShape;
+
+  /// No description provided for @canvasRemoveOutline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat obrys'**
+  String get canvasRemoveOutline;
+
+  /// No description provided for @canvasRealize.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zrealizovat'**
+  String get canvasRealize;
+
+  /// No description provided for @canvasRealizedActivity.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zrealizováno podle plánu: {name}'**
+  String canvasRealizedActivity(String name);
+
+  /// No description provided for @canvasRealized.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} je teď v Realitě a v deníku přibyl záznam.'**
+  String canvasRealized(String name);
+
+  /// No description provided for @canvasSelectedOutline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Obrys zahrady · {area} m²'**
+  String canvasSelectedOutline(String area);
+
+  /// No description provided for @canvasSelectedZone.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} · {area} m²'**
+  String canvasSelectedZone(String name, String area);
+
+  /// No description provided for @canvasSelectedPlanned.
+  ///
+  /// In cs, this message translates to:
+  /// **'{name} · {area} m² · v návrhu'**
+  String canvasSelectedPlanned(String name, String area);
+
+  /// No description provided for @canvasAssignTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ke které zóně tvar patří?'**
+  String get canvasAssignTitle;
+
+  /// No description provided for @canvasAssignNew.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nová zóna'**
+  String get canvasAssignNew;
+
+  /// No description provided for @canvasAssignNewName.
+  ///
+  /// In cs, this message translates to:
+  /// **'Název nové zóny'**
+  String get canvasAssignNewName;
+
+  /// No description provided for @canvasAssignCreate.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vytvořit zónu'**
+  String get canvasAssignCreate;
+
+  /// No description provided for @canvasAssignPlanned.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nová zóna půjde do vrstvy Návrh.'**
+  String get canvasAssignPlanned;
+
+  /// No description provided for @canvasOutsideOutline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zóna přesahuje obrys zahrady. Zkontroluj uzly.'**
+  String get canvasOutsideOutline;
+
+  /// No description provided for @canvasAreaSuggest.
+  ///
+  /// In cs, this message translates to:
+  /// **'Podle plánu má {name} {plan} m², zadáno je {current} m².'**
+  String canvasAreaSuggest(String name, String plan, String current);
+
+  /// No description provided for @canvasAreaUse.
+  ///
+  /// In cs, this message translates to:
+  /// **'Použít'**
+  String get canvasAreaUse;
+
+  /// No description provided for @canvasLengthTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Skutečná délka'**
+  String get canvasLengthTitle;
+
+  /// No description provided for @canvasLengthLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Délka v metrech'**
+  String get canvasLengthLabel;
+
+  /// No description provided for @canvasLengthInvalid.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej kladné číslo.'**
+  String get canvasLengthInvalid;
+
+  /// No description provided for @canvasLengthDrawn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Na plánu teď {length} m.'**
+  String canvasLengthDrawn(String length);
+
+  /// No description provided for @canvasCalibrated.
+  ///
+  /// In cs, this message translates to:
+  /// **'Plán je přepočtený na metry. Pro kontrolu změř ještě jednu známou vzdálenost.'**
+  String get canvasCalibrated;
+
+  /// No description provided for @canvasDeviationOk.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odchylka {value} %, měřítko sedí.'**
+  String canvasDeviationOk(String value);
+
+  /// No description provided for @canvasDeviationBad.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odchylka {value} % je víc než 5 %. Podklad je asi zkreslený (šikmá fotka, nepřesný plánek).'**
+  String canvasDeviationBad(String value);
+
+  /// No description provided for @canvasBackgroundPick.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vložit podklad'**
+  String get canvasBackgroundPick;
+
+  /// No description provided for @canvasBackgroundRemove.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odebrat podklad'**
+  String get canvasBackgroundRemove;
+
+  /// No description provided for @canvasBackgroundHelp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Fotka plánku nebo snímek mapy, který máš u sebe. Pak plán zkalibruj podle známé délky.'**
+  String get canvasBackgroundHelp;
+
+  /// No description provided for @canvasBackgroundFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Obrázek se nepodařilo načíst.'**
+  String get canvasBackgroundFailed;
+
+  /// No description provided for @canvasMore.
+  ///
+  /// In cs, this message translates to:
+  /// **'Další volby'**
+  String get canvasMore;
+
+  /// No description provided for @canvasSemantics.
+  ///
+  /// In cs, this message translates to:
+  /// **'Plán zahrady, {count, plural, =0{žádná zóna} =1{1 zóna} few{{count} zóny} other{{count} zón}}'**
+  String canvasSemantics(int count);
 }
 
 class _AppLocalizationsDelegate

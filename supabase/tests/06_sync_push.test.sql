@@ -67,12 +67,7 @@ select is(
    where id = '91000000-0000-4000-8000-000000000001'),
   'a0000000-0000-4000-8000-000000000001'::uuid, 'message owner is the caller');
 
--- Starší změna se zahodí, novější projde; sloupce, které aplikace
--- neposílá, zůstanou.
-reset role;
-update public.zones set polygon = '[[0,0],[1,0],[1,1]]'::jsonb
-  where id = 'c0000000-0000-4000-8000-000000000001';
-set local role authenticated;
+-- Starší změna se zahodí, novější projde.
 select lives_ok(
   $$select public.sync_push('{"zones": [
     {"id": "c0000000-0000-4000-8000-000000000001",
@@ -91,9 +86,9 @@ select lives_ok(
      "created_at": "2026-10-01T10:00:00Z", "updated_at": "2026-10-03T10:00:00Z"}]}'::jsonb)$$,
   'newer change runs');
 select is(
-  (select name || '|' || area_m2::text || '|' || (polygon is not null)::text
+  (select name || '|' || area_m2::text || '|' || covered::text
    from public.zones where id = 'c0000000-0000-4000-8000-000000000001'),
-  'Zelenina JV|22|true', 'newer change is applied and the polygon is kept');
+  'Zelenina JV|22|true', 'newer change is applied');
 
 -- Natvrdo smazaný řádek v telefonu = měkké smazání na serveru.
 select lives_ok(

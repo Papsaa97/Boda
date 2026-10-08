@@ -153,7 +153,7 @@ AssistantContext buildAssistantContext({
 }) {
   final active = [
     for (final z in zones)
-      if (!z.archived) z,
+      if (z.isActive) z,
   ].take(maxContextZones).toList();
   final focus = [
     for (final z in active)
