@@ -53,6 +53,7 @@ Backend je **Supabase** (DECLOG D24); kód serveru je v `supabase/`, projekty `d
 * Dva projekty v regionu EU (Frankfurt, `eu-central-1`): `zahradnik-boda-dev` (bezplatný tarif stačí, při neaktivitě se uspí) a `zahradnik-boda-prod` (placený tarif Pro, aby se neuspal; zapnutý strop útrat). Aktuální ceník ověřit při zakládání.
 * Lokální vývoj přes [Supabase CLI](https://supabase.com/docs/guides/local-development) (`supabase start`, potřebuje Docker). Schéma jako SQL migrace v `supabase/migrations/`, Edge Functions v `supabase/functions/`, testy RLS v `supabase/tests/` (`supabase test db`, běží i v CI).
 * Aplikace se k backendu připojí jen s `--dart-define=SUPABASE_URL=…` a `--dart-define=SUPABASE_PUBLISHABLE_KEY=…` (nebo `--dart-define-from-file=env/dev.json`, DECLOG D71). Obě hodnoty nejsou tajné, přístup hlídá RLS. Bez nich běží aplikace jen v telefonu; tak ji staví i CI. Flavors `dev`/`prod` přijdou s nahráním do obchodů.
+* Stejnou cestou (`--dart-define-from-file=env/prod.json`, vzor v `env.example.json`) se zapínají služby pro vydání (DECLOG D102): `SENTRY_DSN` (pády), `POSTHOG_API_KEY` + `POSTHOG_HOST` (analytika, jen se souhlasem), `REVENUECAT_ANDROID_KEY` / `REVENUECAT_IOS_KEY` (platby), `PRIVACY_POLICY_URL` a `APP_ENV` (`dev`/`prod`). Prázdný klíč = služba vypnutá, aplikace běží bez ní.
 * **Tajné** jsou servisní klíč Supabase (service role), API klíče LLM, RevenueCat a FCM: patří **jen** do secrets Edge Functions (`supabase secrets set`), nikdy do aplikace ani do gitu.
 * Další účty, které 1.0 potřebuje (zakládá Papi): Sentry (EU), PostHog (EU), RevenueCat, Google Cloud OAuth klient pro přihlášení Googlem, Apple Developer Program, poskytovatel LLM.
 
@@ -63,8 +64,8 @@ Backend je **Supabase** (DECLOG D24); kód serveru je v `supabase/`, projekty `d
 | Projekty Supabase `dev` a `prod`, migrace, funkce, secrets `LLM_*` | účet, synchronizace, Bóďa | `--dart-define` `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`; návod v `supabase/README.md` |
 | Šablona e-mailu s `{{ .Token }}`, vlastní SMTP | přihlášení kódem | dashboard Supabase |
 | Stránka se zásadami ochrany soukromí | GDPR, obchody | `--dart-define=PRIVACY_POLICY_URL=…` |
-| RevenueCat + produkty v Google Play a App Store | Premium (sezóna 2028) | `RevenueCatPurchaseService` (DECLOG D73) |
-| Sentry a PostHog (EU) | pády, měření H1–H4 | `crashReporterProvider`, `analyticsSinkProvider` (DECLOG D75) |
+| RevenueCat + produkty v Google Play a App Store | Premium (sezóna 2028) | `REVENUECAT_ANDROID_KEY`, `REVENUECAT_IOS_KEY` v `env/prod.json` (DECLOG D73, D102) |
+| Sentry a PostHog (EU) | pády, měření H1–H4 | `SENTRY_DSN`, `POSTHOG_API_KEY` v `env/prod.json` (DECLOG D75, D102) |
 | Podpisový klíč Androidu, účet Google Play | vydání na Androidu | `android/key.properties` (mimo git) |
 | Apple Developer Program, Mac s Xcode | build a vydání pro iOS | `ios/` (bundle `cz.zahradnikboda.app`), `pod install` na Macu |
 | Poskytovatel počasí s licencí pro komerční aplikaci (např. placený tarif Open-Meteo) | počasí a zálivka (V2, Premium) | secrets `WEATHER_API_URL`, `WEATHER_API_KEY` (DECLOG D85) |

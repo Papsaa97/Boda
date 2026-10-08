@@ -57,6 +57,9 @@ dependencies:
   url_launcher: ^6.3.0
   turf: ^0.0.14
   geolocator: ^14.0.0
+  purchases_flutter: ^10.15.1
+  sentry_flutter: ^8.14.2
+  posthog_flutter: ^5.52.0
 
 dev_dependencies:
   flutter_test:
