@@ -103,8 +103,17 @@ class SyncController extends Notifier<SyncStatus> {
     final remoteId = state.conflictGardenId;
     final engine = _engine();
     if (remoteId == null || engine == null) return;
-    state = const SyncStatus(running: true);
-    await engine.adoptRemoteGarden(remoteId);
+    state = SyncStatus(running: true, conflictGardenId: remoteId);
+    try {
+      await engine.adoptRemoteGarden(remoteId);
+    } on Exception catch (e) {
+      debugPrint('Převzetí zahrady selhalo: $e');
+      state = SyncStatus(
+        problem: SyncProblem.failed,
+        conflictGardenId: remoteId,
+      );
+      return;
+    }
     ref.read(restartAppProvider)();
   }
 

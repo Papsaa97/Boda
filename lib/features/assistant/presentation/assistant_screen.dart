@@ -262,32 +262,38 @@ class _ConsentCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    return Card(
-      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-      color: scheme.secondaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l.assistantConsentTitle,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(l.assistantConsentBody),
-            const SizedBox(height: 12),
-            FilledButton(
-              onPressed: () => ref
-                  .read(settingsControllerProvider.notifier)
-                  .update(
-                    (s) => s.copyWith(
-                      aiConsentAt: () => ref.read(clockProvider)(),
+    // Při velkém písmu se karta posouvá a nevytlačí rozhovor z obrazovky.
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.45,
+      ),
+      child: Card(
+        margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+        color: scheme.secondaryContainer,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l.assistantConsentTitle,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(l.assistantConsentBody),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: () => ref
+                    .read(settingsControllerProvider.notifier)
+                    .update(
+                      (s) => s.copyWith(
+                        aiConsentAt: () => ref.read(clockProvider)(),
+                      ),
                     ),
-                  ),
-              child: Text(l.assistantConsentAgree),
-            ),
-          ],
+                child: Text(l.assistantConsentAgree),
+              ),
+            ],
+          ),
         ),
       ),
     );

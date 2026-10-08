@@ -104,6 +104,8 @@ void main() {
     await openAssistant(tester);
     expect(find.text('Než se zeptáš Bódi'), findsOneWidget);
     expect(find.textContaining('Ukázkový režim bez AI'), findsNothing);
+    await tester.ensureVisible(find.text('Souhlasím'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Souhlasím'));
     await tester.pumpAndSettle();
     expect(settings.current.aiConsentAt, testNow);
