@@ -82,7 +82,7 @@ supabase functions deploy delete-account
 supabase functions deploy revenuecat-webhook --no-verify-jwt
 ```
 
-Webhook má vlastní ověření tokenem, proto `--no-verify-jwt`.
+Všechny funkce si přihlášení ověřují samy, proto `--no-verify-jwt` (brána neumí tokeny ES256, DECLOG D94); webhook má vlastní ověření tokenem.
 Logy: dashboard → **Edge Functions → (funkce) → Logs**. U každého dotazu na
 Bóďu je řádek `boda_chat` s počtem tokenů a cenou.
 

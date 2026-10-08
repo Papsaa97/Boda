@@ -101,19 +101,21 @@ policy = "per_worker"
 inspector_port = 8083
 deno_version = 2
 
-# Bóďa a smazání účtu vyžadují přihlášeného uživatele (JWT ověřuje brána
-# i samotná funkce). Webhook RevenueCat má vlastní tajný Bearer token.
+# Bóďa, počasí, diagnostika a smazání účtu vyžadují přihlášeného uživatele;
+# JWT ověřuje samotná funkce přes auth.getUser (DECLOG D94). Brána ho
+# neověřuje, protože tokeny podepsané asymetrickým klíčem (ES256) odmítá.
+# Webhook RevenueCat má vlastní tajný Bearer token.
 [functions.boda-chat]
-verify_jwt = true
+verify_jwt = false
 
 [functions.delete-account]
-verify_jwt = true
+verify_jwt = false
 
 [functions.weather]
-verify_jwt = true
+verify_jwt = false
 
 [functions.diagnose]
-verify_jwt = true
+verify_jwt = false
 
 [functions.revenuecat-webhook]
 verify_jwt = false
