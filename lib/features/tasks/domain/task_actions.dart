@@ -71,6 +71,7 @@ TaskClosure closeTask(
     durationEstMin: task.durationEstMin,
     tools: task.tools,
     materials: task.materials,
+    source: task.source,
     createdAt: now,
     updatedAt: now,
   );

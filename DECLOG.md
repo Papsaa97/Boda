@@ -272,3 +272,41 @@ Dopad: `docs/FORMAT_EXPORTU.md` popisuje verzi 2; test načte zálohu verze 1.
 **D59. Navigace zatím zůstává `Navigator`; GoRouter až s první funkcí, která potřebuje adresy (upřesňuje D7, posouvá spec 7.1).**
 Proč: přihlášení Googlem jde nativně (`signInWithIdToken`) a e-mailem jednorázovým kódem, takže návrat z prohlížeče není potřeba; klepnutí na notifikaci otevře aplikaci. Přepis všech obrazovek na GoRouter by teď nic nepřinesl a rozbil by testy.
 Dopad: GoRouter s webovými adresami přijde s plánováním na velké obrazovce (1.1) nebo s odkazy z notifikací na konkrétní úkol.
+
+## 2026-10-08 – MVP 1.0 Chytrý parťák, část 2: Bóďa
+
+**D60. Bóďa je pátá záložka uprostřed spodní navigace (Dnes, Deník, Bóďa, Úkoly, Zahrada).**
+Proč: rada na míru je hlavní hodnota 1.0 a hypotéza H2 měří, kolik lidí se Bódi ptá každý týden; schovaný v menu by se neměřil poctivě.
+Dopad: záložka Bóďa ani Zahrada nemá plovoucí tlačítko pro nový záznam.
+
+**D61. Dávky počítá kalkulátor v telefonu: dávka z obalu nebo etikety × výměra zóny (FR-B2).**
+Proč: jazykové modely chybují v číslech. Výpočty jdou s dotazem jako `calculations` i se zdrojem dávky a model je jen přebírá (pravidlo v promptu funkce `boda-chat`).
+Dopad: interní tabulka dávek, kterou FR-B2 připouští, zatím není. Bez ověřeného zdroje by to byl odhad; když dávka z obalu chybí, Bóďa ji neuvede a řekne, co doplnit. Přípravek bez povolení pro neprofesionály se nepočítá vůbec (FR-B4).
+
+**D62. Kontext k dotazu je whitelist podle kontraktu `boda-chat`; zóny jmenované v dotazu určují, z kterých zón jdou záznamy (FR-B1).**
+Proč: minimalizace dat (kap. 9) a menší, levnější dotaz. Limity: 50 zón, 30 záznamů, 30 otevřených úkolů, 100 položek skladu, 20 výpočtů; ze skladu jen údaje z obalu a etikety (bez šarže).
+Dopad: lokalitu zahrada zatím nemá (`garden: null`), přijde s plátnem v 1.1 jako souřadnice zaokrouhlené na ~1 km. „Z čeho vycházím“ ukazuje shrnutí uložené ke každé odpovědi.
+
+**D63. Druhá pojistka k FR-B4 běží v telefonu nad hotovou odpovědí.**
+Proč: pravidla v promptu model většinou dodrží, ale ne vždy. Kontrola najde dávku, která není z výpočtu, etikety ani dotazu, přípravek jen pro profesionály a chybějící ochrannou lhůtu.
+Dopad: u odpovědi se ukáže varování, odpověď se neschová. Je to heuristika (čísla s jednotkou na m² nebo ve větě o hnojení či postřiku), ne záruka.
+
+**D64. Do připojení účtu běží Bóďa v ukázkovém režimu bez AI.**
+Proč: skutečný backend potřebuje projekt Supabase a klíč k modelu, které ještě nejsou. Ukázkový režim odpovídá deterministicky z dat v telefonu (výpočty dávek, nejbližší úkoly, co dochází) a nabízí akce.
+Dopad: je vždy označený banerem a štítkem u odpovědi; nic neodesílá, proto zatím nepotřebuje souhlas se zpracováním AI. Souhlas, přihlášení a volání `boda-chat` přijdou v části 3 za stejným rozhraním `AssistantBackend`.
+
+**D65. Dotaz bez připojení čeká ve stavu `pending` a odešle se později (FR-B7).**
+Proč: venku na zahradě často není signál; dotaz se nemá ztratit.
+Dopad: odešle se po klepnutí na „Odeslat“ nebo při dalším otevření záložky. Ostatní chyby (přihlášení, limit, server) jsou `failed` s důvodem; vyčerpaný limit se neopakuje.
+
+**D66. Rozhovory jsou v tabulkách `assistant_threads` a `assistant_messages` (schéma 3), v zálohovacím ZIPu nejsou.**
+Proč: nejsou součást deníku; s účtem se budou synchronizovat a patří do exportu GDPR (FR-E5). Text zprávy je lokálně ve sloupci `body`, na serveru `text` (název `text` koliduje s API Driftu).
+Dopad: import zálohy rozhovory nemaže. Hodnocení 👍/👎 s komentářem (FR-B6) se ukládá ke zprávě.
+
+**D67. Úkol má zdroj `source` (`user`, `boda`, `weather`) podle spec 8.3.**
+Proč: měření H2 a pozdější přehled „co navrhl Bóďa“.
+Dopad: zdroj se ukládá, přechází na další výskyt opakovaného úkolu a je v záloze jako nepovinné pole formátu 2.
+
+**D68. Akce z odpovědi se ukládají jedním klepnutím (FR-B5).**
+Proč: rada má skončit v úkolech a nákupu, ne v chatu.
+Dopad: úkol bez termínu dostane dnešek a neznámá zóna se zahodí. Položka nákupu se propojí se skladem podle názvu, aby šla po koupi přičíst. Záznam do deníku otevře předvyplněný formulář a uloží ho až uživatel.

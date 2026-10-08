@@ -12,6 +12,17 @@ enum TaskStatus {
       values.firstWhere((s) => s.name == key, orElse: () => open);
 }
 
+/// Kdo úkol založil (spec 8.3): uživatel, Bóďa z odpovědi (FR-B5), nebo
+/// později upozornění na počasí.
+enum TaskSource {
+  user,
+  boda,
+  weather;
+
+  static TaskSource fromKey(String? key) =>
+      values.firstWhere((s) => s.name == key, orElse: () => user);
+}
+
 /// Materiál potřebný k úkolu (FR-U7): položka skladu a množství.
 class TaskMaterial extends Equatable {
   const TaskMaterial({
@@ -65,6 +76,8 @@ class TaskEntity extends Equatable {
   /// Materiál ze skladu (FR-U7).
   final List<TaskMaterial> materials;
 
+  final TaskSource source;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -83,6 +96,7 @@ class TaskEntity extends Equatable {
     this.durationEstMin,
     this.tools = const [],
     this.materials = const [],
+    this.source = TaskSource.user,
     this.createdAt,
     this.updatedAt,
   });
@@ -138,6 +152,7 @@ class TaskEntity extends Equatable {
           : durationEstMin(),
       tools: tools ?? this.tools,
       materials: materials ?? this.materials,
+      source: source,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -159,6 +174,7 @@ class TaskEntity extends Equatable {
     durationEstMin,
     tools,
     materials,
+    source,
     createdAt,
     updatedAt,
   ];

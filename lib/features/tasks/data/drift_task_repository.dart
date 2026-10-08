@@ -139,6 +139,7 @@ TaskEntity taskFromRow(TaskRow r, [List<TaskMaterial> materials = const []]) =>
       durationEstMin: r.durationEstMin,
       tools: decodeTools(r.tools),
       materials: materials,
+      source: TaskSource.fromKey(r.source),
       createdAt: r.createdAt.toLocal(),
       updatedAt: r.updatedAt.toLocal(),
     );
@@ -164,6 +165,7 @@ TasksCompanion taskToCompanion(
   completedActivityId: Value(t.completedActivityId),
   durationEstMin: Value(t.durationEstMin),
   tools: Value(t.tools.isEmpty ? null : jsonEncode(t.tools)),
+  source: Value(t.source.name),
   createdAt: (t.createdAt ?? now).toUtc(),
   updatedAt: now,
 );

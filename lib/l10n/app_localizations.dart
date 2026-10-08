@@ -2445,6 +2445,282 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'{count, plural, =1{Hlídač zásob: 1 upozornění} few{Hlídač zásob: {count} upozornění} other{Hlídač zásob: {count} upozornění}}'**
   String dashboardInventoryAlerts(int count);
+
+  /// No description provided for @navAssistant.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa'**
+  String get navAssistant;
+
+  /// No description provided for @assistantTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa'**
+  String get assistantTitle;
+
+  /// No description provided for @assistantNewConversation.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nový rozhovor'**
+  String get assistantNewConversation;
+
+  /// No description provided for @assistantDeleteConversation.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat rozhovor'**
+  String get assistantDeleteConversation;
+
+  /// No description provided for @assistantDeleteConfirmTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat rozhovor?'**
+  String get assistantDeleteConfirmTitle;
+
+  /// No description provided for @assistantDeleteConfirmBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Dotazy i odpovědi z tohoto rozhovoru zmizí z telefonu.'**
+  String get assistantDeleteConfirmBody;
+
+  /// No description provided for @assistantDemoBanner.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ukázkový režim bez AI. Bóďa zatím jen spočítá dávky z tvých údajů a shrne, co o zahradě ví. Skutečné rady přijdou po přihlášení k účtu.'**
+  String get assistantDemoBanner;
+
+  /// No description provided for @assistantDemoLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ukázkový režim'**
+  String get assistantDemoLabel;
+
+  /// No description provided for @assistantUsage.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tento měsíc {used} z {limit} dotazů'**
+  String assistantUsage(int used, int limit);
+
+  /// No description provided for @assistantPendingBanner.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =1{1 dotaz čeká na připojení} few{{count} dotazy čekají na připojení} other{{count} dotazů čeká na připojení}}'**
+  String assistantPendingBanner(int count);
+
+  /// No description provided for @assistantSendPending.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odeslat'**
+  String get assistantSendPending;
+
+  /// No description provided for @assistantEmptyTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zeptej se Bódi na svou zahradu'**
+  String get assistantEmptyTitle;
+
+  /// No description provided for @assistantEmptyBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa vidí tvé zóny, poslední záznamy, úkoly a sklad. Dávky hnojiv počítá z údajů na obalu a výměry zóny.'**
+  String get assistantEmptyBody;
+
+  /// No description provided for @assistantSuggestionDose.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kolik hnojiva dát na zeleninu?'**
+  String get assistantSuggestionDose;
+
+  /// No description provided for @assistantSuggestionWeek.
+  ///
+  /// In cs, this message translates to:
+  /// **'Co mám tento týden na zahradě udělat?'**
+  String get assistantSuggestionWeek;
+
+  /// No description provided for @assistantSuggestionStock.
+  ///
+  /// In cs, this message translates to:
+  /// **'Co mi dochází ve skladu?'**
+  String get assistantSuggestionStock;
+
+  /// No description provided for @assistantInputHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Napiš dotaz…'**
+  String get assistantInputHint;
+
+  /// No description provided for @assistantSend.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odeslat dotaz'**
+  String get assistantSend;
+
+  /// No description provided for @assistantThinking.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa přemýšlí…'**
+  String get assistantThinking;
+
+  /// No description provided for @assistantStatusPending.
+  ///
+  /// In cs, this message translates to:
+  /// **'Čeká na připojení. Odešle se, až budeš online.'**
+  String get assistantStatusPending;
+
+  /// No description provided for @assistantRetry.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zkusit znovu'**
+  String get assistantRetry;
+
+  /// No description provided for @assistantFailureNotSignedIn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pro dotazy na Bóďu je potřeba se přihlásit k účtu.'**
+  String get assistantFailureNotSignedIn;
+
+  /// No description provided for @assistantFailureLimit.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tento měsíc máš vyčerpané dotazy ({limit}). Další přibudou 1. dne v měsíci.'**
+  String assistantFailureLimit(int limit);
+
+  /// No description provided for @assistantFailureNotConfigured.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa teď není dostupný, server nemá dokončené nastavení.'**
+  String get assistantFailureNotConfigured;
+
+  /// No description provided for @assistantFailureUpstream.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa teď neodpovídá. Zkus to za chvíli.'**
+  String get assistantFailureUpstream;
+
+  /// No description provided for @assistantSourcesTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Z čeho vycházím'**
+  String get assistantSourcesTitle;
+
+  /// No description provided for @assistantSourcesZones.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zóny: {zones}'**
+  String assistantSourcesZones(String zones);
+
+  /// No description provided for @assistantSourcesCounts.
+  ///
+  /// In cs, this message translates to:
+  /// **'Záznamy z deníku: {activities} · otevřené úkoly: {tasks} · položky skladu: {items}'**
+  String assistantSourcesCounts(int activities, int tasks, int items);
+
+  /// No description provided for @assistantSourcesCalculations.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výpočty'**
+  String get assistantSourcesCalculations;
+
+  /// No description provided for @assistantSourcesNone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez výpočtů dávek. Dávku spočítám, když má zóna výměru a hnojivo dávku na m² z obalu.'**
+  String get assistantSourcesNone;
+
+  /// No description provided for @assistantCalculationLine.
+  ///
+  /// In cs, this message translates to:
+  /// **'{label}: {result} ({source})'**
+  String assistantCalculationLine(String label, String result, String source);
+
+  /// No description provided for @assistantWarningUnverifiedDose.
+  ///
+  /// In cs, this message translates to:
+  /// **'Číslo {text} nepochází z výpočtu ani z etikety. Než ho použiješ, ověř ho na obalu.'**
+  String assistantWarningUnverifiedDose(String text);
+
+  /// No description provided for @assistantWarningProfessionalOnly.
+  ///
+  /// In cs, this message translates to:
+  /// **'{product} není povolený pro neprofesionální uživatele. Nepoužívej ho.'**
+  String assistantWarningProfessionalOnly(String product);
+
+  /// No description provided for @assistantWarningMissingPhi.
+  ///
+  /// In cs, this message translates to:
+  /// **'U přípravku {product} chybí ochranná lhůta do sklizně. Najdeš ji na etiketě.'**
+  String assistantWarningMissingPhi(String product);
+
+  /// No description provided for @assistantActionTask.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidat úkol: {title}'**
+  String assistantActionTask(String title);
+
+  /// No description provided for @assistantActionShopping.
+  ///
+  /// In cs, this message translates to:
+  /// **'Na nákupní seznam: {name}'**
+  String assistantActionShopping(String name);
+
+  /// No description provided for @assistantActionActivity.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zapsat do deníku: {title}'**
+  String assistantActionActivity(String title);
+
+  /// No description provided for @assistantActionTaskDone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Úkol přidán'**
+  String get assistantActionTaskDone;
+
+  /// No description provided for @assistantActionShoppingDone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidáno na nákupní seznam'**
+  String get assistantActionShoppingDone;
+
+  /// No description provided for @assistantActionFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Akci se nepodařilo uložit.'**
+  String get assistantActionFailed;
+
+  /// No description provided for @assistantFeedbackUp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Dobrá odpověď'**
+  String get assistantFeedbackUp;
+
+  /// No description provided for @assistantFeedbackDown.
+  ///
+  /// In cs, this message translates to:
+  /// **'Špatná odpověď'**
+  String get assistantFeedbackDown;
+
+  /// No description provided for @assistantFeedbackCommentTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Co bylo špatně?'**
+  String get assistantFeedbackCommentTitle;
+
+  /// No description provided for @assistantFeedbackCommentHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nepovinné. Pomůže to Bóďu zlepšit.'**
+  String get assistantFeedbackCommentHint;
+
+  /// No description provided for @assistantFeedbackThanks.
+  ///
+  /// In cs, this message translates to:
+  /// **'Díky za zpětnou vazbu.'**
+  String get assistantFeedbackThanks;
+
+  /// No description provided for @assistantSaveFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Rozhovor se nepodařilo uložit.'**
+  String get assistantSaveFailed;
 }
 
 class _AppLocalizationsDelegate
