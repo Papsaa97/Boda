@@ -580,6 +580,18 @@ class AppLocalizationsCs extends AppLocalizations {
   String get backupImportSubtitle => 'Nahradí všechna data obsahem ZIP souboru';
 
   @override
+  String get diaryCsvExport => 'Exportovat deník do tabulky';
+
+  @override
+  String get diaryCsvExportSubtitle => 'CSV pro Excel nebo Google Tabulky';
+
+  @override
+  String get diaryCsvShareSubject => 'Deník Zahradníka Bódi (CSV)';
+
+  @override
+  String get diaryCsvFailed => 'Tabulku se nepodařilo vytvořit.';
+
+  @override
   String get backupUnavailableWeb =>
       'Záloha je dostupná v aplikaci pro Android a iOS.';
 

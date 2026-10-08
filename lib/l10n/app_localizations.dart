@@ -1012,6 +1012,30 @@ abstract class AppLocalizations {
   /// **'Nahradí všechna data obsahem ZIP souboru'**
   String get backupImportSubtitle;
 
+  /// No description provided for @diaryCsvExport.
+  ///
+  /// In cs, this message translates to:
+  /// **'Exportovat deník do tabulky'**
+  String get diaryCsvExport;
+
+  /// No description provided for @diaryCsvExportSubtitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'CSV pro Excel nebo Google Tabulky'**
+  String get diaryCsvExportSubtitle;
+
+  /// No description provided for @diaryCsvShareSubject.
+  ///
+  /// In cs, this message translates to:
+  /// **'Deník Zahradníka Bódi (CSV)'**
+  String get diaryCsvShareSubject;
+
+  /// No description provided for @diaryCsvFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tabulku se nepodařilo vytvořit.'**
+  String get diaryCsvFailed;
+
   /// No description provided for @backupUnavailableWeb.
   ///
   /// In cs, this message translates to:

@@ -10,7 +10,12 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/app/app_info.dart';
 import '../../../core/di/providers.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../core/time/calendar.dart';
 import '../../account/presentation/garden_reload.dart';
+import '../../activity/presentation/activity_type_ui.dart';
+import '../../activity/presentation/controllers/activity_controller.dart';
+import '../../zones/presentation/zones_controller.dart';
+import '../domain/diary_csv.dart';
 import '../../settings/presentation/settings_controller.dart';
 import '../data/backup_service.dart';
 import '../domain/backup_format.dart';
@@ -56,6 +61,42 @@ Future<void> exportBackup(BuildContext context, WidgetRef ref) async {
   } catch (e) {
     debugPrint('Export selhal: $e');
     messenger.showSnackBar(SnackBar(content: Text(l.backupExportFailed)));
+  }
+}
+
+/// Uloží deník jako CSV a nabídne ho přes systémové sdílení (FR-E4).
+Future<void> exportDiaryCsv(BuildContext context, WidgetRef ref) async {
+  final l = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final box = context.findRenderObject() as RenderBox?;
+  try {
+    final activities = await ref.read(activityControllerProvider.future);
+    final zones = await ref.read(zonesControllerProvider.future);
+    final names = {for (final z in zones) z.id: z.name};
+    final csv = diaryCsv(
+      activities,
+      zoneName: (id) => names[id] ?? l.commonUnknownZone,
+      typeLabel: (type) => activityTypeLabel(l, type),
+    );
+    final dir = await getTemporaryDirectory();
+    final now = ref.read(clockProvider)();
+    final path = p.join(
+      dir.path,
+      'zahradnik-boda-denik-${formatDateKey(now)}.csv',
+    );
+    await File(path).writeAsString(csv, flush: true);
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(path, mimeType: 'text/csv')],
+        subject: l.diaryCsvShareSubject,
+        sharePositionOrigin: box == null
+            ? null
+            : box.localToGlobal(Offset.zero) & box.size,
+      ),
+    );
+  } catch (e, stack) {
+    ref.read(crashReporterProvider).recordError(e, stack);
+    messenger.showSnackBar(SnackBar(content: Text(l.diaryCsvFailed)));
   }
 }
 

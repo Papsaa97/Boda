@@ -453,3 +453,7 @@ Dopad: `LoadErrorView` (`commonLoadFailed`) a `commonSaveFailed` místo `commonE
 **D99. Připomínka zálohy se ukazuje jen bez účtu a text o soukromí říká, co se na server posílá.**
 Proč: FR-E3 chce připomínku jen bez cloudové synchronizace; věta „Aplikace nic neodesílá“ přestala platit od MVP 1.0 (synchronizace, Bóďa, počasí, diagnostika).
 Dopad: karta na „Dnes“ se skryje přihlášenému uživateli; `settingsPrivacy` a `backupReminderBody` popisují skutečný stav. Mazání karty problému přeskočí její otevřené kontroly; „Všechny úkoly“ přepíná záložku (`homeTabProvider`) místo druhé obrazovky bez tlačítka plus.
+
+**D100. Export deníku do CSV (FR-E4) se středníkem, desetinnou čárkou a BOM.**
+Proč: FR-E4 je ve fázi 1.0, ale v aplikaci chyběl. Český Excel i Google Tabulky s českým nastavením čekají středník a desetinnou čárku; bez BOM Excel rozbije diakritiku.
+Dopad: `lib/features/backup/domain/diary_csv.dart` (čistý Dart, test), v Nastavení pod zálohou „Exportovat deník do tabulky“, soubor jde přes systémové sdílení stejně jako ZIP záloha. Sloupce: datum, čas, zóna, typ práce, název, poznámka, sklizeň, jednotka, náklady, počet fotek.
