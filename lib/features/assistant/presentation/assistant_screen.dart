@@ -7,6 +7,7 @@ import '../../activity/presentation/screens/activity_form_screen.dart';
 import '../domain/assistant_backend.dart';
 import '../domain/assistant_message.dart';
 import '../domain/safety_check.dart';
+import '../../settings/presentation/settings_controller.dart';
 import 'assistant_controller.dart';
 
 /// Záložka Bóďa: rozhovor s asistentem (kap. 5.2).
@@ -100,6 +101,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     final l = AppLocalizations.of(context);
     final async = ref.watch(assistantControllerProvider);
     final isDemo = ref.watch(assistantBackendProvider).isDemo;
+    final access = ref.watch(assistantAccessProvider);
     final conversation = async.value;
     final sending = conversation?.sending ?? false;
     final usage = conversation?.usage;
@@ -128,7 +130,12 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
       ),
       body: Column(
         children: [
-          if (isDemo) const _DemoBanner(),
+          if (isDemo)
+            switch (access) {
+              AssistantAccess.noConsent => const _ConsentCard(),
+              AssistantAccess.signedOut => const _DemoBanner(signIn: true),
+              _ => const _DemoBanner(),
+            },
           if (usage != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -217,7 +224,10 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
 }
 
 class _DemoBanner extends StatelessWidget {
-  const _DemoBanner();
+  const _DemoBanner({this.signIn = false});
+
+  /// Backend je k dispozici, chybí jen přihlášení.
+  final bool signIn;
 
   @override
   Widget build(BuildContext context) {
@@ -232,11 +242,53 @@ class _DemoBanner extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              AppLocalizations.of(context).assistantDemoBanner,
+              signIn
+                  ? AppLocalizations.of(context).assistantDemoBannerSignIn
+                  : AppLocalizations.of(context).assistantDemoBanner,
               style: TextStyle(color: scheme.onTertiaryContainer),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Souhlas se zpracováním dotazů před prvním odesláním na server.
+class _ConsentCard extends ConsumerWidget {
+  const _ConsentCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      color: scheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l.assistantConsentTitle,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(l.assistantConsentBody),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () => ref
+                  .read(settingsControllerProvider.notifier)
+                  .update(
+                    (s) => s.copyWith(
+                      aiConsentAt: () => ref.read(clockProvider)(),
+                    ),
+                  ),
+              child: Text(l.assistantConsentAgree),
+            ),
+          ],
+        ),
       ),
     );
   }

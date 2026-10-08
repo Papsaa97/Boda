@@ -196,6 +196,7 @@ Future<LegacyImportResult> importLegacyHiveData({
                 activityId: Value(a.id),
                 localPath: path,
                 createdAt: now,
+                updatedAt: Value(now),
               ),
             );
       }

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/app/app_info.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../core/di/providers.dart';
+import '../../account/presentation/account_screen.dart';
 import '../../backup/presentation/backup_actions.dart';
 import '../../stats/presentation/stats_screen.dart';
 import '../domain/app_settings.dart';
@@ -54,6 +56,8 @@ class SettingsScreen extends ConsumerWidget {
     );
 
     final lastExport = settings.lastExportAt;
+    final user = ref.watch(currentUserProvider).value;
+    final consentAt = settings.aiConsentAt;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.settingsTitle)),
@@ -125,6 +129,33 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           section(l.settingsData),
+          ListTile(
+            leading: const Icon(Icons.cloud_sync_outlined),
+            title: Text(l.accountSettingsTile),
+            subtitle: Text(
+              user == null
+                  ? l.accountSettingsSignedOut
+                  : l.accountSettingsSignedIn(user.email ?? ''),
+            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const AccountScreen())),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.auto_awesome_outlined),
+            title: Text(l.settingsAiConsent),
+            subtitle: Text(
+              consentAt == null
+                  ? l.settingsAiConsentOff
+                  : l.settingsAiConsentOn(formatDate(consentAt)),
+            ),
+            value: consentAt != null,
+            onChanged: (on) => controller.update(
+              (s) => s.copyWith(
+                aiConsentAt: () => on ? ref.read(clockProvider)() : null,
+              ),
+            ),
+          ),
           if (kIsWeb)
             ListTile(
               leading: const Icon(Icons.info_outline),

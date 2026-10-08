@@ -48,10 +48,10 @@ Klíč vytvoří Papi (`keytool -genkey -v -keystore upload-keystore.jks -keyalg
 
 ## Prostředí backendu (od MVP 1.0)
 
-Zatím žádný backend není. Backend bude **Supabase** (DECLOG D24):
+Backend je **Supabase** (DECLOG D24); kód serveru je v `supabase/`, projekty `dev` a `prod` zakládá Papi (návod v [supabase/README.md](supabase/README.md)):
 
 * Dva projekty v regionu EU (Frankfurt, `eu-central-1`): `zahradnik-boda-dev` (bezplatný tarif stačí, při neaktivitě se uspí) a `zahradnik-boda-prod` (placený tarif Pro, aby se neuspal; zapnutý strop útrat). Aktuální ceník ověřit při zakládání.
 * Lokální vývoj přes [Supabase CLI](https://supabase.com/docs/guides/local-development) (`supabase start`, potřebuje Docker). Schéma jako SQL migrace v `supabase/migrations/`, Edge Functions v `supabase/functions/`, testy RLS v `supabase/tests/` (`supabase test db`, běží i v CI).
-* Přepínání prostředí přes Flutter flavors (`dev`, `prod`); URL projektu a veřejný (publishable) klíč se předávají přes `--dart-define-from-file` a nejsou tajné, protože přístup hlídá RLS.
+* Aplikace se k backendu připojí jen s `--dart-define=SUPABASE_URL=…` a `--dart-define=SUPABASE_PUBLISHABLE_KEY=…` (nebo `--dart-define-from-file=env/dev.json`, DECLOG D71). Obě hodnoty nejsou tajné, přístup hlídá RLS. Bez nich běží aplikace jen v telefonu; tak ji staví i CI. Flavors `dev`/`prod` přijdou s nahráním do obchodů.
 * **Tajné** jsou servisní klíč Supabase (service role), API klíče LLM, RevenueCat a FCM: patří **jen** do secrets Edge Functions (`supabase secrets set`), nikdy do aplikace ani do gitu.
 * Další účty, které 1.0 potřebuje (zakládá Papi): Sentry (EU), PostHog (EU), RevenueCat, Google Cloud OAuth klient pro přihlášení Googlem, Apple Developer Program, poskytovatel LLM.

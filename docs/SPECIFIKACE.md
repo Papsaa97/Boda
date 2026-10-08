@@ -376,7 +376,7 @@ docs/            # specifikace, formát exportu, ADR
 - Změny se ve stejné transakci zapíší do lokální fronty (`sync_outbox`) a odesílají na pozadí jako `upsert` podle `id`. Konflikt řeší **poslední zápis vyhrává** podle `updated_at` na úrovni řádku; databázový trigger odmítne zápis starší, než je uložená verze. Pro deník jednoho uživatele to stačí; u sdílených zahrad ve V2 přehodnotit.
 - Stahování: řádky zahrad, kde je uživatel členem, se `server_updated_at` větším než poslední stažený. Realtime odběr změn jen pokud bude potřeba (sdílení ve V2).
 - Fotky se nahrávají zvlášť, ve výchozím stavu jen přes Wi-Fi; v cloudu se ukládá i náhled (~400 px) vytvořený v telefonu.
-- První přihlášení: nahrát lokální data do nové zahrady v cloudu; přihlášení na druhém zařízení s lokálními daty nabídne sloučit nebo nahradit.
+- První přihlášení: nahrát lokální data do nové zahrady v cloudu; přihlášení na druhém zařízení s lokálními daty nabídne sloučit nebo nahradit *(V 1.0 jen nahradit zahradou z účtu, sloučení je v NAPADNIKu; DECLOG D70. Odesílání jednou funkcí `sync_push` v jedné transakci, frontu plní triggery SQLite; DECLOG D69.)*
 - Supabase nemá offline SDK jako Firestore; vlastní outbox je proto nutnost, ne volba navíc. Hotová alternativa je **PowerSync** (synchronizační služba nad Supabase se SQLite v telefonu); zvážit, pokud se vlastní synchronizace ukáže jako křehká, hlavně se sdílením ve V2. Drift obě cesty nechává otevřené.
 
 ---

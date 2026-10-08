@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zahradnik_boda/core/di/providers.dart';
 import 'package:zahradnik_boda/features/assistant/domain/assistant_backend.dart';
 import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
 
@@ -90,5 +91,32 @@ void main() {
     await tester.tap(find.text('Uložit'));
     await tester.pumpAndSettle();
     expect(find.text('Díky za zpětnou vazbu.'), findsOneWidget);
+  });
+
+  testWidgets('signed in without consent: the card asks before AI is used', (
+    tester,
+  ) async {
+    final settings = InMemorySettingsRepository();
+    await pumpApp(tester, [
+      ...testOverrides(settings: settings),
+      assistantAccessProvider.overrideWithValue(AssistantAccess.noConsent),
+    ]);
+    await openAssistant(tester);
+    expect(find.text('Než se zeptáš Bódi'), findsOneWidget);
+    expect(find.textContaining('Ukázkový režim bez AI'), findsNothing);
+    await tester.tap(find.text('Souhlasím'));
+    await tester.pumpAndSettle();
+    expect(settings.current.aiConsentAt, testNow);
+  });
+
+  testWidgets('signed out with a backend: the banner points to sign in', (
+    tester,
+  ) async {
+    await pumpApp(tester, [
+      ...testOverrides(),
+      assistantAccessProvider.overrideWithValue(AssistantAccess.signedOut),
+    ]);
+    await openAssistant(tester);
+    expect(find.textContaining('se přihlas v Nastavení'), findsOneWidget);
   });
 }

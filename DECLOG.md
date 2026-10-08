@@ -310,3 +310,21 @@ Dopad: zdroj se ukládá, přechází na další výskyt opakovaného úkolu a j
 **D68. Akce z odpovědi se ukládají jedním klepnutím (FR-B5).**
 Proč: rada má skončit v úkolech a nákupu, ne v chatu.
 Dopad: úkol bez termínu dostane dnešek a neznámá zóna se zahodí. Položka nákupu se propojí se skladem podle názvu, aby šla po koupi přičíst. Záznam do deníku otevře předvyplněný formulář a uloží ho až uživatel.
+
+## 2026-10-08 – MVP 1.0 Chytrý parťák, část 3: účet a synchronizace
+
+**D69. Frontu změn plní triggery SQLite, odesílá ji jedna funkce `sync_push` v jedné transakci.**
+Proč: trigger zachytí každý zápis, i ten, který repozitář nezná (obnova ze zálohy maže tabulky natvrdo). Úkoly a záznamy na sebe odkazují oběma směry, proto server přijme celou dávku najednou s odloženou kontrolou cizích klíčů.
+Dopad: `sync_outbox` drží jen klíč řádku, obsah se čte až při odeslání. Řádek, který v telefonu už není, odejde jako náhrobek (`deleted`), server ho měkce smaže. Stažené změny se zapisují s příznakem `applying`, aby se neposlaly zpátky. Stahuje se po tabulkách podle `server_updated_at` s překryvem 5 s; poslední zápis vyhrává podle `updated_at` v telefonu i na serveru. Fotky dostaly sloupec `updated_at` (schéma 4).
+
+**D70. Druhý telefon s jinou zahradou si vybere: převzít zahradu z účtu, nebo zůstat bez synchronizace.**
+Proč: Free plán má jednu zahradu; sloučení dvou zahrad (spec 7.4 „sloučit nebo nahradit“) by potřebovalo párování zón a duplicit, které zatím nikdo nepotřebuje.
+Dopad: převzetí smaže data v telefonu (po potvrzení) a stáhne zahradu z účtu, aplikace se znovu načte. Sloučení je v NAPADNIKu. Synchronizace běží při přihlášení, startu, návratu do aplikace a ručně; periodický časovač ani „jen přes Wi-Fi“ zatím nejsou (fotky jdou po jakékoli síti, náhled je zatím stejný soubor jako fotka).
+
+**D71. Backend se zapíná při buildu přes `--dart-define` (`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`); přihlášení e-mailem jednorázovým kódem.**
+Proč: build bez backendu (testeři 0.2, CI) běží beze změny jen v telefonu. Kód z e-mailu nepotřebuje heslo ani přesměrování zpět do aplikace; Google a Apple potřebují nastavení v konzolích, která zakládá Papi.
+Dopad: bez proměnných se účet nenabízí a Bóďa zůstává v ukázkovém režimu. Šablona e-mailu v Supabase musí obsahovat `{{ .Token }}`. Smazání účtu volá funkci `delete-account`, data v telefonu zůstanou. Rozhovory s Bóďou se synchronizují s ostatními daty.
+
+**D72. Skutečná AI až po přihlášení a výslovném souhlasu; souhlas jde odvolat v Nastavení.**
+Proč: dotaz s daty zahrady odchází k poskytovateli jazykového modelu (kap. 9, GDPR).
+Dopad: bez souhlasu odpovídá ukázkový režim a nic neodchází; Bóďa ukáže kartu se souhlasem. Datum souhlasu se ukládá v nastavení telefonu; na server (`profiles.consents`) se zapíše s obrazovkou souhlasů v části 4.

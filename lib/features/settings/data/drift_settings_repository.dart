@@ -37,6 +37,7 @@ const _quietEnd = 'quiet_end';
 const _digest = 'digest';
 const _lastExportAt = 'last_export_at';
 const _lastZoneId = 'last_zone_id';
+const _aiConsentAt = 'ai_consent_at';
 
 AppSettings settingsFromMap(Map<String, String> m) {
   const defaults = AppSettings();
@@ -55,6 +56,7 @@ AppSettings settingsFromMap(Map<String, String> m) {
     digest: DigestMode.fromKey(m[_digest]),
     lastExportAt: DateTime.tryParse(m[_lastExportAt] ?? '')?.toLocal(),
     lastZoneId: m[_lastZoneId],
+    aiConsentAt: DateTime.tryParse(m[_aiConsentAt] ?? '')?.toLocal(),
   );
 }
 
@@ -66,4 +68,5 @@ Map<String, String?> settingsToMap(AppSettings s) => {
   _digest: s.digest.name,
   _lastExportAt: s.lastExportAt?.toUtc().toIso8601String(),
   _lastZoneId: s.lastZoneId,
+  _aiConsentAt: s.aiConsentAt?.toUtc().toIso8601String(),
 };

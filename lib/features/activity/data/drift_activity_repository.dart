@@ -58,7 +58,7 @@ class DriftActivityRepository implements ActivityRepository {
       );
       await (_db.update(_db.photos)
             ..where((p) => p.activityId.equals(id) & p.deletedAt.isNull()))
-          .write(PhotosCompanion(deletedAt: Value(now)));
+          .write(PhotosCompanion(deletedAt: Value(now), updatedAt: Value(now)));
     });
   }
 
@@ -108,7 +108,7 @@ class DriftActivityRepository implements ActivityRepository {
                 p.deletedAt.isNull() &
                 p.id.isNotIn(keep),
           ))
-          .write(PhotosCompanion(deletedAt: Value(now)));
+          .write(PhotosCompanion(deletedAt: Value(now), updatedAt: Value(now)));
       for (var i = 0; i < a.photos.length; i++) {
         final photo = a.photos[i];
         await _db
@@ -121,11 +121,13 @@ class DriftActivityRepository implements ActivityRepository {
                 localPath: photo.path,
                 position: Value(i),
                 createdAt: now,
+                updatedAt: Value(now),
               ),
               onConflict: DoUpdate(
                 (_) => PhotosCompanion(
                   localPath: Value(photo.path),
                   position: Value(i),
+                  updatedAt: Value(now),
                   deletedAt: const Value(null),
                 ),
               ),

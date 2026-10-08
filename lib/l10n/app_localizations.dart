@@ -2721,6 +2721,276 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Rozhovor se nepodařilo uložit.'**
   String get assistantSaveFailed;
+
+  /// No description provided for @accountTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Účet a synchronizace'**
+  String get accountTitle;
+
+  /// No description provided for @accountSettingsTile.
+  ///
+  /// In cs, this message translates to:
+  /// **'Účet a synchronizace'**
+  String get accountSettingsTile;
+
+  /// No description provided for @accountSettingsSignedOut.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez účtu, data jsou jen v tomto telefonu'**
+  String get accountSettingsSignedOut;
+
+  /// No description provided for @accountSettingsSignedIn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Účet {email}'**
+  String accountSettingsSignedIn(String email);
+
+  /// No description provided for @accountUnavailable.
+  ///
+  /// In cs, this message translates to:
+  /// **'Účet v této verzi aplikace zatím není. Všechno funguje i bez něj, data zůstávají v telefonu.'**
+  String get accountUnavailable;
+
+  /// No description provided for @accountIntro.
+  ///
+  /// In cs, this message translates to:
+  /// **'S účtem se zahrada zálohuje do cloudu a jde otevřít i na dalším zařízení. Bóďa s umělou inteligencí účet potřebuje. Bez účtu vše funguje dál jen v tomto telefonu.'**
+  String get accountIntro;
+
+  /// No description provided for @accountEmailLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'E-mail'**
+  String get accountEmailLabel;
+
+  /// No description provided for @accountSendCode.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poslat kód'**
+  String get accountSendCode;
+
+  /// No description provided for @accountCodeSent.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kód jsme poslali na {email}. Platí jen chvíli.'**
+  String accountCodeSent(String email);
+
+  /// No description provided for @accountCodeLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kód z e-mailu'**
+  String get accountCodeLabel;
+
+  /// No description provided for @accountVerify.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přihlásit'**
+  String get accountVerify;
+
+  /// No description provided for @accountChangeEmail.
+  ///
+  /// In cs, this message translates to:
+  /// **'Jiný e-mail'**
+  String get accountChangeEmail;
+
+  /// No description provided for @accountErrorEmail.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tohle nevypadá jako e-mail.'**
+  String get accountErrorEmail;
+
+  /// No description provided for @accountErrorCode.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kód nesedí nebo už vypršel. Pošli si nový.'**
+  String get accountErrorCode;
+
+  /// No description provided for @accountErrorRate.
+  ///
+  /// In cs, this message translates to:
+  /// **'Moc pokusů. Zkus to za pár minut.'**
+  String get accountErrorRate;
+
+  /// No description provided for @accountErrorOffline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez připojení. Zkus to, až budeš online.'**
+  String get accountErrorOffline;
+
+  /// No description provided for @accountErrorUnknown.
+  ///
+  /// In cs, this message translates to:
+  /// **'Něco se nepovedlo. Zkus to znovu.'**
+  String get accountErrorUnknown;
+
+  /// No description provided for @accountSignedInAs.
+  ///
+  /// In cs, this message translates to:
+  /// **'Účet {email}'**
+  String accountSignedInAs(String email);
+
+  /// No description provided for @accountSyncNow.
+  ///
+  /// In cs, this message translates to:
+  /// **'Synchronizovat teď'**
+  String get accountSyncNow;
+
+  /// No description provided for @accountSyncRunning.
+  ///
+  /// In cs, this message translates to:
+  /// **'Synchronizuji…'**
+  String get accountSyncRunning;
+
+  /// No description provided for @accountSyncNever.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ještě se nesynchronizovalo.'**
+  String get accountSyncNever;
+
+  /// No description provided for @accountSyncLast.
+  ///
+  /// In cs, this message translates to:
+  /// **'Naposledy synchronizováno {time}'**
+  String accountSyncLast(String time);
+
+  /// No description provided for @accountSyncOffline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez připojení. Změny počkají v telefonu a odešlou se příště.'**
+  String get accountSyncOffline;
+
+  /// No description provided for @accountSyncFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Synchronizace se nepovedla. Data v telefonu jsou v pořádku, zkusí se to znovu.'**
+  String get accountSyncFailed;
+
+  /// No description provided for @accountConflictTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Účet už má jinou zahradu'**
+  String get accountConflictTitle;
+
+  /// No description provided for @accountConflictBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'K tomuto účtu patří zahrada z jiného zařízení. Můžeš ji použít i tady; data, která jsou teď v tomto telefonu, se nahradí. Když chceš data z telefonu zachovat, nejdřív si udělej zálohu.'**
+  String get accountConflictBody;
+
+  /// No description provided for @accountConflictUse.
+  ///
+  /// In cs, this message translates to:
+  /// **'Použít zahradu z účtu'**
+  String get accountConflictUse;
+
+  /// No description provided for @accountConflictConfirmTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nahradit data v telefonu?'**
+  String get accountConflictConfirmTitle;
+
+  /// No description provided for @accountConflictConfirmBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Záznamy, úkoly, zóny a sklad v tomto telefonu se smažou a nahradí zahradou z účtu.'**
+  String get accountConflictConfirmBody;
+
+  /// No description provided for @accountConflictConfirm.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nahradit'**
+  String get accountConflictConfirm;
+
+  /// No description provided for @accountSignOut.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odhlásit se'**
+  String get accountSignOut;
+
+  /// No description provided for @accountSignOutBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Data zůstanou v telefonu. Změny se do cloudu dostanou po dalším přihlášení.'**
+  String get accountSignOutBody;
+
+  /// No description provided for @accountDelete.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat účet'**
+  String get accountDelete;
+
+  /// No description provided for @accountDeleteTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat účet?'**
+  String get accountDeleteTitle;
+
+  /// No description provided for @accountDeleteBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smaže se účet a všechna data na serveru: zahrada, fotky v cloudu, rozhovory s Bóďou. Sdílené zahrady přejdou na dalšího člena. Data v tomto telefonu zůstanou. Nejde to vrátit.'**
+  String get accountDeleteBody;
+
+  /// No description provided for @accountDeleteConfirm.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat natrvalo'**
+  String get accountDeleteConfirm;
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In cs, this message translates to:
+  /// **'Účet je smazaný. Data v telefonu zůstala.'**
+  String get accountDeleted;
+
+  /// No description provided for @assistantDemoBannerSignIn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ukázkový režim bez AI. Pro skutečné rady se přihlas v Nastavení, Účet a synchronizace.'**
+  String get assistantDemoBannerSignIn;
+
+  /// No description provided for @assistantConsentTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Než se zeptáš Bódi'**
+  String get assistantConsentTitle;
+
+  /// No description provided for @assistantConsentBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Dotaz a vybraná data ze zahrady (zóny, poslední záznamy, úkoly, sklad, spočítané dávky) se pošlou na náš server a odtud jazykovému modelu, který připraví odpověď. Jména, e-maily a fotky se neposílají. Souhlas jde kdykoli odvolat v Nastavení.'**
+  String get assistantConsentBody;
+
+  /// No description provided for @assistantConsentAgree.
+  ///
+  /// In cs, this message translates to:
+  /// **'Souhlasím'**
+  String get assistantConsentAgree;
+
+  /// No description provided for @settingsAiConsent.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zpracování dotazů na Bóďu umělou inteligencí'**
+  String get settingsAiConsent;
+
+  /// No description provided for @settingsAiConsentOn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Souhlas udělen {date}'**
+  String settingsAiConsentOn(String date);
+
+  /// No description provided for @settingsAiConsentOff.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez souhlasu (Bóďa odpovídá jen v ukázkovém režimu)'**
+  String get settingsAiConsentOff;
+
+  /// No description provided for @onboardingHaveAccount.
+  ///
+  /// In cs, this message translates to:
+  /// **'Už mám účet, přihlásit se'**
+  String get onboardingHaveAccount;
 }
 
 class _AppLocalizationsDelegate

@@ -34,6 +34,10 @@ class AppSettings extends Equatable {
   /// Poslední použitá zóna, předvyplní se v novém záznamu (FR-D6).
   final String? lastZoneId;
 
+  /// Kdy uživatel souhlasil se zpracováním dotazů na Bóďu jazykovým
+  /// modelem (kap. 9); null = nesouhlasil nebo souhlas odvolal.
+  final DateTime? aiConsentAt;
+
   const AppSettings({
     this.theme = ThemePreference.system,
     this.quietStart = 21 * 60,
@@ -41,6 +45,7 @@ class AppSettings extends Equatable {
     this.digest = DigestMode.auto,
     this.lastExportAt,
     this.lastZoneId,
+    this.aiConsentAt,
   });
 
   AppSettings copyWith({
@@ -50,6 +55,7 @@ class AppSettings extends Equatable {
     DigestMode? digest,
     DateTime? lastExportAt,
     String? lastZoneId,
+    DateTime? Function()? aiConsentAt,
   }) {
     return AppSettings(
       theme: theme ?? this.theme,
@@ -58,6 +64,7 @@ class AppSettings extends Equatable {
       digest: digest ?? this.digest,
       lastExportAt: lastExportAt ?? this.lastExportAt,
       lastZoneId: lastZoneId ?? this.lastZoneId,
+      aiConsentAt: aiConsentAt == null ? this.aiConsentAt : aiConsentAt(),
     );
   }
 
@@ -69,5 +76,6 @@ class AppSettings extends Equatable {
     digest,
     lastExportAt,
     lastZoneId,
+    aiConsentAt,
   ];
 }

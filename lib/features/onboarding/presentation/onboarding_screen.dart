@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../account/presentation/account_screen.dart';
 import '../../zones/domain/zone_entity.dart';
 import '../../zones/presentation/zone_icons.dart';
 import '../../zones/presentation/zones_controller.dart';
@@ -104,6 +105,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       l.onboardingZonesBody,
                       style: theme.textTheme.bodyMedium,
                     ),
+                    if (ref.watch(authServiceProvider).available)
+                      TextButton.icon(
+                        icon: const Icon(Icons.cloud_download_outlined),
+                        label: Text(l.onboardingHaveAccount),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AccountScreen(),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
