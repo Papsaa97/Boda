@@ -16,10 +16,22 @@ import 'core/formatting/dates.dart';
 import 'core/notifications/notification_scheduler.dart';
 import 'core/photos/photo_storage.dart';
 import 'core/storage/app_storage.dart';
+import 'core/telemetry/telemetry.dart';
 import 'features/settings/data/drift_settings_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Pády a nezachycené chyby (Sentry přijde s DSN, DECLOG D75).
+  const crashes = DebugCrashReporter();
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    crashes.recordError(details.exception, details.stack, fatal: true);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    crashes.recordError(error, stack, fatal: true);
+    return true;
+  };
 
   await initializeDateFormatting(appLocale);
 

@@ -55,3 +55,16 @@ Backend je **Supabase** (DECLOG D24); kód serveru je v `supabase/`, projekty `d
 * Aplikace se k backendu připojí jen s `--dart-define=SUPABASE_URL=…` a `--dart-define=SUPABASE_PUBLISHABLE_KEY=…` (nebo `--dart-define-from-file=env/dev.json`, DECLOG D71). Obě hodnoty nejsou tajné, přístup hlídá RLS. Bez nich běží aplikace jen v telefonu; tak ji staví i CI. Flavors `dev`/`prod` přijdou s nahráním do obchodů.
 * **Tajné** jsou servisní klíč Supabase (service role), API klíče LLM, RevenueCat a FCM: patří **jen** do secrets Edge Functions (`supabase secrets set`), nikdy do aplikace ani do gitu.
 * Další účty, které 1.0 potřebuje (zakládá Papi): Sentry (EU), PostHog (EU), RevenueCat, Google Cloud OAuth klient pro přihlášení Googlem, Apple Developer Program, poskytovatel LLM.
+
+## Co je potřeba k vydání 1.0 (zakládá Papi)
+
+| Krok | Proč | Kde v kódu se napojí |
+| --- | --- | --- |
+| Projekty Supabase `dev` a `prod`, migrace, funkce, secrets `LLM_*` | účet, synchronizace, Bóďa | `--dart-define` `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`; návod v `supabase/README.md` |
+| Šablona e-mailu s `{{ .Token }}`, vlastní SMTP | přihlášení kódem | dashboard Supabase |
+| Stránka se zásadami ochrany soukromí | GDPR, obchody | `--dart-define=PRIVACY_POLICY_URL=…` |
+| RevenueCat + produkty v Google Play a App Store | Premium (sezóna 2028) | `RevenueCatPurchaseService` (DECLOG D73) |
+| Sentry a PostHog (EU) | pády, měření H1–H4 | `crashReporterProvider`, `analyticsSinkProvider` (DECLOG D75) |
+| Podpisový klíč Androidu, účet Google Play | vydání na Androidu | `android/key.properties` (mimo git) |
+| Apple Developer Program, Mac s Xcode | build a vydání pro iOS | `ios/` (bundle `cz.zahradnikboda.app`), `pod install` na Macu |
+| ≥ 10 testerů, test na skutečných telefonech | ověření před vydáním | – |

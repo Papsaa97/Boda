@@ -2991,6 +2991,324 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Už mám účet, přihlásit se'**
   String get onboardingHaveAccount;
+
+  /// No description provided for @consentsTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Souhlasy a soukromí'**
+  String get consentsTitle;
+
+  /// No description provided for @consentsTile.
+  ///
+  /// In cs, this message translates to:
+  /// **'Souhlasy a soukromí'**
+  String get consentsTile;
+
+  /// No description provided for @consentsTileSubtitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Co odesíláme a s čím jsi souhlasil(a)'**
+  String get consentsTileSubtitle;
+
+  /// No description provided for @consentsIntro.
+  ///
+  /// In cs, this message translates to:
+  /// **'Deník funguje i bez souhlasů a data zůstávají v telefonu. Každý souhlas je zvlášť a jde kdykoli odvolat.'**
+  String get consentsIntro;
+
+  /// No description provided for @consentsAiHelp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Dotaz a vybraná data ze zahrady jdou přes náš server jazykovému modelu. Bez souhlasu odpovídá Bóďa jen v ukázkovém režimu.'**
+  String get consentsAiHelp;
+
+  /// No description provided for @consentsAnalytics.
+  ///
+  /// In cs, this message translates to:
+  /// **'Anonymní statistiky používání'**
+  String get consentsAnalytics;
+
+  /// No description provided for @consentsAnalyticsHelp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kolik záznamů a úkolů vzniká a které funkce se používají, bez textů, fotek a polohy. Pomáhá rozhodnout, co zlepšit.'**
+  String get consentsAnalyticsHelp;
+
+  /// No description provided for @consentsAnalyticsOn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Souhlas udělen {date}'**
+  String consentsAnalyticsOn(String date);
+
+  /// No description provided for @consentsAnalyticsOff.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez souhlasu, nic se neodesílá'**
+  String get consentsAnalyticsOff;
+
+  /// No description provided for @consentsSync.
+  ///
+  /// In cs, this message translates to:
+  /// **'S účtem se souhlasy uloží i k účtu (verze zásad {version}).'**
+  String consentsSync(String version);
+
+  /// No description provided for @consentsPolicy.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zásady ochrany soukromí'**
+  String get consentsPolicy;
+
+  /// No description provided for @premiumTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Premium'**
+  String get premiumTitle;
+
+  /// No description provided for @premiumTile.
+  ///
+  /// In cs, this message translates to:
+  /// **'Premium'**
+  String get premiumTile;
+
+  /// No description provided for @premiumTileFree.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tarif Free'**
+  String get premiumTileFree;
+
+  /// No description provided for @premiumTilePremium.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tarif Premium'**
+  String get premiumTilePremium;
+
+  /// No description provided for @premiumTilePremiumUntil.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tarif Premium do {date}'**
+  String premiumTilePremiumUntil(String date);
+
+  /// No description provided for @premiumTileUnknown.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tarif se nepodařilo ověřit'**
+  String get premiumTileUnknown;
+
+  /// No description provided for @premiumHeadline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bóďa naplno'**
+  String get premiumHeadline;
+
+  /// No description provided for @premiumIntro.
+  ///
+  /// In cs, this message translates to:
+  /// **'Deník, zóny, úkoly a záloha zůstávají vždy zdarma. Premium přidává chytrost navíc.'**
+  String get premiumIntro;
+
+  /// No description provided for @premiumCurrentFree.
+  ///
+  /// In cs, this message translates to:
+  /// **'Teď máš Free.'**
+  String get premiumCurrentFree;
+
+  /// No description provided for @premiumCurrentPremium.
+  ///
+  /// In cs, this message translates to:
+  /// **'Máš Premium. Díky!'**
+  String get premiumCurrentPremium;
+
+  /// No description provided for @premiumColumnFree.
+  ///
+  /// In cs, this message translates to:
+  /// **'Free'**
+  String get premiumColumnFree;
+
+  /// No description provided for @premiumColumnPremium.
+  ///
+  /// In cs, this message translates to:
+  /// **'Premium'**
+  String get premiumColumnPremium;
+
+  /// No description provided for @premiumRowDiary.
+  ///
+  /// In cs, this message translates to:
+  /// **'Deník, zóny, úkoly, sklad, export'**
+  String get premiumRowDiary;
+
+  /// No description provided for @premiumRowGardens.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahrady'**
+  String get premiumRowGardens;
+
+  /// No description provided for @premiumRowPhotos.
+  ///
+  /// In cs, this message translates to:
+  /// **'Fotky v cloudu'**
+  String get premiumRowPhotos;
+
+  /// No description provided for @premiumRowBoda.
+  ///
+  /// In cs, this message translates to:
+  /// **'Dotazy na Bóďu'**
+  String get premiumRowBoda;
+
+  /// No description provided for @premiumRowV2.
+  ///
+  /// In cs, this message translates to:
+  /// **'Počasí, diagnostika z fotek, sdílení (V2)'**
+  String get premiumRowV2;
+
+  /// No description provided for @premiumUnlimited.
+  ///
+  /// In cs, this message translates to:
+  /// **'bez omezení'**
+  String get premiumUnlimited;
+
+  /// No description provided for @premiumYes.
+  ///
+  /// In cs, this message translates to:
+  /// **'ano'**
+  String get premiumYes;
+
+  /// No description provided for @premiumNo.
+  ///
+  /// In cs, this message translates to:
+  /// **'ne'**
+  String get premiumNo;
+
+  /// No description provided for @premiumFreeGardens.
+  ///
+  /// In cs, this message translates to:
+  /// **'1'**
+  String get premiumFreeGardens;
+
+  /// No description provided for @premiumFreePhotos.
+  ///
+  /// In cs, this message translates to:
+  /// **'200'**
+  String get premiumFreePhotos;
+
+  /// No description provided for @premiumFreeBoda.
+  ///
+  /// In cs, this message translates to:
+  /// **'10 měsíčně'**
+  String get premiumFreeBoda;
+
+  /// No description provided for @premiumPremiumBoda.
+  ///
+  /// In cs, this message translates to:
+  /// **'300 měsíčně'**
+  String get premiumPremiumBoda;
+
+  /// No description provided for @premiumYearly.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ročně'**
+  String get premiumYearly;
+
+  /// No description provided for @premiumMonthly.
+  ///
+  /// In cs, this message translates to:
+  /// **'Měsíčně'**
+  String get premiumMonthly;
+
+  /// No description provided for @premiumPerYear.
+  ///
+  /// In cs, this message translates to:
+  /// **'{price} za rok'**
+  String premiumPerYear(String price);
+
+  /// No description provided for @premiumPerMonth.
+  ///
+  /// In cs, this message translates to:
+  /// **'{price} za měsíc'**
+  String premiumPerMonth(String price);
+
+  /// No description provided for @premiumBestValue.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výhodnější'**
+  String get premiumBestValue;
+
+  /// No description provided for @premiumTrial.
+  ///
+  /// In cs, this message translates to:
+  /// **'{days, plural, =1{1 den zdarma} few{{days} dny zdarma} other{{days} dní zdarma}}'**
+  String premiumTrial(int days);
+
+  /// No description provided for @premiumBuy.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vyzkoušet Premium'**
+  String get premiumBuy;
+
+  /// No description provided for @premiumRestore.
+  ///
+  /// In cs, this message translates to:
+  /// **'Obnovit nákupy'**
+  String get premiumRestore;
+
+  /// No description provided for @premiumNotYet.
+  ///
+  /// In cs, this message translates to:
+  /// **'Předplatné spustíme na začátku sezóny 2028. Do té doby máš všechno z Free.'**
+  String get premiumNotYet;
+
+  /// No description provided for @premiumSignInFirst.
+  ///
+  /// In cs, this message translates to:
+  /// **'Předplatné patří k účtu. Nejdřív se přihlas.'**
+  String get premiumSignInFirst;
+
+  /// No description provided for @premiumSignIn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přihlásit se'**
+  String get premiumSignIn;
+
+  /// No description provided for @premiumRenewal.
+  ///
+  /// In cs, this message translates to:
+  /// **'Předplatné se obnovuje automaticky; zrušit jde kdykoli v obchodě (Google Play, App Store).'**
+  String get premiumRenewal;
+
+  /// No description provided for @premiumThanks.
+  ///
+  /// In cs, this message translates to:
+  /// **'Premium je aktivní.'**
+  String get premiumThanks;
+
+  /// No description provided for @premiumPending.
+  ///
+  /// In cs, this message translates to:
+  /// **'Platba čeká na potvrzení obchodu. Premium se zapne, až projde.'**
+  String get premiumPending;
+
+  /// No description provided for @premiumRestored.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nákupy obnovené.'**
+  String get premiumRestored;
+
+  /// No description provided for @premiumFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nákup se nepovedl. Zkus to prosím znovu.'**
+  String get premiumFailed;
+
+  /// No description provided for @premiumOffline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez připojení. Zkus to, až budeš online.'**
+  String get premiumOffline;
+
+  /// No description provided for @assistantLimitPremium.
+  ///
+  /// In cs, this message translates to:
+  /// **'Víc dotazů s Premium'**
+  String get assistantLimitPremium;
 }
 
 class _AppLocalizationsDelegate

@@ -7,6 +7,7 @@ import '../../activity/presentation/screens/activity_form_screen.dart';
 import '../domain/assistant_backend.dart';
 import '../domain/assistant_message.dart';
 import '../domain/safety_check.dart';
+import '../../premium/presentation/paywall_screen.dart';
 import '../../settings/presentation/settings_controller.dart';
 import 'assistant_controller.dart';
 
@@ -406,7 +407,14 @@ class _UserBubble extends ConsumerWidget {
                 style: small?.copyWith(color: scheme.error),
                 textAlign: TextAlign.end,
               ),
-              if (message.meta.failure != AssistantFailureKind.limitReached)
+              if (message.meta.failure == AssistantFailureKind.limitReached)
+                TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                  ),
+                  child: Text(l.assistantLimitPremium),
+                )
+              else
                 TextButton(
                   onPressed: () => ref
                       .read(assistantControllerProvider.notifier)

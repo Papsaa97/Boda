@@ -38,6 +38,7 @@ const _digest = 'digest';
 const _lastExportAt = 'last_export_at';
 const _lastZoneId = 'last_zone_id';
 const _aiConsentAt = 'ai_consent_at';
+const _analyticsConsentAt = 'analytics_consent_at';
 
 AppSettings settingsFromMap(Map<String, String> m) {
   const defaults = AppSettings();
@@ -57,6 +58,9 @@ AppSettings settingsFromMap(Map<String, String> m) {
     lastExportAt: DateTime.tryParse(m[_lastExportAt] ?? '')?.toLocal(),
     lastZoneId: m[_lastZoneId],
     aiConsentAt: DateTime.tryParse(m[_aiConsentAt] ?? '')?.toLocal(),
+    analyticsConsentAt: DateTime.tryParse(
+      m[_analyticsConsentAt] ?? '',
+    )?.toLocal(),
   );
 }
 
@@ -69,4 +73,5 @@ Map<String, String?> settingsToMap(AppSettings s) => {
   _lastExportAt: s.lastExportAt?.toUtc().toIso8601String(),
   _lastZoneId: s.lastZoneId,
   _aiConsentAt: s.aiConsentAt?.toUtc().toIso8601String(),
+  _analyticsConsentAt: s.analyticsConsentAt?.toUtc().toIso8601String(),
 };

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
+import '../../../core/telemetry/telemetry.dart';
 import '../../../core/text/normalize.dart';
 import '../../../core/time/calendar.dart';
 import '../../../core/time/today.dart';
@@ -143,6 +144,9 @@ class AssistantController extends AsyncNotifier<AssistantConversation> {
         status: MessageStatus.pending,
       );
       await _store([message], sending: true);
+      ref.read(analyticsProvider).track(AnalyticsEvent.assistantAsked, {
+        'demo': ref.read(assistantBackendProvider).isDemo,
+      });
       await _send(message);
       return _current;
     });

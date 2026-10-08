@@ -328,3 +328,21 @@ Dopad: bez proměnných se účet nenabízí a Bóďa zůstává v ukázkovém r
 **D72. Skutečná AI až po přihlášení a výslovném souhlasu; souhlas jde odvolat v Nastavení.**
 Proč: dotaz s daty zahrady odchází k poskytovateli jazykového modelu (kap. 9, GDPR).
 Dopad: bez souhlasu odpovídá ukázkový režim a nic neodchází; Bóďa ukáže kartu se souhlasem. Datum souhlasu se ukládá v nastavení telefonu; na server (`profiles.consents`) se zapíše s obrazovkou souhlasů v části 4.
+
+## 2026-10-08 – MVP 1.0 Chytrý parťák, část 4: Premium, souhlasy, provoz
+
+**D73. Platby jsou za rozhraním `PurchaseService`; balíček RevenueCat se přidá až s jeho klíči.**
+Proč: nákup nejde vyzkoušet bez projektu RevenueCat, produktů v Google Play a App Store a podpisového klíče, a nativní balíček bez klíčů jen přidá riziko do buildu. Platby se podle spec 11.2 spouštějí až na začátku sezóny 2028.
+Dopad: nabídka Premium (srovnání tarifů, 449 Kč ročně / 69 Kč měsíčně, 7 dní zdarma, obnovení nákupů) je hotová a ukazuje „spustíme na začátku sezóny 2028“. Nárok se čte ze serveru (`entitlements`, zapisuje jen webhook). Napojení = jedna třída `RevenueCatPurchaseService` (`purchases_flutter`, `Purchases.logIn(id uživatele)`), override v `main.dart`.
+
+**D74. Souhlasy mají vlastní obrazovku a ukládají se i do `profiles.consents` s verzí zásad.**
+Proč: kap. 9 chce souhlasy oddělené, odvolatelné a se záznamem verze a času.
+Dopad: v 1.0 jsou dva souhlasy, zpracování dotazů AI a anonymní analytika; diagnostika z fotek přijde s V2. Odvolání se zapíše jako `granted: false` s časem. Adresa zásad je `PRIVACY_POLICY_URL` (výchozí `zahradnikboda.cz/soukromi`), stránku a text zásad musí zveřejnit Papi.
+
+**D75. Hlášení pádů a analytika jsou rozhraní bez SDK, analytika jen se souhlasem.**
+Proč: Sentry a PostHog potřebují účty (EU) a DSN/klíč; do té doby by SDK nic neposílalo.
+Dopad: `CrashReporter` zachytí chyby Flutteru i nezachycené výjimky (zatím jen do konzole). `Analytics` posílá jen čísla a výčty (záznam, splněný úkol, dotaz na Bóďu, zobrazení nabídky) a bez souhlasu nic. Napojení = implementace rozhraní a override `analyticsSinkProvider` / `crashReporterProvider`.
+
+**D76. Verze 1.0.0 = kód MVP 1.0 hotový; vydání čeká na účty a testy na zařízeních.**
+Proč: zbývající kroky (Supabase projekty, klíč k modelu, RevenueCat, obchody, podpis, iOS build na Macu, testeři) nejdou udělat bez Papiho.
+Dopad: build bez `--dart-define` je dál offline deník; s backendem je to celé MVP 1.0. Definice hotovo z kap. 4 (referenční dotazy ≥ 80 %, souběžná úprava na dvou zařízeních, RLS testy, smazání účtu) je ověřená automatickými testy kromě hodnocení referenčních dotazů, které potřebuje skutečný model.

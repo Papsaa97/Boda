@@ -5,6 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart' show SupabaseClient;
 import 'package:uuid/uuid.dart';
 
 import '../../features/account/data/supabase_auth_service.dart';
+import '../../features/account/data/supabase_profile_remote.dart';
+import '../../features/account/domain/consents.dart';
 import '../../features/account/domain/auth_service.dart';
 import '../../features/activity/data/drift_activity_repository.dart';
 import '../../features/assistant/data/demo_assistant_backend.dart';
@@ -15,6 +17,8 @@ import '../../features/assistant/domain/assistant_message.dart';
 import '../../features/activity/domain/activity_repository.dart';
 import '../../features/inventory/data/drift_inventory_repository.dart';
 import '../../features/inventory/domain/inventory_repository.dart';
+import '../../features/premium/data/supabase_entitlement_repository.dart';
+import '../../features/premium/domain/premium.dart';
 import '../../features/settings/domain/settings_repository.dart';
 import '../../features/settings/presentation/settings_controller.dart';
 import '../../features/tasks/data/drift_task_repository.dart';
@@ -26,6 +30,7 @@ import '../notifications/notification_scheduler.dart';
 import '../photos/photo_storage.dart';
 import '../sync/supabase_sync_remote.dart';
 import '../sync/sync_remote.dart';
+import '../telemetry/telemetry.dart';
 
 Never _notOverridden(String name) =>
     throw UnimplementedError('$name se nastavuje v main.dart (overrides).');
@@ -183,4 +188,38 @@ final assistantBackendProvider = Provider<AssistantBackend>((ref) {
     return const DemoAssistantBackend();
   }
   return SupabaseAssistantBackend(client);
+});
+
+/// Profil na serveru (souhlasy); null bez backendu.
+final profileRemoteProvider = Provider<ProfileRemote?>((ref) {
+  final client = ref.watch(supabaseClientProvider);
+  return client == null ? null : SupabaseProfileRemote(client);
+});
+
+/// Nárok na Premium na serveru; null bez backendu.
+final entitlementRepositoryProvider = Provider<EntitlementRepository?>((ref) {
+  final client = ref.watch(supabaseClientProvider);
+  return client == null ? null : SupabaseEntitlementRepository(client);
+});
+
+/// Nákupy v obchodě. RevenueCat se napojí s klíči (DECLOG D73); do té doby
+/// platby nejsou.
+final purchaseServiceProvider = Provider<PurchaseService>(
+  (ref) => const UnavailablePurchaseService(),
+);
+
+final crashReporterProvider = Provider<CrashReporter>(
+  (ref) => const DebugCrashReporter(),
+);
+
+/// Služba analytiky (PostHog); null = není nastavená.
+final analyticsSinkProvider = Provider<Analytics?>((ref) => null);
+
+/// Analytika jen se souhlasem (kap. 9); jinak se nic neposílá.
+final analyticsProvider = Provider<Analytics>((ref) {
+  final sink = ref.watch(analyticsSinkProvider);
+  final consent = ref.watch(
+    settingsControllerProvider.select((s) => s.analyticsConsentAt),
+  );
+  return sink == null || consent == null ? const NoopAnalytics() : sink;
 });

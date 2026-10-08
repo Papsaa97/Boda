@@ -1794,4 +1794,190 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get onboardingHaveAccount => 'Už mám účet, přihlásit se';
+
+  @override
+  String get consentsTitle => 'Souhlasy a soukromí';
+
+  @override
+  String get consentsTile => 'Souhlasy a soukromí';
+
+  @override
+  String get consentsTileSubtitle => 'Co odesíláme a s čím jsi souhlasil(a)';
+
+  @override
+  String get consentsIntro =>
+      'Deník funguje i bez souhlasů a data zůstávají v telefonu. Každý souhlas je zvlášť a jde kdykoli odvolat.';
+
+  @override
+  String get consentsAiHelp =>
+      'Dotaz a vybraná data ze zahrady jdou přes náš server jazykovému modelu. Bez souhlasu odpovídá Bóďa jen v ukázkovém režimu.';
+
+  @override
+  String get consentsAnalytics => 'Anonymní statistiky používání';
+
+  @override
+  String get consentsAnalyticsHelp =>
+      'Kolik záznamů a úkolů vzniká a které funkce se používají, bez textů, fotek a polohy. Pomáhá rozhodnout, co zlepšit.';
+
+  @override
+  String consentsAnalyticsOn(String date) {
+    return 'Souhlas udělen $date';
+  }
+
+  @override
+  String get consentsAnalyticsOff => 'Bez souhlasu, nic se neodesílá';
+
+  @override
+  String consentsSync(String version) {
+    return 'S účtem se souhlasy uloží i k účtu (verze zásad $version).';
+  }
+
+  @override
+  String get consentsPolicy => 'Zásady ochrany soukromí';
+
+  @override
+  String get premiumTitle => 'Premium';
+
+  @override
+  String get premiumTile => 'Premium';
+
+  @override
+  String get premiumTileFree => 'Tarif Free';
+
+  @override
+  String get premiumTilePremium => 'Tarif Premium';
+
+  @override
+  String premiumTilePremiumUntil(String date) {
+    return 'Tarif Premium do $date';
+  }
+
+  @override
+  String get premiumTileUnknown => 'Tarif se nepodařilo ověřit';
+
+  @override
+  String get premiumHeadline => 'Bóďa naplno';
+
+  @override
+  String get premiumIntro =>
+      'Deník, zóny, úkoly a záloha zůstávají vždy zdarma. Premium přidává chytrost navíc.';
+
+  @override
+  String get premiumCurrentFree => 'Teď máš Free.';
+
+  @override
+  String get premiumCurrentPremium => 'Máš Premium. Díky!';
+
+  @override
+  String get premiumColumnFree => 'Free';
+
+  @override
+  String get premiumColumnPremium => 'Premium';
+
+  @override
+  String get premiumRowDiary => 'Deník, zóny, úkoly, sklad, export';
+
+  @override
+  String get premiumRowGardens => 'Zahrady';
+
+  @override
+  String get premiumRowPhotos => 'Fotky v cloudu';
+
+  @override
+  String get premiumRowBoda => 'Dotazy na Bóďu';
+
+  @override
+  String get premiumRowV2 => 'Počasí, diagnostika z fotek, sdílení (V2)';
+
+  @override
+  String get premiumUnlimited => 'bez omezení';
+
+  @override
+  String get premiumYes => 'ano';
+
+  @override
+  String get premiumNo => 'ne';
+
+  @override
+  String get premiumFreeGardens => '1';
+
+  @override
+  String get premiumFreePhotos => '200';
+
+  @override
+  String get premiumFreeBoda => '10 měsíčně';
+
+  @override
+  String get premiumPremiumBoda => '300 měsíčně';
+
+  @override
+  String get premiumYearly => 'Ročně';
+
+  @override
+  String get premiumMonthly => 'Měsíčně';
+
+  @override
+  String premiumPerYear(String price) {
+    return '$price za rok';
+  }
+
+  @override
+  String premiumPerMonth(String price) {
+    return '$price za měsíc';
+  }
+
+  @override
+  String get premiumBestValue => 'Výhodnější';
+
+  @override
+  String premiumTrial(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dní zdarma',
+      few: '$days dny zdarma',
+      one: '1 den zdarma',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get premiumBuy => 'Vyzkoušet Premium';
+
+  @override
+  String get premiumRestore => 'Obnovit nákupy';
+
+  @override
+  String get premiumNotYet =>
+      'Předplatné spustíme na začátku sezóny 2028. Do té doby máš všechno z Free.';
+
+  @override
+  String get premiumSignInFirst =>
+      'Předplatné patří k účtu. Nejdřív se přihlas.';
+
+  @override
+  String get premiumSignIn => 'Přihlásit se';
+
+  @override
+  String get premiumRenewal =>
+      'Předplatné se obnovuje automaticky; zrušit jde kdykoli v obchodě (Google Play, App Store).';
+
+  @override
+  String get premiumThanks => 'Premium je aktivní.';
+
+  @override
+  String get premiumPending =>
+      'Platba čeká na potvrzení obchodu. Premium se zapne, až projde.';
+
+  @override
+  String get premiumRestored => 'Nákupy obnovené.';
+
+  @override
+  String get premiumFailed => 'Nákup se nepovedl. Zkus to prosím znovu.';
+
+  @override
+  String get premiumOffline => 'Bez připojení. Zkus to, až budeš online.';
+
+  @override
+  String get assistantLimitPremium => 'Víc dotazů s Premium';
 }
