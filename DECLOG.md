@@ -4,7 +4,7 @@ Každé rozhodnutí: datum, co, proč, dopad.
 
 ## 2026-10-07 – Dokončení MVP 0.1 Offline Deník
 
-**D1. Zůstáváme u Hive, ne Firestore.**
+**D1. Zůstáváme u Hive, ne Firestore.** *(backend od 1.0 je Supabase, viz D24; lokální DB od 0.2 Drift, viz D26)*
 Proč: MVP 0.1 má být 100% offline a bez backendu. Firebase přijde se synchronizací v MVP 1.0.
 Dopad: data jsou jen na zařízení, při odinstalaci zmizí. Synchronizace bude nová data source vrstva vedle Hive.
 
@@ -68,11 +68,11 @@ Dopad: FR-B4, referenční testy Bódi, pole `authorizationNo` a `nonProfessiona
 Proč: aplikace musí fungovat bez účtu a bez sítě stejně jako s nimi. Firestore offline cache by vyžadovala přihlášení online při prvním spuštění a není zaručeně trvalá.
 Dopad: outbox, měkké mazání (`deletedAt`), „poslední zápis vyhrává“. Finální ADR (vlastní sync vs. Firestore cache, Hive CE vs. Drift) na začátku 1.0.
 
-**D16. Firestore: zahrady jako kolekce nejvyšší úrovně s mapou členů; pole v camelCase; doplněny `activities`, `photos`, `users`.**
+**D16. Firestore: zahrady jako kolekce nejvyšší úrovně s mapou členů; pole v camelCase; doplněny `activities`, `photos`, `users`.** *(tvar schématu nahrazen D28, princip platí)*
 Proč: hlavní entita MVP (`Activity`) ve schématu v2.0 chyběla; sdílení zahrady ve V2 by se schématem `users/{uid}/gardens` vyžadovalo migraci; v2.0 míchala snake_case s Dart konvencí.
 Dopad: kap. 8 specifikace; lokální model v 0.2 přebírá stejné názvy polí.
 
-**D17. Přechod z `hive` na `hive_ce` v MVP 0.2.**
+**D17. Přechod z `hive` na `hive_ce` v MVP 0.2.** *(nahrazeno D26)*
 Proč: `hive` 2.x se už neudržuje; `hive_ce` je udržovaná, API-kompatibilní náhrada a řeší i kolizi generátorů z D2.
 Dopad: úkol pro MVP 0.2, s migračním testem.
 
@@ -99,3 +99,61 @@ Dopad: [COLLAB_WORKFLOW.md](COLLAB_WORKFLOW.md), [CODE_REVIEW_CHECKLIST.md](CODE
 **D23. `NÁPADNÍK.md` se jmenuje `NAPADNIK.md`.**
 Proč: diakritika v názvech souborů dělá potíže v git (normalizace Unicode na macOS), v URL a na Windows.
 Dopad: odkazy ve specifikaci a README vedou na `NAPADNIK.md`.
+
+## 2026-10-08 – Supabase místo Firebase a revize technologií (specifikace v2.2)
+
+Papi rozhodl: „tak použijeme Supabase. A takto to uprav též v celém projektu. Vždy vyber pro danou věc ten správný předmět. Ten co je aktuálně vedený, použij jako předlohu.“ Na základě toho Claude prošel stack po částech. Změny jsou ve specifikaci (kap. 7, 8, 9, 12, 13, přehled v kap. 15.2).
+
+**D24. Backend od MVP 1.0 je Supabase, ne Firebase.**
+Proč: data deníku, zón, úkolů a skladu jsou relační (zóna má záznamy, úkol materiály, materiál pohyby) a PostgreSQL to umí přímo: joiny, transakce, cizí klíče, SQL pro analýzu. Cena je předvídatelná (tarif za projekt), zatímco Firestore účtuje každé čtení a zápis dokumentu, což při synchronizaci deníku roste. Supabase je open source nad standardním PostgreSQL, takže data i schéma jdou kdykoli odnést. Hlavní výhoda Firebase (offline SDK) pro nás neplatí, protože zdrojem pravdy je lokální databáze (D15).
+Dopad: Auth, Storage, Edge Functions a RLS místo Firebase Auth, Storage, Cloud Functions a pravidel Firestore; region EU (Frankfurt); projekty `dev` a `prod`, `prod` na placeném tarifu (bezplatný projekt se při neaktivitě uspí). Do kódu aplikace se nepřidávají žádné balíčky Firebase.
+
+**D25. Technologie ve specifikaci jsou předloha, ne závazek.**
+Proč: Papiho pravidlo „vždy vyber pro danou věc ten správný předmět“. Volba z v2.0/v2.1 vznikla bez porovnání alternativ.
+Dopad: pro každou část se volí nástroj, který se na ni hodí nejlépe; změna = záznam v DECLOGu s důvodem; neměnit kvůli změně samotné. Pravidlo je v kap. 7.1 specifikace.
+
+**D26. Lokální databáze je od MVP 0.2 Drift (SQLite), ne `hive_ce` (nahrazuje D17, uzavírá otevřenou otázku z D15).**
+Proč: se Supabase je serverová databáze relační a Drift umí stejné tabulky a sloupce v telefonu (výchozí snake_case jako PostgreSQL). MVP 0.2 potřebuje fulltext (FTS5) a filtry, 1.0 transakce (sklad, outbox ve stejné transakci jako změna). Přechod `hive` → `hive_ce` teď a `hive_ce` → Drift před 1.0 by znamenal dvě migrace, z toho druhou na skutečných datech testerů; jedna migrace teď proběhne dřív, než testeři začnou zapisovat (konec února 2027). Drift má typované migrace s testy proti snímkům schématu a funguje i na webu (WebAssembly).
+Dopad: MVP 0.2 převede data z Hive jednorázově při prvním spuštění (s testem). Odpadá kolize generátorů z D2.
+
+**D27. Synchronizace je vlastní outbox nad Driftem; PowerSync je záložní varianta (upřesňuje D15).**
+Proč: Supabase nemá offline SDK, takže nějakou synchronizační vrstvu potřebujeme tak jako tak. Pro deník jednoho uživatele stačí outbox, `upsert` podle UUID a „poslední zápis vyhrává“; další placená služba by byla zbytečná. Stahuje se podle času serveru (`server_updated_at`), aby nevadily rozdílně nastavené hodiny telefonů; trigger na serveru odmítne starší zápis.
+Dopad: kap. 7.4. Pokud se se sdílením zahrad ve V2 ukáže vlastní synchronizace jako křehká, přejít na PowerSync (SQLite v telefonu, Drift ho podporuje).
+
+**D28. Datový model jako tabulky PostgreSQL; členství v zahradě je tabulka; snake_case v databázích, camelCase v Dartu (nahrazuje tvar schématu z D16, princip zůstává).**
+Proč: místo mapy `members` v dokumentu má relační databáze tabulku `garden_members`, nad kterou jde postavit RLS. snake_case je konvence PostgreSQL i výchozí chování Driftu (camelCase by v SQL vyžadoval uvozovky). Pole s proměnlivým tvarem (detaily položky skladu podle kategorie, nastavení, souhlasy) jsou `jsonb`; materiály úkolů a záznamů jsou vazební tabulky kvůli odpisu ve V2. Nárok na Premium je samostatná tabulka `entitlements`, kterou zapisuje jen backend.
+Dopad: kap. 8; export (JSON) zůstává v camelCase.
+
+**D29. Přihlášení přes Supabase Auth: Google, Apple a e-mail s jednorázovým kódem; bez hesel.**
+Proč: Google a Apple pokrývají většinu uživatelů; App Store při přihlášení přes Google vyžaduje i alternativu šetrnou k soukromí a Sign in with Apple ji splní nejjednodušeji. Jednorázový kód místo hesla odpadá s resetem hesel. Anonymní přihlášení není potřeba, protože host pracuje jen lokálně (D19).
+Dopad: Google přes nativní přihlášení a `signInWithIdToken`, Apple přes nativní dialog; návrat do aplikace přes deep link (GoRouter, 1.0).
+
+**D30. Serverová logika v Supabase Edge Functions (TypeScript), ne Cloud Functions; ochrana backendu bez App Check.**
+Proč: Edge Functions jsou součást Supabase, TypeScript zůstává. Supabase nemá obdobu Firebase App Check, ochranu proto dělá povinné přihlášení, limity dotazů na uživatele v Edge Function, strop útrat v Supabase a u poskytovatele LLM a CAPTCHA u registrace e-mailem.
+Dopad: složka `supabase/` (migrations, functions, tests) od 1.0; tajné klíče jen v secrets Edge Functions.
+
+**D31. Doplněné a změněné volby pro 1.0: Sentry, PostHog, RevenueCat, FCM jen jako doručovací kanál.**
+Proč:
+- *Crash reporting* „Crashlytics nebo Sentry“ → **Sentry** (EU): Crashlytics by znamenal Firebase jen kvůli pádům; Sentry má dobrou podporu Flutteru včetně webu a datové centrum v EU.
+- *Analytika* (dosud bez volby) → **PostHog** v EU cloudu: kohorty a retence pro měření H1–H4, vlastní instance by šla i provozovat sám; odesílá se jen se souhlasem.
+- *Platby* (dosud bez volby) → **RevenueCat** nad Google Play Billing a App Store: předplatné digitální služby musí jít přes obchody, RevenueCat řeší obě platformy, obnovy a zkušební verzi a webhookem nastaví `entitlements`. Vlastní ověřování účtenek by bylo zbytečná práce navíc.
+- *Push ze serveru* (V2): **FCM jen jako doručovací kanál** (na Androidu standard), odesílá Edge Function; žádné jiné služby Firebase.
+Dopad: kap. 7.1 a 9 (seznam zpracovatelů); balíčky se přidávají až ve fázi, kdy se funkce staví.
+
+**D32. Revize ostatních částí stacku: co zůstává a proč.**
+
+| Část | Rozhodnutí | Důvod |
+| --- | --- | --- |
+| Flutter (Android, iOS, web) | ponecháno | Jeden kód pro všechny platformy, existující kód MVP 0.1, dobrá podpora Driftu, Supabase i Sentry. |
+| Feature-first clean architecture | ponecháno | Repozitáře v domain vrstvě dovolují vyměnit Hive za Drift bez zásahu do UI. |
+| Riverpod (`AsyncNotifier`) | ponecháno; Riverpod 3 a `@riverpod` volitelně | Funguje a je v kódu; po odchodu z Hive generátory nekolidují, přechod není nutný. |
+| Navigace: `Navigator` v 0.x, GoRouter od 1.0 | ponecháno | GoRouter je oficiální balíček Flutteru; v 1.0 jsou potřeba deep linky (notifikace, návrat z přihlášení). |
+| Lokální notifikace `flutter_local_notifications` | ponecháno | Standard pro plánované notifikace bez serveru, udržovaný. |
+| Geometrie: vlastní výpočet ploch + `turf` | ponecháno s upřesněním | `turf` jen na rovinné predikáty; jeho geodetické funkce počítají ve stupních, plátno má lokální metry (kap. 5.1). |
+| AI Bóďa: LLM přes backend, poskytovatel na začátku 1.0 | ponecháno, backend = Edge Function | Výběr modelu teď by byl předčasný; kritéria (čeština, cena za dotaz, EU/DPA) platí. |
+| Diagnostika z fotek: cloudový multimodální model (V2) | ponecháno | Specializované API jako alternativa porovnat na stejné sadě fotek před V2. |
+| Počasí (V2): zdroj podle licence | ponecháno | Rozhodnutí patří před V2; Open-Meteo vyžaduje pro komerční aplikaci placený tarif, alternativa ČHMÚ. |
+| Lokalizace `gen-l10n` + ARB | ponecháno | Oficiální řešení Flutteru, slovenština bez zásahu do kódu. |
+| Testy `flutter_test` + Mockito | ponecháno | Už v kódu a v CI; výměna za Mocktail by nic nepřinesla. |
+| CI GitHub Actions | ponecháno, od 1.0 rozšířeno | Od 1.0 přibudou testy databáze (`supabase test db`); iOS build přes macOS runner nebo Codemagic. |
+| Distribuce: Google Play interní testování | ponecháno | Do 100 testerů zdarma a bez veřejné stránky v obchodě. |

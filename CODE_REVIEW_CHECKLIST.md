@@ -20,14 +20,14 @@ Nemusí se odškrtávat všechno: co se PR netýká, se přeskočí.
 
 ## 3. Data
 
-- [ ] Změna uloženého modelu (Hive adaptér, pole, box) má **migraci** a test, že data z předchozí verze se načtou (NFR-2).
+- [ ] Změna uloženého modelu (tabulka nebo sloupec v Driftu, dříve Hive box) má **migraci** a test, že data z předchozí verze se načtou (NFR-2).
 - [ ] Nové ID = UUID v4.
 - [ ] Soubory (fotky) se ukládají do složky aplikace a v datech je **relativní** cesta (na iOS se absolutní cesta ke kontejneru aplikace po aktualizaci mění).
 - [ ] Žádná osobní data v logu.
 
 ## 4. Architektura a kód
 
-- [ ] Feature-first struktura: `domain` nezávisí na Flutteru ani na Hive; UI nečte databázi přímo.
+- [ ] Feature-first struktura: `domain` nezávisí na Flutteru ani na databázi (Hive / Drift); UI nečte databázi přímo.
 - [ ] Stav přes Riverpod `AsyncNotifier` / `Notifier`, zápisy přes `AsyncValue.guard()`; žádný nový `StateNotifier`.
 - [ ] Závislosti přes providery (testovatelné přes `overrides`), žádné globální singletony.
 - [ ] Žádný mrtvý kód, zakomentované bloky ani artefakty z AI nástrojů (např. `:contentReference[...]`).
@@ -51,7 +51,8 @@ Nemusí se odškrtávat všechno: co se PR netýká, se přeskočí.
 
 - [ ] Žádné klíče, tokeny ani hesla v kódu nebo v gitu.
 - [ ] Nic se neodesílá ze zařízení bez důvodu a bez souhlasu (kap. 9 specifikace).
-- [ ] (od 1.0) Změna Firestore pravidel má test v emulátoru.
+- [ ] (od 1.0) Nová tabulka má zapnuté RLS; změna schématu je SQL migrace v `supabase/migrations/` a změna pravidel má test (`supabase test db`).
+- [ ] (od 1.0) V aplikaci je jen veřejný klíč Supabase; servisní klíč a API klíče jen v Edge Functions.
 - [ ] (od 1.0, Bóďa) Odpověď s čísly bere čísla z kalkulátoru; doporučení chemie jen podle etikety (FR-B4).
 
 ## 8. Dokumentace

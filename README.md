@@ -20,7 +20,7 @@ Celá roadmapa s definicí hotovo je ve [specifikaci, kap. 4](docs/SPECIFIKACE.m
 
 | Soubor | Obsah |
 | --- | --- |
-| [docs/SPECIFIKACE.md](docs/SPECIFIKACE.md) | Produktová a technická specifikace (v2.1) |
+| [docs/SPECIFIKACE.md](docs/SPECIFIKACE.md) | Produktová a technická specifikace (v2.2) |
 | [DECLOG.md](DECLOG.md) | Deník rozhodnutí: co, proč, dopad |
 | [NAPADNIK.md](NAPADNIK.md) | Nápady mimo aktuální fázi |
 | [COLLAB_WORKFLOW.md](COLLAB_WORKFLOW.md) | Jak spolu pracujeme (role, větve, PR) |
@@ -53,7 +53,8 @@ Na webu funguje vše kromě fotek (prohlížeč nemá trvalé lokální úloži�
   * `features/dashboard` – „Co dnes?“ a tipy od Bódi
   * `features/onboarding` – úvodní obrazovka a výběr zón
 * **State Management:** Riverpod (`AsyncNotifier`, zápisy přes `AsyncValue.guard()`)
-* **Lokální Databáze:** Hive
+* **Lokální Databáze:** Hive (v MVP 0.2 přechod na Drift / SQLite, DECLOG D26)
+* **Backend (od MVP 1.0):** Supabase (PostgreSQL, Auth, Storage, Edge Functions), viz [specifikace, kap. 7](docs/SPECIFIKACE.md#7-architektura)
 * **Design:** tmavý motiv podle palety ze specifikace (kap. 10.2), čeština včetně kalendáře
 * **Testování:** flutter_test + Mockito, CI v GitHub Actions
 
