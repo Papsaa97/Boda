@@ -14,7 +14,7 @@ Mobilní aplikace, která vede **deník a digitální model zahrady** a nad ním
 | MVP 1.0 – Chytrý parťák (účet, synchronizace, Bóďa) | ✅ kód hotový (DECLOG D50, D60, D69, D73–D76); vydání čeká na účty (Supabase, AI, RevenueCat, obchody) a testy na zařízeních |
 | MVP 1.1 – 2D plátno | ✅ kód hotový (DECLOG D77–D81); 60 fps s 300 uzly ověřit na telefonu |
 | V2 – Počasí, diagnostika, sdílení | ✅ kód hotový: odpis ze skladu, incidenty, počasí, zálivka, kalendář prací, diagnostika z fotek, sdílení v rodině (DECLOG D82–D89); čeká na poskytovatele počasí a klíč k AI |
-| V3 – Parametrické návrhy | ○ |
+| V3 – Parametrické návrhy | ✅ kód hotový: vyvýšený záhon, chodník, mostek, přístřešek s výkresem, výkazem, rozpočtem a mantinely (DECLOG D90, D91) |
 
 Celá roadmapa s definicí hotovo je ve [specifikaci, kap. 4](docs/SPECIFIKACE.md#4-roadmapa-a-rozsah-fází).
 
@@ -57,6 +57,7 @@ všechno, co je potřeba, aby se na deník dalo spolehnout celou sezónu.
 * ✅ **Počasí a zálivka (V2, Premium):** srážky za týden a předpověď pro polohu zahrady, návrh odložit zálivku po dešti (i automaticky), varování před mrazem pro čerstvé výsadby (DECLOG D85, D86). Čeká na poskytovatele počasí.
 * ✅ **Kalendář prací (V2, zdarma):** výsevy, sázení a řezy pro ČR posunuté podle nadmořské výšky, s přidáním jako úkol (DECLOG D87).
 * ✅ **Diagnostika z fotky (V2, Premium):** u problému „Zkusit poznat z fotky“ vrátí 1–3 možnosti s tím, čím je ověřit, a šetrnou péči; fotka se posílá bez polohy a jen se souhlasem (DECLOG D88).
+* ✅ **Návrhy staveb (V3, zdarma):** vyvýšený záhon, chodník, mostek a přístřešek z parametrů: výkres, výkaz materiálu na nákupní seznam, rozpočet s vlastními cenami a mantinely s doporučením, kdy zavolat statika (DECLOG D90, D91).
 * ✅ **Sdílení zahrady (V2, Premium):** vlastník pozve rodinu kódem, členové zapisují do jedné zahrady, odebrání a opuštění zahrady (DECLOG D89).
 * ✅ **Offline-first:** data i fotky jsou vždy v zařízení (SQLite přes Drift + složka aplikace); účet je volitelný a cloud slouží jako záloha a most mezi telefony. Data z verze 0.1 se při prvním spuštění jednorázově převedou.
 
@@ -70,6 +71,7 @@ Na webu funguje vše kromě fotek, zálohy a připomínek (prohlížeč nemá tr
   * `features/canvas` – plán zahrady: geometrie, historie úprav, plátno
   * `features/incidents` – problémy na zahradě, jejich kontroly a diagnostika z fotky
   * `features/sharing` – sdílení zahrady: členové, pozvánky
+  * `features/builds` – návrhy staveb: šablony, výpočty a mantinely, výkres
   * `features/weather` – počasí, zálivka, mráz a fenologický kalendář
   * `features/tasks` – úkoly, opakování, plán připomínek
   * `features/inventory` – sklad a nákupní seznam

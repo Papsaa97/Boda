@@ -21,7 +21,7 @@ boda-export-2026-10-07.zip
 
 ```json
 {
-  "formatVersion": 4,
+  "formatVersion": 5,
   "app": "zahradnik_boda",
   "appVersion": "1.0.0",
   "exportedAt": "2026-10-07T08:00:00.000Z",
@@ -133,6 +133,7 @@ boda-export-2026-10-07.zip
 | `tasks[].incidentId` | text | Úkol je kontrola incidentu (od verze 4). |
 | `incidents[]` | pole | Problémy na zahradě (od verze 4): `id`, `zoneId`, `label`, `source` (`user`, `model`), `candidates` (možné příčiny: `label`, `reason`), `planBio`, `planChem`, `status` (`open`, `resolved`), `photoIds` (fotky ve složce `photos/` jako u záznamů), `createdAt`. |
 | `movements[]` | pole | Pohyby na skladě (od verze 4): `id`, `itemId`, `qtyDelta` (v jednotce položky, záporná = odpis), `reason` (`purchase`, `task`, `manual`, `reversal`), `taskId`, `at`. Stav skladu je v `inventory[].stockQty`, pohyby jsou historie. |
+| `builds[]` | pole | Návrhy staveb (od verze 5): `id`, `name`, `template` (`raised_bed`, `path`, `bridge`, `shelter`), `zoneId` (nepovinné), `params` (parametry šablony, délky v metrech), `prices` (ceny zadané uživatelem v Kč za jednotku podle materiálu), `createdAt`. Výkres, výkaz a rozpočet se z parametrů dopočítají. Neznámá šablona se při importu přeskočí. |
 | `garden.outline` | pole bodů | Obrys pozemku ve stejných souřadnicích jako `polygon`; `null`, když plán není nakreslený (od verze 3). Podklad plánu (fotka nebo nákres) se nezálohuje, zůstává jen v telefonu. |
 | `garden.location` | objekt `{lat, lng}` | Poloha zahrady pro počasí, zaokrouhlená na 2 desetinná místa (~1 km); `null` nebo chybí, když není zadaná (od verze 4, nepovinné). Stažené počasí se nezálohuje. |
 | `garden.altitudeM` | celé číslo | Nadmořská výška v metrech pro kalendář prací; `null` nebo chybí, když není zadaná (od verze 4, nepovinné). |

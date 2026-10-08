@@ -9341,6 +9341,620 @@ class InventoryMovementsCompanion
   }
 }
 
+class $BuildsTable extends Builds with TableInfo<$BuildsTable, BuildRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BuildsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gardenIdMeta = const VerificationMeta(
+    'gardenId',
+  );
+  @override
+  late final GeneratedColumn<String> gardenId = GeneratedColumn<String>(
+    'garden_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES gardens (id)',
+    ),
+  );
+  static const VerificationMeta _zoneIdMeta = const VerificationMeta('zoneId');
+  @override
+  late final GeneratedColumn<String> zoneId = GeneratedColumn<String>(
+    'zone_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES zones (id)',
+    ),
+  );
+  static const VerificationMeta _templateMeta = const VerificationMeta(
+    'template',
+  );
+  @override
+  late final GeneratedColumn<String> template = GeneratedColumn<String>(
+    'template',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _paramsMeta = const VerificationMeta('params');
+  @override
+  late final GeneratedColumn<String> params = GeneratedColumn<String>(
+    'params',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pricesMeta = const VerificationMeta('prices');
+  @override
+  late final GeneratedColumn<String> prices = GeneratedColumn<String>(
+    'prices',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    gardenId,
+    zoneId,
+    template,
+    name,
+    params,
+    prices,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'builds';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BuildRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('garden_id')) {
+      context.handle(
+        _gardenIdMeta,
+        gardenId.isAcceptableOrUnknown(data['garden_id']!, _gardenIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gardenIdMeta);
+    }
+    if (data.containsKey('zone_id')) {
+      context.handle(
+        _zoneIdMeta,
+        zoneId.isAcceptableOrUnknown(data['zone_id']!, _zoneIdMeta),
+      );
+    }
+    if (data.containsKey('template')) {
+      context.handle(
+        _templateMeta,
+        template.isAcceptableOrUnknown(data['template']!, _templateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_templateMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('params')) {
+      context.handle(
+        _paramsMeta,
+        params.isAcceptableOrUnknown(data['params']!, _paramsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_paramsMeta);
+    }
+    if (data.containsKey('prices')) {
+      context.handle(
+        _pricesMeta,
+        prices.isAcceptableOrUnknown(data['prices']!, _pricesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BuildRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BuildRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      gardenId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}garden_id'],
+      )!,
+      zoneId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}zone_id'],
+      ),
+      template: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      params: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}params'],
+      )!,
+      prices: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prices'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $BuildsTable createAlias(String alias) {
+    return $BuildsTable(attachedDatabase, alias);
+  }
+}
+
+class BuildRow extends DataClass implements Insertable<BuildRow> {
+  final String id;
+  final String gardenId;
+  final String? zoneId;
+
+  /// `raised_bed`, `path`, `bridge`, `shelter`.
+  final String template;
+  final String name;
+
+  /// Parametry šablony jako JSON objekt.
+  final String params;
+
+  /// Ceny zadané uživatelem (Kč za jednotku podle materiálu) jako JSON.
+  final String? prices;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const BuildRow({
+    required this.id,
+    required this.gardenId,
+    this.zoneId,
+    required this.template,
+    required this.name,
+    required this.params,
+    this.prices,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['garden_id'] = Variable<String>(gardenId);
+    if (!nullToAbsent || zoneId != null) {
+      map['zone_id'] = Variable<String>(zoneId);
+    }
+    map['template'] = Variable<String>(template);
+    map['name'] = Variable<String>(name);
+    map['params'] = Variable<String>(params);
+    if (!nullToAbsent || prices != null) {
+      map['prices'] = Variable<String>(prices);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  BuildsCompanion toCompanion(bool nullToAbsent) {
+    return BuildsCompanion(
+      id: Value(id),
+      gardenId: Value(gardenId),
+      zoneId: zoneId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(zoneId),
+      template: Value(template),
+      name: Value(name),
+      params: Value(params),
+      prices: prices == null && nullToAbsent
+          ? const Value.absent()
+          : Value(prices),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory BuildRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BuildRow(
+      id: serializer.fromJson<String>(json['id']),
+      gardenId: serializer.fromJson<String>(json['gardenId']),
+      zoneId: serializer.fromJson<String?>(json['zoneId']),
+      template: serializer.fromJson<String>(json['template']),
+      name: serializer.fromJson<String>(json['name']),
+      params: serializer.fromJson<String>(json['params']),
+      prices: serializer.fromJson<String?>(json['prices']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'gardenId': serializer.toJson<String>(gardenId),
+      'zoneId': serializer.toJson<String?>(zoneId),
+      'template': serializer.toJson<String>(template),
+      'name': serializer.toJson<String>(name),
+      'params': serializer.toJson<String>(params),
+      'prices': serializer.toJson<String?>(prices),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  BuildRow copyWith({
+    String? id,
+    String? gardenId,
+    Value<String?> zoneId = const Value.absent(),
+    String? template,
+    String? name,
+    String? params,
+    Value<String?> prices = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => BuildRow(
+    id: id ?? this.id,
+    gardenId: gardenId ?? this.gardenId,
+    zoneId: zoneId.present ? zoneId.value : this.zoneId,
+    template: template ?? this.template,
+    name: name ?? this.name,
+    params: params ?? this.params,
+    prices: prices.present ? prices.value : this.prices,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  BuildRow copyWithCompanion(BuildsCompanion data) {
+    return BuildRow(
+      id: data.id.present ? data.id.value : this.id,
+      gardenId: data.gardenId.present ? data.gardenId.value : this.gardenId,
+      zoneId: data.zoneId.present ? data.zoneId.value : this.zoneId,
+      template: data.template.present ? data.template.value : this.template,
+      name: data.name.present ? data.name.value : this.name,
+      params: data.params.present ? data.params.value : this.params,
+      prices: data.prices.present ? data.prices.value : this.prices,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BuildRow(')
+          ..write('id: $id, ')
+          ..write('gardenId: $gardenId, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('template: $template, ')
+          ..write('name: $name, ')
+          ..write('params: $params, ')
+          ..write('prices: $prices, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    gardenId,
+    zoneId,
+    template,
+    name,
+    params,
+    prices,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BuildRow &&
+          other.id == this.id &&
+          other.gardenId == this.gardenId &&
+          other.zoneId == this.zoneId &&
+          other.template == this.template &&
+          other.name == this.name &&
+          other.params == this.params &&
+          other.prices == this.prices &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class BuildsCompanion extends UpdateCompanion<BuildRow> {
+  final Value<String> id;
+  final Value<String> gardenId;
+  final Value<String?> zoneId;
+  final Value<String> template;
+  final Value<String> name;
+  final Value<String> params;
+  final Value<String?> prices;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const BuildsCompanion({
+    this.id = const Value.absent(),
+    this.gardenId = const Value.absent(),
+    this.zoneId = const Value.absent(),
+    this.template = const Value.absent(),
+    this.name = const Value.absent(),
+    this.params = const Value.absent(),
+    this.prices = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BuildsCompanion.insert({
+    required String id,
+    required String gardenId,
+    this.zoneId = const Value.absent(),
+    required String template,
+    required String name,
+    required String params,
+    this.prices = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       gardenId = Value(gardenId),
+       template = Value(template),
+       name = Value(name),
+       params = Value(params),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<BuildRow> custom({
+    Expression<String>? id,
+    Expression<String>? gardenId,
+    Expression<String>? zoneId,
+    Expression<String>? template,
+    Expression<String>? name,
+    Expression<String>? params,
+    Expression<String>? prices,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (gardenId != null) 'garden_id': gardenId,
+      if (zoneId != null) 'zone_id': zoneId,
+      if (template != null) 'template': template,
+      if (name != null) 'name': name,
+      if (params != null) 'params': params,
+      if (prices != null) 'prices': prices,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BuildsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? gardenId,
+    Value<String?>? zoneId,
+    Value<String>? template,
+    Value<String>? name,
+    Value<String>? params,
+    Value<String?>? prices,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return BuildsCompanion(
+      id: id ?? this.id,
+      gardenId: gardenId ?? this.gardenId,
+      zoneId: zoneId ?? this.zoneId,
+      template: template ?? this.template,
+      name: name ?? this.name,
+      params: params ?? this.params,
+      prices: prices ?? this.prices,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (gardenId.present) {
+      map['garden_id'] = Variable<String>(gardenId.value);
+    }
+    if (zoneId.present) {
+      map['zone_id'] = Variable<String>(zoneId.value);
+    }
+    if (template.present) {
+      map['template'] = Variable<String>(template.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (params.present) {
+      map['params'] = Variable<String>(params.value);
+    }
+    if (prices.present) {
+      map['prices'] = Variable<String>(prices.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BuildsCompanion(')
+          ..write('id: $id, ')
+          ..write('gardenId: $gardenId, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('template: $template, ')
+          ..write('name: $name, ')
+          ..write('params: $params, ')
+          ..write('prices: $prices, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $SettingEntriesTable extends SettingEntries
     with TableInfo<$SettingEntriesTable, SettingRow> {
   @override
@@ -9728,6 +10342,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'CREATE TRIGGER inventory_movements_outbox_delete AFTER DELETE ON inventory_movements WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'inventory_movements\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'inventory_movements\', OLD.id);END',
     'inventory_movements_outbox_delete',
   );
+  late final $BuildsTable builds = $BuildsTable(this);
+  late final Trigger buildsOutboxInsert = Trigger(
+    'CREATE TRIGGER builds_outbox_insert AFTER INSERT ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'builds\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'builds\', NEW.id);END',
+    'builds_outbox_insert',
+  );
+  late final Trigger buildsOutboxUpdate = Trigger(
+    'CREATE TRIGGER builds_outbox_update AFTER UPDATE ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'builds\' AND row_key = NEW.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'builds\', NEW.id);END',
+    'builds_outbox_update',
+  );
+  late final Trigger buildsOutboxDelete = Trigger(
+    'CREATE TRIGGER builds_outbox_delete AFTER DELETE ON builds WHEN NOT EXISTS (SELECT 1 FROM sync_state WHERE name = \'applying\') BEGIN DELETE FROM sync_outbox WHERE entity = \'builds\' AND row_key = OLD.id;INSERT INTO sync_outbox (entity, row_key) VALUES (\'builds\', OLD.id);END',
+    'builds_outbox_delete',
+  );
   late final $SettingEntriesTable settingEntries = $SettingEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -9788,6 +10415,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     inventoryMovementsOutboxInsert,
     inventoryMovementsOutboxUpdate,
     inventoryMovementsOutboxDelete,
+    builds,
+    buildsOutboxInsert,
+    buildsOutboxUpdate,
+    buildsOutboxDelete,
     settingEntries,
   ];
   @override
@@ -10175,6 +10806,36 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'inventory_movements',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'builds',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'builds',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('sync_outbox', kind: UpdateKind.delete),
+        TableUpdate('sync_outbox', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'builds',
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [
@@ -10727,6 +11388,25 @@ final class $$GardensTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$BuildsTable, List<BuildRow>> _buildsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.builds,
+    aliasName: 'gardens__id__builds__garden_id',
+  );
+
+  $$BuildsTableProcessedTableManager get buildsRefs {
+    final manager = $$BuildsTableTableManager(
+      $_db,
+      $_db.builds,
+    ).filter((f) => f.gardenId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_buildsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$GardensTableFilterComposer
@@ -11044,6 +11724,31 @@ class $$GardensTableFilterComposer
           }) => $$InventoryMovementsTableFilterComposer(
             $db: $db,
             $table: $db.inventoryMovements,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> buildsRefs(
+    Expression<bool> Function($$BuildsTableFilterComposer f) f,
+  ) {
+    final $$BuildsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.builds,
+      getReferencedColumn: (t) => t.gardenId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BuildsTableFilterComposer(
+            $db: $db,
+            $table: $db.builds,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -11417,6 +12122,31 @@ class $$GardensTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> buildsRefs<T extends Object>(
+    Expression<T> Function($$BuildsTableAnnotationComposer a) f,
+  ) {
+    final $$BuildsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.builds,
+      getReferencedColumn: (t) => t.gardenId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BuildsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.builds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$GardensTableTableManager
@@ -11444,6 +12174,7 @@ class $$GardensTableTableManager
             bool shoppingItemsRefs,
             bool assistantThreadsRefs,
             bool inventoryMovementsRefs,
+            bool buildsRefs,
           })
         > {
   $$GardensTableTableManager(_$AppDatabase db, $GardensTable table)
@@ -11522,6 +12253,7 @@ class $$GardensTableTableManager
                 shoppingItemsRefs = false,
                 assistantThreadsRefs = false,
                 inventoryMovementsRefs = false,
+                buildsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -11537,6 +12269,7 @@ class $$GardensTableTableManager
                     if (shoppingItemsRefs) db.shoppingItems,
                     if (assistantThreadsRefs) db.assistantThreads,
                     if (inventoryMovementsRefs) db.inventoryMovements,
+                    if (buildsRefs) db.builds,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -11764,6 +12497,27 @@ class $$GardensTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (buildsRefs)
+                        await $_getPrefetchedData<
+                          GardenRow,
+                          $GardensTable,
+                          BuildRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$GardensTableReferences
+                              ._buildsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GardensTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).buildsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gardenId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -11796,6 +12550,7 @@ typedef $$GardensTableProcessedTableManager =
         bool shoppingItemsRefs,
         bool assistantThreadsRefs,
         bool inventoryMovementsRefs,
+        bool buildsRefs,
       })
     >;
 typedef $$ZonesTableCreateCompanionBuilder =
@@ -11914,6 +12669,25 @@ final class $$ZonesTableReferences
     ).filter((f) => f.zoneId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_activitiesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$BuildsTable, List<BuildRow>> _buildsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.builds,
+    aliasName: 'zones__id__builds__zone_id',
+  );
+
+  $$BuildsTableProcessedTableManager get buildsRefs {
+    final manager = $$BuildsTableTableManager(
+      $_db,
+      $_db.builds,
+    ).filter((f) => f.zoneId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_buildsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -12102,6 +12876,31 @@ class $$ZonesTableFilterComposer extends Composer<_$AppDatabase, $ZonesTable> {
           }) => $$ActivitiesTableFilterComposer(
             $db: $db,
             $table: $db.activities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> buildsRefs(
+    Expression<bool> Function($$BuildsTableFilterComposer f) f,
+  ) {
+    final $$BuildsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.builds,
+      getReferencedColumn: (t) => t.zoneId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BuildsTableFilterComposer(
+            $db: $db,
+            $table: $db.builds,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12395,6 +13194,31 @@ class $$ZonesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> buildsRefs<T extends Object>(
+    Expression<T> Function($$BuildsTableAnnotationComposer a) f,
+  ) {
+    final $$BuildsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.builds,
+      getReferencedColumn: (t) => t.zoneId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BuildsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.builds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ZonesTableTableManager
@@ -12415,6 +13239,7 @@ class $$ZonesTableTableManager
             bool incidentsRefs,
             bool tasksRefs,
             bool activitiesRefs,
+            bool buildsRefs,
           })
         > {
   $$ZonesTableTableManager(_$AppDatabase db, $ZonesTable table)
@@ -12526,6 +13351,7 @@ class $$ZonesTableTableManager
                 incidentsRefs = false,
                 tasksRefs = false,
                 activitiesRefs = false,
+                buildsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -12533,6 +13359,7 @@ class $$ZonesTableTableManager
                     if (incidentsRefs) db.incidents,
                     if (tasksRefs) db.tasks,
                     if (activitiesRefs) db.activities,
+                    if (buildsRefs) db.builds,
                   ],
                   addJoins:
                       <
@@ -12627,6 +13454,23 @@ class $$ZonesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (buildsRefs)
+                        await $_getPrefetchedData<
+                          ZoneRow,
+                          $ZonesTable,
+                          BuildRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ZonesTableReferences
+                              ._buildsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ZonesTableReferences(db, table, p0).buildsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.zoneId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -12652,6 +13496,7 @@ typedef $$ZonesTableProcessedTableManager =
         bool incidentsRefs,
         bool tasksRefs,
         bool activitiesRefs,
+        bool buildsRefs,
       })
     >;
 typedef $$InventoryItemsTableCreateCompanionBuilder =
@@ -19734,6 +20579,504 @@ typedef $$InventoryMovementsTableProcessedTableManager =
       InventoryMovementRow,
       PrefetchHooks Function({bool gardenId, bool itemId, bool taskId})
     >;
+typedef $$BuildsTableCreateCompanionBuilder =
+    BuildsCompanion Function({
+      required String id,
+      required String gardenId,
+      Value<String?> zoneId,
+      required String template,
+      required String name,
+      required String params,
+      Value<String?> prices,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$BuildsTableUpdateCompanionBuilder =
+    BuildsCompanion Function({
+      Value<String> id,
+      Value<String> gardenId,
+      Value<String?> zoneId,
+      Value<String> template,
+      Value<String> name,
+      Value<String> params,
+      Value<String?> prices,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+
+final class $$BuildsTableReferences
+    extends BaseReferences<_$AppDatabase, $BuildsTable, BuildRow> {
+  $$BuildsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GardensTable _gardenIdTable(_$AppDatabase db) =>
+      db.gardens.createAlias('builds__garden_id__gardens__id');
+
+  $$GardensTableProcessedTableManager get gardenId {
+    final $_column = $_itemColumn<String>('garden_id')!;
+
+    final manager = $$GardensTableTableManager(
+      $_db,
+      $_db.gardens,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gardenIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ZonesTable _zoneIdTable(_$AppDatabase db) =>
+      db.zones.createAlias('builds__zone_id__zones__id');
+
+  $$ZonesTableProcessedTableManager? get zoneId {
+    final $_column = $_itemColumn<String>('zone_id');
+    if ($_column == null) return null;
+    final manager = $$ZonesTableTableManager(
+      $_db,
+      $_db.zones,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_zoneIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$BuildsTableFilterComposer
+    extends Composer<_$AppDatabase, $BuildsTable> {
+  $$BuildsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get template => $composableBuilder(
+    column: $table.template,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get params => $composableBuilder(
+    column: $table.params,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get prices => $composableBuilder(
+    column: $table.prices,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GardensTableFilterComposer get gardenId {
+    final $$GardensTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableFilterComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableFilterComposer get zoneId {
+    final $$ZonesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableFilterComposer(
+            $db: $db,
+            $table: $db.zones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BuildsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BuildsTable> {
+  $$BuildsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get template => $composableBuilder(
+    column: $table.template,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get params => $composableBuilder(
+    column: $table.params,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get prices => $composableBuilder(
+    column: $table.prices,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GardensTableOrderingComposer get gardenId {
+    final $$GardensTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableOrderingComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableOrderingComposer get zoneId {
+    final $$ZonesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableOrderingComposer(
+            $db: $db,
+            $table: $db.zones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BuildsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BuildsTable> {
+  $$BuildsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get template =>
+      $composableBuilder(column: $table.template, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get params =>
+      $composableBuilder(column: $table.params, builder: (column) => column);
+
+  GeneratedColumn<String> get prices =>
+      $composableBuilder(column: $table.prices, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$GardensTableAnnotationComposer get gardenId {
+    final $$GardensTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gardenId,
+      referencedTable: $db.gardens,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GardensTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gardens,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableAnnotationComposer get zoneId {
+    final $$ZonesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BuildsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BuildsTable,
+          BuildRow,
+          $$BuildsTableFilterComposer,
+          $$BuildsTableOrderingComposer,
+          $$BuildsTableAnnotationComposer,
+          $$BuildsTableCreateCompanionBuilder,
+          $$BuildsTableUpdateCompanionBuilder,
+          (BuildRow, $$BuildsTableReferences),
+          BuildRow,
+          PrefetchHooks Function({bool gardenId, bool zoneId})
+        > {
+  $$BuildsTableTableManager(_$AppDatabase db, $BuildsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BuildsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BuildsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BuildsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> gardenId = const Value.absent(),
+                Value<String?> zoneId = const Value.absent(),
+                Value<String> template = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> params = const Value.absent(),
+                Value<String?> prices = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BuildsCompanion(
+                id: id,
+                gardenId: gardenId,
+                zoneId: zoneId,
+                template: template,
+                name: name,
+                params: params,
+                prices: prices,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String gardenId,
+                Value<String?> zoneId = const Value.absent(),
+                required String template,
+                required String name,
+                required String params,
+                Value<String?> prices = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BuildsCompanion.insert(
+                id: id,
+                gardenId: gardenId,
+                zoneId: zoneId,
+                template: template,
+                name: name,
+                params: params,
+                prices: prices,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$BuildsTable, BuildRow>(table),
+                  $$BuildsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({gardenId = false, zoneId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (gardenId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.gardenId,
+                                referencedTable: $$BuildsTableReferences
+                                    ._gardenIdTable(db),
+                                referencedColumn: $$BuildsTableReferences
+                                    ._gardenIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+                    if (zoneId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.zoneId,
+                                referencedTable: $$BuildsTableReferences
+                                    ._zoneIdTable(db),
+                                referencedColumn: $$BuildsTableReferences
+                                    ._zoneIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$BuildsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BuildsTable,
+      BuildRow,
+      $$BuildsTableFilterComposer,
+      $$BuildsTableOrderingComposer,
+      $$BuildsTableAnnotationComposer,
+      $$BuildsTableCreateCompanionBuilder,
+      $$BuildsTableUpdateCompanionBuilder,
+      (BuildRow, $$BuildsTableReferences),
+      BuildRow,
+      PrefetchHooks Function({bool gardenId, bool zoneId})
+    >;
 typedef $$SettingEntriesTableCreateCompanionBuilder =
     SettingEntriesCompanion Function({
       required String key,
@@ -19919,6 +21262,8 @@ class $AppDatabaseManager {
       $$AssistantMessagesTableTableManager(_db, _db.assistantMessages);
   $$InventoryMovementsTableTableManager get inventoryMovements =>
       $$InventoryMovementsTableTableManager(_db, _db.inventoryMovements);
+  $$BuildsTableTableManager get builds =>
+      $$BuildsTableTableManager(_db, _db.builds);
   $$SettingEntriesTableTableManager get settingEntries =>
       $$SettingEntriesTableTableManager(_db, _db.settingEntries);
 }

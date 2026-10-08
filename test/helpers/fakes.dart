@@ -12,6 +12,7 @@ import 'package:zahradnik_boda/features/activity/domain/activity_repository.dart
 import 'package:zahradnik_boda/features/activity/domain/activity_type.dart';
 import 'package:zahradnik_boda/features/assistant/domain/assistant_backend.dart';
 import 'package:zahradnik_boda/features/assistant/domain/assistant_message.dart';
+import 'package:zahradnik_boda/features/builds/domain/build_design.dart';
 import 'package:zahradnik_boda/features/incidents/domain/diagnosis.dart';
 import 'package:zahradnik_boda/features/incidents/domain/incident.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
@@ -271,6 +272,19 @@ class InMemoryGardenSiteRepository implements GardenSiteRepository {
   Future<void> savePrefs(WeatherPrefs prefs) async => this.prefs = prefs;
 }
 
+class InMemoryBuildRepository implements BuildRepository {
+  final Map<String, BuildDesign> items = {};
+
+  @override
+  Future<List<BuildDesign>> getAll() async => items.values.toList();
+
+  @override
+  Future<void> save(BuildDesign design) async => items[design.id] = design;
+
+  @override
+  Future<void> delete(String id) async => items.remove(id);
+}
+
 /// Id pro nové entity v testech: id-1, id-2, …
 String Function() sequentialIds() {
   var n = 0;
@@ -292,8 +306,12 @@ List<Override> testOverrides({
   WeatherSource? weather,
   DiagnosisBackend? diagnosis,
   PhotoStorage? photos,
+  InMemoryBuildRepository? builds,
 }) {
   return [
+    buildRepositoryProvider.overrideWithValue(
+      builds ?? InMemoryBuildRepository(),
+    ),
     if (diagnosis != null)
       diagnosisBackendProvider.overrideWithValue(diagnosis),
     gardenSiteRepositoryProvider.overrideWithValue(

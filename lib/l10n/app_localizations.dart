@@ -4635,6 +4635,828 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Začít vlastní zahradu'**
   String get accountLostAccessStart;
+
+  /// No description provided for @buildsTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Stavby'**
+  String get buildsTitle;
+
+  /// No description provided for @buildsCardSubtitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Záhony, chodníky, mostky a přístřešky s výkazem materiálu a rozpočtem'**
+  String get buildsCardSubtitle;
+
+  /// No description provided for @buildsEmpty.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zatím žádný návrh. Vyber šablonu a uvidíš výkres, materiál i rozpočet.'**
+  String get buildsEmpty;
+
+  /// No description provided for @buildsNew.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nový návrh'**
+  String get buildsNew;
+
+  /// No description provided for @buildsChooseTemplate.
+  ///
+  /// In cs, this message translates to:
+  /// **'Co chceš postavit?'**
+  String get buildsChooseTemplate;
+
+  /// No description provided for @buildsName.
+  ///
+  /// In cs, this message translates to:
+  /// **'Název'**
+  String get buildsName;
+
+  /// No description provided for @buildsNameRequired.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej název'**
+  String get buildsNameRequired;
+
+  /// No description provided for @buildsZone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zóna'**
+  String get buildsZone;
+
+  /// No description provided for @buildsNoZone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez zóny'**
+  String get buildsNoZone;
+
+  /// No description provided for @buildsParams.
+  ///
+  /// In cs, this message translates to:
+  /// **'Parametry'**
+  String get buildsParams;
+
+  /// No description provided for @buildsDrawingTop.
+  ///
+  /// In cs, this message translates to:
+  /// **'Půdorys'**
+  String get buildsDrawingTop;
+
+  /// No description provided for @buildsDrawingSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'Příčný řez'**
+  String get buildsDrawingSection;
+
+  /// No description provided for @buildsChecks.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kontrola návrhu'**
+  String get buildsChecks;
+
+  /// No description provided for @buildsChecksOk.
+  ///
+  /// In cs, this message translates to:
+  /// **'Návrh je v mezích orientačních limitů.'**
+  String get buildsChecksOk;
+
+  /// No description provided for @buildsMaterial.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výkaz materiálu'**
+  String get buildsMaterial;
+
+  /// No description provided for @buildsTotal.
+  ///
+  /// In cs, this message translates to:
+  /// **'Celkem orientačně {total} Kč'**
+  String buildsTotal(String total);
+
+  /// No description provided for @buildsPricesNote.
+  ///
+  /// In cs, this message translates to:
+  /// **'Ceny jsou orientační. Klepni na položku a zadej cenu ze svého obchodu.'**
+  String get buildsPricesNote;
+
+  /// No description provided for @buildsPriceTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Cena: {material}'**
+  String buildsPriceTitle(String material);
+
+  /// No description provided for @buildsPricePerUnit.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kč za {unit}'**
+  String buildsPricePerUnit(String unit);
+
+  /// No description provided for @buildsPriceReset.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výchozí cena'**
+  String get buildsPriceReset;
+
+  /// No description provided for @buildsLineTotal.
+  ///
+  /// In cs, this message translates to:
+  /// **'{qty} {unit} × {price} Kč'**
+  String buildsLineTotal(String qty, String unit, String price);
+
+  /// No description provided for @buildsAddToShopping.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidat na nákupní seznam'**
+  String get buildsAddToShopping;
+
+  /// No description provided for @buildsAddedToShopping.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =0{Všechno už na nákupním seznamu je} =1{Na nákupní seznam přibyla 1 položka} few{Na nákupní seznam přibyly {count} položky} other{Na nákupní seznam přibylo {count} položek}}'**
+  String buildsAddedToShopping(int count);
+
+  /// No description provided for @buildsDelete.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat návrh'**
+  String get buildsDelete;
+
+  /// No description provided for @buildsDeleteTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat návrh?'**
+  String get buildsDeleteTitle;
+
+  /// No description provided for @buildsDeleteBody.
+  ///
+  /// In cs, this message translates to:
+  /// **'Návrh „{name}“ zmizí ze seznamu.'**
+  String buildsDeleteBody(String name);
+
+  /// No description provided for @buildsDeleted.
+  ///
+  /// In cs, this message translates to:
+  /// **'Návrh smazán'**
+  String get buildsDeleted;
+
+  /// No description provided for @buildsSaved.
+  ///
+  /// In cs, this message translates to:
+  /// **'Návrh uložen'**
+  String get buildsSaved;
+
+  /// No description provided for @buildsRangeError.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej číslo od {min} do {max}'**
+  String buildsRangeError(String min, String max);
+
+  /// No description provided for @buildsDiscardTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahodit změny v návrhu?'**
+  String get buildsDiscardTitle;
+
+  /// No description provided for @buildsDiscardKeep.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pokračovat v úpravách'**
+  String get buildsDiscardKeep;
+
+  /// No description provided for @buildsDiscardConfirm.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahodit'**
+  String get buildsDiscardConfirm;
+
+  /// No description provided for @buildsDisclaimer.
+  ///
+  /// In cs, this message translates to:
+  /// **'Orientační návrh, nejde o autorizovaný statický výpočet.'**
+  String get buildsDisclaimer;
+
+  /// No description provided for @buildsEngineer.
+  ///
+  /// In cs, this message translates to:
+  /// **'Konstrukce nese osoby nad stanovenou mez. Než začneš stavět, nech návrh posoudit statikem.'**
+  String get buildsEngineer;
+
+  /// No description provided for @buildsUpdated.
+  ///
+  /// In cs, this message translates to:
+  /// **'Upraveno {date}'**
+  String buildsUpdated(String date);
+
+  /// No description provided for @buildsSnowHelp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Podle mapy sněhových oblastí ČR: nížiny většinou I a II, vrchoviny III, hory IV a výš. Nad oblastí V nech přístřešek navrhnout statikem.'**
+  String get buildsSnowHelp;
+
+  /// No description provided for @buildTemplateRaisedBed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vyvýšený záhon'**
+  String get buildTemplateRaisedBed;
+
+  /// No description provided for @buildTemplatePath.
+  ///
+  /// In cs, this message translates to:
+  /// **'Chodník'**
+  String get buildTemplatePath;
+
+  /// No description provided for @buildTemplateBridge.
+  ///
+  /// In cs, this message translates to:
+  /// **'Mostek'**
+  String get buildTemplateBridge;
+
+  /// No description provided for @buildTemplateShelter.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přístřešek'**
+  String get buildTemplateShelter;
+
+  /// No description provided for @buildTemplateRaisedBedHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Prkna, sloupky, náplň a ochrana proti hryzcům'**
+  String get buildTemplateRaisedBedHint;
+
+  /// No description provided for @buildTemplatePathHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Štěrk, dlažba, nášlapy nebo kůra včetně podkladu'**
+  String get buildTemplatePathHint;
+
+  /// No description provided for @buildTemplateBridgeHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Lávka pro pěší přes jezírko nebo potok'**
+  String get buildTemplateBridgeHint;
+
+  /// No description provided for @buildTemplateShelterHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pultová střecha na sloupcích, třeba na dřevo nebo kola'**
+  String get buildTemplateShelterHint;
+
+  /// No description provided for @buildParamLength.
+  ///
+  /// In cs, this message translates to:
+  /// **'Délka'**
+  String get buildParamLength;
+
+  /// No description provided for @buildParamWidth.
+  ///
+  /// In cs, this message translates to:
+  /// **'Šířka'**
+  String get buildParamWidth;
+
+  /// No description provided for @buildParamHeight.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výška'**
+  String get buildParamHeight;
+
+  /// No description provided for @buildParamFrontHeight.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výška vpředu'**
+  String get buildParamFrontHeight;
+
+  /// No description provided for @buildParamBoardThickness.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tloušťka prken'**
+  String get buildParamBoardThickness;
+
+  /// No description provided for @buildParamMoleMesh.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pletivo proti hryzcům na dno'**
+  String get buildParamMoleMesh;
+
+  /// No description provided for @buildParamLiner.
+  ///
+  /// In cs, this message translates to:
+  /// **'Fólie na vnitřní stěny'**
+  String get buildParamLiner;
+
+  /// No description provided for @buildParamSurface.
+  ///
+  /// In cs, this message translates to:
+  /// **'Povrch'**
+  String get buildParamSurface;
+
+  /// No description provided for @buildParamEdging.
+  ///
+  /// In cs, this message translates to:
+  /// **'Obrubník'**
+  String get buildParamEdging;
+
+  /// No description provided for @buildParamSpan.
+  ///
+  /// In cs, this message translates to:
+  /// **'Rozpětí'**
+  String get buildParamSpan;
+
+  /// No description provided for @buildParamBeamSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'Průřez nosníků'**
+  String get buildParamBeamSection;
+
+  /// No description provided for @buildParamBeamCount.
+  ///
+  /// In cs, this message translates to:
+  /// **'Počet nosníků'**
+  String get buildParamBeamCount;
+
+  /// No description provided for @buildParamDeckThickness.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tloušťka podlahových prken'**
+  String get buildParamDeckThickness;
+
+  /// No description provided for @buildParamHeightAbove.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výška nad hladinou nebo terénem'**
+  String get buildParamHeightAbove;
+
+  /// No description provided for @buildParamRailing.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zábradlí'**
+  String get buildParamRailing;
+
+  /// No description provided for @buildParamDepth.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hloubka'**
+  String get buildParamDepth;
+
+  /// No description provided for @buildParamRoofing.
+  ///
+  /// In cs, this message translates to:
+  /// **'Krytina'**
+  String get buildParamRoofing;
+
+  /// No description provided for @buildParamRafterSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'Průřez krokví'**
+  String get buildParamRafterSection;
+
+  /// No description provided for @buildParamPostSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'Průřez sloupků'**
+  String get buildParamPostSection;
+
+  /// No description provided for @buildParamSnowRegion.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sněhová oblast'**
+  String get buildParamSnowRegion;
+
+  /// No description provided for @buildOptionMm.
+  ///
+  /// In cs, this message translates to:
+  /// **'{mm} mm'**
+  String buildOptionMm(String mm);
+
+  /// No description provided for @buildOptionSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'{section} mm'**
+  String buildOptionSection(String section);
+
+  /// No description provided for @buildOptionGravel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Štěrk'**
+  String get buildOptionGravel;
+
+  /// No description provided for @buildOptionPavers.
+  ///
+  /// In cs, this message translates to:
+  /// **'Betonová dlažba'**
+  String get buildOptionPavers;
+
+  /// No description provided for @buildOptionStepping.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nášlapné kameny'**
+  String get buildOptionStepping;
+
+  /// No description provided for @buildOptionMulch.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kůra nebo štěpka'**
+  String get buildOptionMulch;
+
+  /// No description provided for @buildOptionPolycarbonate.
+  ///
+  /// In cs, this message translates to:
+  /// **'Polykarbonát'**
+  String get buildOptionPolycarbonate;
+
+  /// No description provided for @buildOptionMetalSheet.
+  ///
+  /// In cs, this message translates to:
+  /// **'Trapézový plech'**
+  String get buildOptionMetalSheet;
+
+  /// No description provided for @buildUnitM.
+  ///
+  /// In cs, this message translates to:
+  /// **'m'**
+  String get buildUnitM;
+
+  /// No description provided for @buildUnitM2.
+  ///
+  /// In cs, this message translates to:
+  /// **'m²'**
+  String get buildUnitM2;
+
+  /// No description provided for @buildUnitM3.
+  ///
+  /// In cs, this message translates to:
+  /// **'m³'**
+  String get buildUnitM3;
+
+  /// No description provided for @buildUnitT.
+  ///
+  /// In cs, this message translates to:
+  /// **'t'**
+  String get buildUnitT;
+
+  /// No description provided for @buildUnitPcs.
+  ///
+  /// In cs, this message translates to:
+  /// **'ks'**
+  String get buildUnitPcs;
+
+  /// No description provided for @buildUnitL.
+  ///
+  /// In cs, this message translates to:
+  /// **'l'**
+  String get buildUnitL;
+
+  /// No description provided for @buildMaterialBoard25.
+  ///
+  /// In cs, this message translates to:
+  /// **'Prkno modřín 25 × 145 mm'**
+  String get buildMaterialBoard25;
+
+  /// No description provided for @buildMaterialBoard32.
+  ///
+  /// In cs, this message translates to:
+  /// **'Prkno modřín 32 × 145 mm'**
+  String get buildMaterialBoard32;
+
+  /// No description provided for @buildMaterialBoard40.
+  ///
+  /// In cs, this message translates to:
+  /// **'Prkno modřín 40 × 145 mm'**
+  String get buildMaterialBoard40;
+
+  /// No description provided for @buildMaterialPost50.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hranol 50 × 50 mm'**
+  String get buildMaterialPost50;
+
+  /// No description provided for @buildMaterialPost70.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hranol 70 × 70 mm'**
+  String get buildMaterialPost70;
+
+  /// No description provided for @buildMaterialPost100.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hranol 100 × 100 mm'**
+  String get buildMaterialPost100;
+
+  /// No description provided for @buildMaterialPost120.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hranol 120 × 120 mm'**
+  String get buildMaterialPost120;
+
+  /// No description provided for @buildMaterialBeam.
+  ///
+  /// In cs, this message translates to:
+  /// **'Hranol KVH {section} mm'**
+  String buildMaterialBeam(String section);
+
+  /// No description provided for @buildMaterialDeck.
+  ///
+  /// In cs, this message translates to:
+  /// **'Terasové prkno {mm} mm'**
+  String buildMaterialDeck(String mm);
+
+  /// No description provided for @buildMaterialScrews.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vruty do dřeva, nerez'**
+  String get buildMaterialScrews;
+
+  /// No description provided for @buildMaterialTieRod.
+  ///
+  /// In cs, this message translates to:
+  /// **'Závitová tyč M10 s maticemi'**
+  String get buildMaterialTieRod;
+
+  /// No description provided for @buildMaterialMoleMesh.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pletivo proti hryzcům'**
+  String get buildMaterialMoleMesh;
+
+  /// No description provided for @buildMaterialLiner.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nopová fólie'**
+  String get buildMaterialLiner;
+
+  /// No description provided for @buildMaterialFill.
+  ///
+  /// In cs, this message translates to:
+  /// **'Náplň: zemina a kompost'**
+  String get buildMaterialFill;
+
+  /// No description provided for @buildMaterialWoodOil.
+  ///
+  /// In cs, this message translates to:
+  /// **'Olej nebo lazura na dřevo'**
+  String get buildMaterialWoodOil;
+
+  /// No description provided for @buildMaterialGravel032.
+  ///
+  /// In cs, this message translates to:
+  /// **'Štěrk 0–32 na podklad'**
+  String get buildMaterialGravel032;
+
+  /// No description provided for @buildMaterialChippings816.
+  ///
+  /// In cs, this message translates to:
+  /// **'Drť 8–16 na povrch'**
+  String get buildMaterialChippings816;
+
+  /// No description provided for @buildMaterialChippings48.
+  ///
+  /// In cs, this message translates to:
+  /// **'Drť 4–8 do lože'**
+  String get buildMaterialChippings48;
+
+  /// No description provided for @buildMaterialGeotextile.
+  ///
+  /// In cs, this message translates to:
+  /// **'Geotextilie'**
+  String get buildMaterialGeotextile;
+
+  /// No description provided for @buildMaterialPavers.
+  ///
+  /// In cs, this message translates to:
+  /// **'Betonová dlažba 6 cm'**
+  String get buildMaterialPavers;
+
+  /// No description provided for @buildMaterialSteppingStone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nášlapný kámen 40 × 40 cm'**
+  String get buildMaterialSteppingStone;
+
+  /// No description provided for @buildMaterialMulch.
+  ///
+  /// In cs, this message translates to:
+  /// **'Mulčovací kůra nebo štěpka'**
+  String get buildMaterialMulch;
+
+  /// No description provided for @buildMaterialEdging.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zahradní obrubník'**
+  String get buildMaterialEdging;
+
+  /// No description provided for @buildMaterialConcreteBag.
+  ///
+  /// In cs, this message translates to:
+  /// **'Beton v pytli 25 kg'**
+  String get buildMaterialConcreteBag;
+
+  /// No description provided for @buildMaterialRailing.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zábradlí (sloupky a madlo)'**
+  String get buildMaterialRailing;
+
+  /// No description provided for @buildMaterialPostAnchor.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kotevní patka sloupku'**
+  String get buildMaterialPostAnchor;
+
+  /// No description provided for @buildMaterialPolycarbonate.
+  ///
+  /// In cs, this message translates to:
+  /// **'Polykarbonát dutinkový'**
+  String get buildMaterialPolycarbonate;
+
+  /// No description provided for @buildMaterialMetalSheet.
+  ///
+  /// In cs, this message translates to:
+  /// **'Trapézový plech'**
+  String get buildMaterialMetalSheet;
+
+  /// No description provided for @buildMaterialRoofScrews.
+  ///
+  /// In cs, this message translates to:
+  /// **'Šrouby na krytinu s podložkou'**
+  String get buildMaterialRoofScrews;
+
+  /// No description provided for @buildSummaryRows.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =1{1 řada prken} few{{count} řady prken} other{{count} řad prken}} po 145 mm, výška {height} m'**
+  String buildSummaryRows(int count, String height);
+
+  /// No description provided for @buildSummaryFill.
+  ///
+  /// In cs, this message translates to:
+  /// **'Náplň {volume} m³'**
+  String buildSummaryFill(String volume);
+
+  /// No description provided for @buildSummaryExcavation.
+  ///
+  /// In cs, this message translates to:
+  /// **'Výkop {volume} m³'**
+  String buildSummaryExcavation(String volume);
+
+  /// No description provided for @buildSummaryBeam.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nosníky využité na {percent} %'**
+  String buildSummaryBeam(int percent);
+
+  /// No description provided for @buildSummaryRafter.
+  ///
+  /// In cs, this message translates to:
+  /// **'Krokve využité na {percent} %'**
+  String buildSummaryRafter(int percent);
+
+  /// No description provided for @buildSummaryPosts.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sloupky po {spacing} m, vaznice {section} mm'**
+  String buildSummaryPosts(String spacing, String section);
+
+  /// No description provided for @buildSummaryRoof.
+  ///
+  /// In cs, this message translates to:
+  /// **'Střecha {area} m², vzadu výška {height} m'**
+  String buildSummaryRoof(String area, String height);
+
+  /// No description provided for @buildFindingBedTooWide.
+  ///
+  /// In cs, this message translates to:
+  /// **'Záhon široký {width} m: do středu nedosáhneš. Záhon přístupný z obou stran má mít nejvýš 1,2 m, u zdi nejvýš 0,6 m.'**
+  String buildFindingBedTooWide(String width);
+
+  /// No description provided for @buildFindingBedThinBoards.
+  ///
+  /// In cs, this message translates to:
+  /// **'Prkna 25 mm se u vyššího záhonu vyboulí pod tlakem zeminy. Zvol 32 nebo 40 mm.'**
+  String get buildFindingBedThinBoards;
+
+  /// No description provided for @buildFindingBedMidPosts.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =1{Přidán 1 mezisloupek} few{Přidány {count} mezisloupky} other{Přidáno {count} mezisloupků}}, prkna mezi sloupky mají nejvýš {spacing} m, ať se stěny neprohýbají.'**
+  String buildFindingBedMidPosts(int count, String spacing);
+
+  /// No description provided for @buildFindingBedTieRods.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =1{Přidána 1 příčná rozpěra} few{Přidány {count} příčné rozpěry} other{Přidáno {count} příčných rozpěr}} proti roztlačení dlouhých stěn.'**
+  String buildFindingBedTieRods(int count);
+
+  /// No description provided for @buildFindingBedTallFill.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vysoký záhon: spodek naplň větvemi a hrubým kompostem, ušetříš substrát a záhon lépe odvodní.'**
+  String get buildFindingBedTallFill;
+
+  /// No description provided for @buildFindingPathNarrow.
+  ///
+  /// In cs, this message translates to:
+  /// **'Chodník užší než 0,6 m: kolečko projede jen těsně.'**
+  String get buildFindingPathNarrow;
+
+  /// No description provided for @buildFindingPathPaversNeedEdging.
+  ///
+  /// In cs, this message translates to:
+  /// **'Dlažba bez obrubníku se po krajích rozjede. Přidej obrubník.'**
+  String get buildFindingPathPaversNeedEdging;
+
+  /// No description provided for @buildFindingPathGravelEdging.
+  ///
+  /// In cs, this message translates to:
+  /// **'Štěrk bez obruby se rozhrnuje do trávníku a záhonů.'**
+  String get buildFindingPathGravelEdging;
+
+  /// No description provided for @buildFindingPathSteppingWide.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nášlapy jsou na šířku jednoho kroku. Pro širší chodník zvol štěrk nebo dlažbu.'**
+  String get buildFindingPathSteppingWide;
+
+  /// No description provided for @buildFindingPathMulchTopUp.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kůru nebo štěpku je potřeba po 2 až 3 letech doplnit.'**
+  String get buildFindingPathMulchTopUp;
+
+  /// No description provided for @buildFindingBridgeBeamFails.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nosníky jsou přetížené ({percent} % únosnosti nebo průhybu). Zvol průřez {section} mm.'**
+  String buildFindingBridgeBeamFails(int percent, String section);
+
+  /// No description provided for @buildFindingBridgeBeamFailsNoSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nosníky jsou přetížené ({percent} % únosnosti nebo průhybu). Přidej nosník nebo zkrať rozpětí.'**
+  String buildFindingBridgeBeamFailsNoSection(int percent);
+
+  /// No description provided for @buildFindingBridgeSpanOverLimit.
+  ///
+  /// In cs, this message translates to:
+  /// **'Rozpětí nad {meters} m bez podpory ve vodě: dřevěný mostek nech navrhnout statikem, nebo přidej podpěru uprostřed.'**
+  String buildFindingBridgeSpanOverLimit(String meters);
+
+  /// No description provided for @buildFindingBridgeTooHigh.
+  ///
+  /// In cs, this message translates to:
+  /// **'Mostek výš než {meters} m nad hladinou nebo terénem: pád je nebezpečný. Návrh nech posoudit statikem a počítej se zábradlím.'**
+  String buildFindingBridgeTooHigh(String meters);
+
+  /// No description provided for @buildFindingBridgeNeedsRailing.
+  ///
+  /// In cs, this message translates to:
+  /// **'Mostek je víc než 0,5 m nad hladinou nebo terénem. Přidej zábradlí, hlavně kvůli dětem.'**
+  String get buildFindingBridgeNeedsRailing;
+
+  /// No description provided for @buildFindingBridgeNarrow.
+  ///
+  /// In cs, this message translates to:
+  /// **'Mostek užší než 0,6 m se špatně přechází. Doporučená šířka je aspoň 0,8 m.'**
+  String get buildFindingBridgeNarrow;
+
+  /// No description provided for @buildFindingBridgeDeckSpan.
+  ///
+  /// In cs, this message translates to:
+  /// **'Podlahová prkna by mezi nosníky měla moc velké pole. Zvol {beams} nosníky nebo silnější prkna.'**
+  String buildFindingBridgeDeckSpan(String beams);
+
+  /// No description provided for @buildFindingShelterRafterFails.
+  ///
+  /// In cs, this message translates to:
+  /// **'Krokve neunesou sníh ({percent} % únosnosti nebo průhybu). Zvol průřez {section} mm.'**
+  String buildFindingShelterRafterFails(int percent, String section);
+
+  /// No description provided for @buildFindingShelterRafterFailsNoSection.
+  ///
+  /// In cs, this message translates to:
+  /// **'Krokve neunesou sníh ({percent} % únosnosti nebo průhybu). Zmenši hloubku přístřešku nebo dej krokve hustěji.'**
+  String buildFindingShelterRafterFailsNoSection(int percent);
+
+  /// No description provided for @buildFindingShelterHeaderFails.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vaznice neunesou střechu se sněhem ani se sloupky po 1 m. Návrh nech posoudit statikem.'**
+  String get buildFindingShelterHeaderFails;
+
+  /// No description provided for @buildFindingShelterHeaderPosts.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kvůli sněhu jsou sloupky blíž u sebe, po {spacing} m.'**
+  String buildFindingShelterHeaderPosts(String spacing);
+
+  /// No description provided for @buildFindingShelterPermit.
+  ///
+  /// In cs, this message translates to:
+  /// **'Stavba nad {area} m² může potřebovat povolení. Ověř to na stavebním úřadě.'**
+  String buildFindingShelterPermit(String area);
+
+  /// No description provided for @buildFindingShelterAnchoring.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sloupky ukotvi do betonových patek: vítr umí lehkou střechu nadzvednout.'**
+  String get buildFindingShelterAnchoring;
 }
 
 class _AppLocalizationsDelegate

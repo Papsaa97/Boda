@@ -1717,5 +1717,386 @@
   "sharingFailed": "Nepovedlo se to. Zkus to znovu.",
   "accountLostAccessTitle": "Sdílená zahrada už není dostupná",
   "accountLostAccessBody": "Vlastník tě ze zahrady odebral, nebo ji přestal sdílet. Data v telefonu zůstala, ale nebudou se synchronizovat.",
-  "accountLostAccessStart": "Začít vlastní zahradu"
+  "accountLostAccessStart": "Začít vlastní zahradu",
+  "buildsTitle": "Stavby",
+  "buildsCardSubtitle": "Záhony, chodníky, mostky a přístřešky s výkazem materiálu a rozpočtem",
+  "buildsEmpty": "Zatím žádný návrh. Vyber šablonu a uvidíš výkres, materiál i rozpočet.",
+  "buildsNew": "Nový návrh",
+  "buildsChooseTemplate": "Co chceš postavit?",
+  "buildsName": "Název",
+  "buildsNameRequired": "Zadej název",
+  "buildsZone": "Zóna",
+  "buildsNoZone": "Bez zóny",
+  "buildsParams": "Parametry",
+  "buildsDrawingTop": "Půdorys",
+  "buildsDrawingSection": "Příčný řez",
+  "buildsChecks": "Kontrola návrhu",
+  "buildsChecksOk": "Návrh je v mezích orientačních limitů.",
+  "buildsMaterial": "Výkaz materiálu",
+  "buildsTotal": "Celkem orientačně {total} Kč",
+  "@buildsTotal": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "buildsPricesNote": "Ceny jsou orientační. Klepni na položku a zadej cenu ze svého obchodu.",
+  "buildsPriceTitle": "Cena: {material}",
+  "@buildsPriceTitle": {
+    "placeholders": {
+      "material": {
+        "type": "String"
+      }
+    }
+  },
+  "buildsPricePerUnit": "Kč za {unit}",
+  "@buildsPricePerUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "buildsPriceReset": "Výchozí cena",
+  "buildsLineTotal": "{qty} {unit} × {price} Kč",
+  "@buildsLineTotal": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "buildsAddToShopping": "Přidat na nákupní seznam",
+  "buildsAddedToShopping": "{count, plural, =0{Všechno už na nákupním seznamu je} =1{Na nákupní seznam přibyla 1 položka} few{Na nákupní seznam přibyly {count} položky} other{Na nákupní seznam přibylo {count} položek}}",
+  "@buildsAddedToShopping": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "buildsDelete": "Smazat návrh",
+  "buildsDeleteTitle": "Smazat návrh?",
+  "buildsDeleteBody": "Návrh „{name}“ zmizí ze seznamu.",
+  "@buildsDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "buildsDeleted": "Návrh smazán",
+  "buildsSaved": "Návrh uložen",
+  "buildsRangeError": "Zadej číslo od {min} do {max}",
+  "@buildsRangeError": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "buildsDiscardTitle": "Zahodit změny v návrhu?",
+  "buildsDiscardKeep": "Pokračovat v úpravách",
+  "buildsDiscardConfirm": "Zahodit",
+  "buildsDisclaimer": "Orientační návrh, nejde o autorizovaný statický výpočet.",
+  "buildsEngineer": "Konstrukce nese osoby nad stanovenou mez. Než začneš stavět, nech návrh posoudit statikem.",
+  "buildsUpdated": "Upraveno {date}",
+  "@buildsUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "buildsSnowHelp": "Podle mapy sněhových oblastí ČR: nížiny většinou I a II, vrchoviny III, hory IV a výš. Nad oblastí V nech přístřešek navrhnout statikem.",
+  "buildTemplateRaisedBed": "Vyvýšený záhon",
+  "buildTemplatePath": "Chodník",
+  "buildTemplateBridge": "Mostek",
+  "buildTemplateShelter": "Přístřešek",
+  "buildTemplateRaisedBedHint": "Prkna, sloupky, náplň a ochrana proti hryzcům",
+  "buildTemplatePathHint": "Štěrk, dlažba, nášlapy nebo kůra včetně podkladu",
+  "buildTemplateBridgeHint": "Lávka pro pěší přes jezírko nebo potok",
+  "buildTemplateShelterHint": "Pultová střecha na sloupcích, třeba na dřevo nebo kola",
+  "buildParamLength": "Délka",
+  "buildParamWidth": "Šířka",
+  "buildParamHeight": "Výška",
+  "buildParamFrontHeight": "Výška vpředu",
+  "buildParamBoardThickness": "Tloušťka prken",
+  "buildParamMoleMesh": "Pletivo proti hryzcům na dno",
+  "buildParamLiner": "Fólie na vnitřní stěny",
+  "buildParamSurface": "Povrch",
+  "buildParamEdging": "Obrubník",
+  "buildParamSpan": "Rozpětí",
+  "buildParamBeamSection": "Průřez nosníků",
+  "buildParamBeamCount": "Počet nosníků",
+  "buildParamDeckThickness": "Tloušťka podlahových prken",
+  "buildParamHeightAbove": "Výška nad hladinou nebo terénem",
+  "buildParamRailing": "Zábradlí",
+  "buildParamDepth": "Hloubka",
+  "buildParamRoofing": "Krytina",
+  "buildParamRafterSection": "Průřez krokví",
+  "buildParamPostSection": "Průřez sloupků",
+  "buildParamSnowRegion": "Sněhová oblast",
+  "buildOptionMm": "{mm} mm",
+  "@buildOptionMm": {
+    "placeholders": {
+      "mm": {
+        "type": "String"
+      }
+    }
+  },
+  "buildOptionSection": "{section} mm",
+  "@buildOptionSection": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "buildOptionGravel": "Štěrk",
+  "buildOptionPavers": "Betonová dlažba",
+  "buildOptionStepping": "Nášlapné kameny",
+  "buildOptionMulch": "Kůra nebo štěpka",
+  "buildOptionPolycarbonate": "Polykarbonát",
+  "buildOptionMetalSheet": "Trapézový plech",
+  "buildUnitM": "m",
+  "buildUnitM2": "m²",
+  "buildUnitM3": "m³",
+  "buildUnitT": "t",
+  "buildUnitPcs": "ks",
+  "buildUnitL": "l",
+  "buildMaterialBoard25": "Prkno modřín 25 × 145 mm",
+  "buildMaterialBoard32": "Prkno modřín 32 × 145 mm",
+  "buildMaterialBoard40": "Prkno modřín 40 × 145 mm",
+  "buildMaterialPost50": "Hranol 50 × 50 mm",
+  "buildMaterialPost70": "Hranol 70 × 70 mm",
+  "buildMaterialPost100": "Hranol 100 × 100 mm",
+  "buildMaterialPost120": "Hranol 120 × 120 mm",
+  "buildMaterialBeam": "Hranol KVH {section} mm",
+  "@buildMaterialBeam": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "buildMaterialDeck": "Terasové prkno {mm} mm",
+  "@buildMaterialDeck": {
+    "placeholders": {
+      "mm": {
+        "type": "String"
+      }
+    }
+  },
+  "buildMaterialScrews": "Vruty do dřeva, nerez",
+  "buildMaterialTieRod": "Závitová tyč M10 s maticemi",
+  "buildMaterialMoleMesh": "Pletivo proti hryzcům",
+  "buildMaterialLiner": "Nopová fólie",
+  "buildMaterialFill": "Náplň: zemina a kompost",
+  "buildMaterialWoodOil": "Olej nebo lazura na dřevo",
+  "buildMaterialGravel032": "Štěrk 0–32 na podklad",
+  "buildMaterialChippings816": "Drť 8–16 na povrch",
+  "buildMaterialChippings48": "Drť 4–8 do lože",
+  "buildMaterialGeotextile": "Geotextilie",
+  "buildMaterialPavers": "Betonová dlažba 6 cm",
+  "buildMaterialSteppingStone": "Nášlapný kámen 40 × 40 cm",
+  "buildMaterialMulch": "Mulčovací kůra nebo štěpka",
+  "buildMaterialEdging": "Zahradní obrubník",
+  "buildMaterialConcreteBag": "Beton v pytli 25 kg",
+  "buildMaterialRailing": "Zábradlí (sloupky a madlo)",
+  "buildMaterialPostAnchor": "Kotevní patka sloupku",
+  "buildMaterialPolycarbonate": "Polykarbonát dutinkový",
+  "buildMaterialMetalSheet": "Trapézový plech",
+  "buildMaterialRoofScrews": "Šrouby na krytinu s podložkou",
+  "buildSummaryRows": "{count, plural, =1{1 řada prken} few{{count} řady prken} other{{count} řad prken}} po 145 mm, výška {height} m",
+  "@buildSummaryRows": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "buildSummaryFill": "Náplň {volume} m³",
+  "@buildSummaryFill": {
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "buildSummaryExcavation": "Výkop {volume} m³",
+  "@buildSummaryExcavation": {
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "buildSummaryBeam": "Nosníky využité na {percent} %",
+  "@buildSummaryBeam": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildSummaryRafter": "Krokve využité na {percent} %",
+  "@buildSummaryRafter": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildSummaryPosts": "Sloupky po {spacing} m, vaznice {section} mm",
+  "@buildSummaryPosts": {
+    "placeholders": {
+      "spacing": {
+        "type": "String"
+      },
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "buildSummaryRoof": "Střecha {area} m², vzadu výška {height} m",
+  "@buildSummaryRoof": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingBedTooWide": "Záhon široký {width} m: do středu nedosáhneš. Záhon přístupný z obou stran má mít nejvýš 1,2 m, u zdi nejvýš 0,6 m.",
+  "@buildFindingBedTooWide": {
+    "placeholders": {
+      "width": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingBedThinBoards": "Prkna 25 mm se u vyššího záhonu vyboulí pod tlakem zeminy. Zvol 32 nebo 40 mm.",
+  "buildFindingBedMidPosts": "{count, plural, =1{Přidán 1 mezisloupek} few{Přidány {count} mezisloupky} other{Přidáno {count} mezisloupků}}, prkna mezi sloupky mají nejvýš {spacing} m, ať se stěny neprohýbají.",
+  "@buildFindingBedMidPosts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "spacing": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingBedTieRods": "{count, plural, =1{Přidána 1 příčná rozpěra} few{Přidány {count} příčné rozpěry} other{Přidáno {count} příčných rozpěr}} proti roztlačení dlouhých stěn.",
+  "@buildFindingBedTieRods": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "buildFindingBedTallFill": "Vysoký záhon: spodek naplň větvemi a hrubým kompostem, ušetříš substrát a záhon lépe odvodní.",
+  "buildFindingPathNarrow": "Chodník užší než 0,6 m: kolečko projede jen těsně.",
+  "buildFindingPathPaversNeedEdging": "Dlažba bez obrubníku se po krajích rozjede. Přidej obrubník.",
+  "buildFindingPathGravelEdging": "Štěrk bez obruby se rozhrnuje do trávníku a záhonů.",
+  "buildFindingPathSteppingWide": "Nášlapy jsou na šířku jednoho kroku. Pro širší chodník zvol štěrk nebo dlažbu.",
+  "buildFindingPathMulchTopUp": "Kůru nebo štěpku je potřeba po 2 až 3 letech doplnit.",
+  "buildFindingBridgeBeamFails": "Nosníky jsou přetížené ({percent} % únosnosti nebo průhybu). Zvol průřez {section} mm.",
+  "@buildFindingBridgeBeamFails": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingBridgeBeamFailsNoSection": "Nosníky jsou přetížené ({percent} % únosnosti nebo průhybu). Přidej nosník nebo zkrať rozpětí.",
+  "@buildFindingBridgeBeamFailsNoSection": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildFindingBridgeSpanOverLimit": "Rozpětí nad {meters} m bez podpory ve vodě: dřevěný mostek nech navrhnout statikem, nebo přidej podpěru uprostřed.",
+  "@buildFindingBridgeSpanOverLimit": {
+    "placeholders": {
+      "meters": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingBridgeTooHigh": "Mostek výš než {meters} m nad hladinou nebo terénem: pád je nebezpečný. Návrh nech posoudit statikem a počítej se zábradlím.",
+  "@buildFindingBridgeTooHigh": {
+    "placeholders": {
+      "meters": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingBridgeNeedsRailing": "Mostek je víc než 0,5 m nad hladinou nebo terénem. Přidej zábradlí, hlavně kvůli dětem.",
+  "buildFindingBridgeNarrow": "Mostek užší než 0,6 m se špatně přechází. Doporučená šířka je aspoň 0,8 m.",
+  "buildFindingBridgeDeckSpan": "Podlahová prkna by mezi nosníky měla moc velké pole. Zvol {beams} nosníky nebo silnější prkna.",
+  "@buildFindingBridgeDeckSpan": {
+    "placeholders": {
+      "beams": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingShelterRafterFails": "Krokve neunesou sníh ({percent} % únosnosti nebo průhybu). Zvol průřez {section} mm.",
+  "@buildFindingShelterRafterFails": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingShelterRafterFailsNoSection": "Krokve neunesou sníh ({percent} % únosnosti nebo průhybu). Zmenši hloubku přístřešku nebo dej krokve hustěji.",
+  "@buildFindingShelterRafterFailsNoSection": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "buildFindingShelterHeaderFails": "Vaznice neunesou střechu se sněhem ani se sloupky po 1 m. Návrh nech posoudit statikem.",
+  "buildFindingShelterHeaderPosts": "Kvůli sněhu jsou sloupky blíž u sebe, po {spacing} m.",
+  "@buildFindingShelterHeaderPosts": {
+    "placeholders": {
+      "spacing": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingShelterPermit": "Stavba nad {area} m² může potřebovat povolení. Ověř to na stavebním úřadě.",
+  "@buildFindingShelterPermit": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "buildFindingShelterAnchoring": "Sloupky ukotvi do betonových patek: vítr umí lehkou střechu nadzvednout."
 }
