@@ -22,6 +22,9 @@ import 'package:zahradnik_boda/features/inventory/domain/shopping_item.dart';
 import 'package:zahradnik_boda/features/inventory/domain/units.dart';
 import 'package:zahradnik_boda/features/tasks/data/drift_task_repository.dart';
 import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
+import 'package:zahradnik_boda/features/weather/data/drift_garden_site_repository.dart';
+import 'package:zahradnik_boda/features/weather/domain/garden_site.dart';
+import 'package:zahradnik_boda/features/weather/domain/weather.dart';
 import 'package:zahradnik_boda/features/zones/data/drift_zone_repository.dart';
 import 'package:zahradnik_boda/features/zones/domain/zone_entity.dart';
 
@@ -61,6 +64,8 @@ class _Device {
   DriftShoppingRepository get shopping =>
       DriftShoppingRepository(db, gardenId, clock);
   DriftPlanRepository get plan => DriftPlanRepository(db, gardenId, clock);
+  DriftGardenSiteRepository get site =>
+      DriftGardenSiteRepository(db, gardenId, clock);
   DriftIncidentRepository get incidents =>
       DriftIncidentRepository(db, gardenId, clock);
 
@@ -99,6 +104,9 @@ void main() {
       ),
     );
     await d.plan.saveOutline(_outline);
+    await d.site.saveSite(
+      GardenSite(location: GardenLocation(49.2, 16.61), altitudeM: 237),
+    );
     await d.inventory.save(
       const InventoryItem(
         id: 'i1',
@@ -251,6 +259,10 @@ void main() {
       expect(planned.layer, ZoneLayer.plan);
       expect(planned.polygon, hasLength(4));
       expect(await fresh.plan.loadOutline(), _outline);
+      expect(
+        await fresh.site.loadSite(),
+        GardenSite(location: GardenLocation(49.2, 16.61), altitudeM: 237),
+      );
       expect(zones.firstWhere((z) => z.id == 'Z3').archived, isTrue);
       final z1 = zones.firstWhere((z) => z.id == 'Z1');
       expect(z1.type, ZoneType.vegetable);
@@ -339,6 +351,8 @@ void main() {
       [20.5, 10.25],
       [-1, 10.25],
     ]);
+    expect((json['garden'] as Map)['location'], {'lat': 49.2, 'lng': 16.61});
+    expect((json['garden'] as Map)['altitudeM'], 237);
     expect(json['appVersion'], '0.2.0');
     final a1 = (json['activities'] as List).cast<Map>().firstWhere(
       (a) => a['id'] == 'a1',
@@ -412,6 +426,7 @@ void main() {
     expect(data.zones.single.polygon, isNull);
     expect(data.zones.single.layer, ZoneLayer.reality);
     expect(data.gardenOutline, isEmpty);
+    expect(data.site, const GardenSite());
   });
 
   group('broken files are rejected without touching data', () {

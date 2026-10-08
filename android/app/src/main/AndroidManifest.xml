@@ -3,6 +3,9 @@
          k notifikacím (Android 13+) a obnovení plánu po restartu. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Poloha zahrady pro počasí (geolocator): stačí přibližná, ukládá
+         se zaokrouhlená na ~1 km a jen po klepnutí uživatele. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="Zahradník Bóďa"
         android:name="${applicationName}"

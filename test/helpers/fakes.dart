@@ -21,6 +21,8 @@ import 'package:zahradnik_boda/features/settings/domain/app_settings.dart';
 import 'package:zahradnik_boda/features/settings/domain/settings_repository.dart';
 import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
 import 'package:zahradnik_boda/features/tasks/domain/task_repository.dart';
+import 'package:zahradnik_boda/features/weather/domain/garden_site.dart';
+import 'package:zahradnik_boda/features/weather/domain/weather.dart';
 import 'package:zahradnik_boda/features/zones/domain/zone_entity.dart';
 import 'package:zahradnik_boda/features/zones/domain/zone_repository.dart';
 
@@ -237,6 +239,37 @@ ProviderContainer makeContainer({
   );
 }
 
+/// Poloha zahrady, počasí a nastavení zálivky v paměti.
+class InMemoryGardenSiteRepository implements GardenSiteRepository {
+  InMemoryGardenSiteRepository({
+    this.site = const GardenSite(),
+    this.cache,
+    this.prefs = const WeatherPrefs(),
+  });
+
+  GardenSite site;
+  CachedWeather? cache;
+  WeatherPrefs prefs;
+
+  @override
+  Future<GardenSite> loadSite() async => site;
+
+  @override
+  Future<void> saveSite(GardenSite site) async => this.site = site;
+
+  @override
+  Future<CachedWeather?> loadCache() async => cache;
+
+  @override
+  Future<void> saveCache(CachedWeather? cache) async => this.cache = cache;
+
+  @override
+  Future<WeatherPrefs> loadPrefs() async => prefs;
+
+  @override
+  Future<void> savePrefs(WeatherPrefs prefs) async => this.prefs = prefs;
+}
+
 /// Id pro nové entity v testech: id-1, id-2, …
 String Function() sequentialIds() {
   var n = 0;
@@ -254,8 +287,17 @@ List<Override> testOverrides({
   AssistantBackend? backend,
   DateTime Function()? clock,
   InMemoryIncidentRepository? incidents,
+  InMemoryGardenSiteRepository? site,
+  WeatherSource? weather,
 }) {
   return [
+    gardenSiteRepositoryProvider.overrideWithValue(
+      site ?? InMemoryGardenSiteRepository(),
+    ),
+    weatherSourceProvider.overrideWithValue(
+      weather ?? const UnavailableWeatherSource(),
+    ),
+    deviceLocationProvider.overrideWithValue(const UnsupportedDeviceLocation()),
     incidentRepositoryProvider.overrideWithValue(
       incidents ?? InMemoryIncidentRepository(),
     ),

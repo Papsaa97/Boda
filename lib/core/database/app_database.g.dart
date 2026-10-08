@@ -531,6 +531,39 @@ class $GardensTable extends Gardens with TableInfo<$GardensTable, GardenRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _locationLatMeta = const VerificationMeta(
+    'locationLat',
+  );
+  @override
+  late final GeneratedColumn<double> locationLat = GeneratedColumn<double>(
+    'location_lat',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _locationLngMeta = const VerificationMeta(
+    'locationLng',
+  );
+  @override
+  late final GeneratedColumn<double> locationLng = GeneratedColumn<double>(
+    'location_lng',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _altitudeMMeta = const VerificationMeta(
+    'altitudeM',
+  );
+  @override
+  late final GeneratedColumn<int> altitudeM = GeneratedColumn<int>(
+    'altitude_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -538,6 +571,9 @@ class $GardensTable extends Gardens with TableInfo<$GardensTable, GardenRow> {
     createdAt,
     updatedAt,
     bounds,
+    locationLat,
+    locationLng,
+    altitudeM,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -586,6 +622,30 @@ class $GardensTable extends Gardens with TableInfo<$GardensTable, GardenRow> {
         bounds.isAcceptableOrUnknown(data['bounds']!, _boundsMeta),
       );
     }
+    if (data.containsKey('location_lat')) {
+      context.handle(
+        _locationLatMeta,
+        locationLat.isAcceptableOrUnknown(
+          data['location_lat']!,
+          _locationLatMeta,
+        ),
+      );
+    }
+    if (data.containsKey('location_lng')) {
+      context.handle(
+        _locationLngMeta,
+        locationLng.isAcceptableOrUnknown(
+          data['location_lng']!,
+          _locationLngMeta,
+        ),
+      );
+    }
+    if (data.containsKey('altitude_m')) {
+      context.handle(
+        _altitudeMMeta,
+        altitudeM.isAcceptableOrUnknown(data['altitude_m']!, _altitudeMMeta),
+      );
+    }
     return context;
   }
 
@@ -615,6 +675,18 @@ class $GardensTable extends Gardens with TableInfo<$GardensTable, GardenRow> {
         DriftSqlType.string,
         data['${effectivePrefix}bounds'],
       ),
+      locationLat: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}location_lat'],
+      ),
+      locationLng: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}location_lng'],
+      ),
+      altitudeM: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}altitude_m'],
+      ),
     );
   }
 
@@ -633,12 +705,23 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
   /// Plán zahrady (1.1, schéma 5): JSON `{"outline": [[x, y], ...]}`
   /// v metrech; serverový sloupec `bounds`.
   final String? bounds;
+
+  /// Poloha zahrady pro počasí (V2, schéma 7), zaokrouhlená na 2 desetinná
+  /// místa (~1 km, spec 8.1).
+  final double? locationLat;
+  final double? locationLng;
+
+  /// Nadmořská výška v metrech (fenologický kalendář, FR-W5).
+  final int? altitudeM;
   const GardenRow({
     required this.id,
     required this.name,
     required this.createdAt,
     required this.updatedAt,
     this.bounds,
+    this.locationLat,
+    this.locationLng,
+    this.altitudeM,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -649,6 +732,15 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
     map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || bounds != null) {
       map['bounds'] = Variable<String>(bounds);
+    }
+    if (!nullToAbsent || locationLat != null) {
+      map['location_lat'] = Variable<double>(locationLat);
+    }
+    if (!nullToAbsent || locationLng != null) {
+      map['location_lng'] = Variable<double>(locationLng);
+    }
+    if (!nullToAbsent || altitudeM != null) {
+      map['altitude_m'] = Variable<int>(altitudeM);
     }
     return map;
   }
@@ -662,6 +754,15 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
       bounds: bounds == null && nullToAbsent
           ? const Value.absent()
           : Value(bounds),
+      locationLat: locationLat == null && nullToAbsent
+          ? const Value.absent()
+          : Value(locationLat),
+      locationLng: locationLng == null && nullToAbsent
+          ? const Value.absent()
+          : Value(locationLng),
+      altitudeM: altitudeM == null && nullToAbsent
+          ? const Value.absent()
+          : Value(altitudeM),
     );
   }
 
@@ -676,6 +777,9 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       bounds: serializer.fromJson<String?>(json['bounds']),
+      locationLat: serializer.fromJson<double?>(json['locationLat']),
+      locationLng: serializer.fromJson<double?>(json['locationLng']),
+      altitudeM: serializer.fromJson<int?>(json['altitudeM']),
     );
   }
   @override
@@ -687,6 +791,9 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'bounds': serializer.toJson<String?>(bounds),
+      'locationLat': serializer.toJson<double?>(locationLat),
+      'locationLng': serializer.toJson<double?>(locationLng),
+      'altitudeM': serializer.toJson<int?>(altitudeM),
     };
   }
 
@@ -696,12 +803,18 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<String?> bounds = const Value.absent(),
+    Value<double?> locationLat = const Value.absent(),
+    Value<double?> locationLng = const Value.absent(),
+    Value<int?> altitudeM = const Value.absent(),
   }) => GardenRow(
     id: id ?? this.id,
     name: name ?? this.name,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     bounds: bounds.present ? bounds.value : this.bounds,
+    locationLat: locationLat.present ? locationLat.value : this.locationLat,
+    locationLng: locationLng.present ? locationLng.value : this.locationLng,
+    altitudeM: altitudeM.present ? altitudeM.value : this.altitudeM,
   );
   GardenRow copyWithCompanion(GardensCompanion data) {
     return GardenRow(
@@ -710,6 +823,13 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       bounds: data.bounds.present ? data.bounds.value : this.bounds,
+      locationLat: data.locationLat.present
+          ? data.locationLat.value
+          : this.locationLat,
+      locationLng: data.locationLng.present
+          ? data.locationLng.value
+          : this.locationLng,
+      altitudeM: data.altitudeM.present ? data.altitudeM.value : this.altitudeM,
     );
   }
 
@@ -720,13 +840,25 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('bounds: $bounds')
+          ..write('bounds: $bounds, ')
+          ..write('locationLat: $locationLat, ')
+          ..write('locationLng: $locationLng, ')
+          ..write('altitudeM: $altitudeM')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, createdAt, updatedAt, bounds);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    createdAt,
+    updatedAt,
+    bounds,
+    locationLat,
+    locationLng,
+    altitudeM,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -735,7 +867,10 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
           other.name == this.name &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
-          other.bounds == this.bounds);
+          other.bounds == this.bounds &&
+          other.locationLat == this.locationLat &&
+          other.locationLng == this.locationLng &&
+          other.altitudeM == this.altitudeM);
 }
 
 class GardensCompanion extends UpdateCompanion<GardenRow> {
@@ -744,6 +879,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<String?> bounds;
+  final Value<double?> locationLat;
+  final Value<double?> locationLng;
+  final Value<int?> altitudeM;
   final Value<int> rowid;
   const GardensCompanion({
     this.id = const Value.absent(),
@@ -751,6 +889,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.bounds = const Value.absent(),
+    this.locationLat = const Value.absent(),
+    this.locationLng = const Value.absent(),
+    this.altitudeM = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   GardensCompanion.insert({
@@ -759,6 +900,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     required DateTime createdAt,
     required DateTime updatedAt,
     this.bounds = const Value.absent(),
+    this.locationLat = const Value.absent(),
+    this.locationLng = const Value.absent(),
+    this.altitudeM = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
@@ -770,6 +914,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<String>? bounds,
+    Expression<double>? locationLat,
+    Expression<double>? locationLng,
+    Expression<int>? altitudeM,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -778,6 +925,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (bounds != null) 'bounds': bounds,
+      if (locationLat != null) 'location_lat': locationLat,
+      if (locationLng != null) 'location_lng': locationLng,
+      if (altitudeM != null) 'altitude_m': altitudeM,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -788,6 +938,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<String?>? bounds,
+    Value<double?>? locationLat,
+    Value<double?>? locationLng,
+    Value<int?>? altitudeM,
     Value<int>? rowid,
   }) {
     return GardensCompanion(
@@ -796,6 +949,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       bounds: bounds ?? this.bounds,
+      locationLat: locationLat ?? this.locationLat,
+      locationLng: locationLng ?? this.locationLng,
+      altitudeM: altitudeM ?? this.altitudeM,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -818,6 +974,15 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     if (bounds.present) {
       map['bounds'] = Variable<String>(bounds.value);
     }
+    if (locationLat.present) {
+      map['location_lat'] = Variable<double>(locationLat.value);
+    }
+    if (locationLng.present) {
+      map['location_lng'] = Variable<double>(locationLng.value);
+    }
+    if (altitudeM.present) {
+      map['altitude_m'] = Variable<int>(altitudeM.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -832,6 +997,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('bounds: $bounds, ')
+          ..write('locationLat: $locationLat, ')
+          ..write('locationLng: $locationLng, ')
+          ..write('altitudeM: $altitudeM, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -10326,6 +10494,9 @@ typedef $$GardensTableCreateCompanionBuilder =
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<String?> bounds,
+      Value<double?> locationLat,
+      Value<double?> locationLng,
+      Value<int?> altitudeM,
       Value<int> rowid,
     });
 typedef $$GardensTableUpdateCompanionBuilder =
@@ -10335,6 +10506,9 @@ typedef $$GardensTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<String?> bounds,
+      Value<double?> locationLat,
+      Value<double?> locationLng,
+      Value<int?> altitudeM,
       Value<int> rowid,
     });
 
@@ -10586,6 +10760,21 @@ class $$GardensTableFilterComposer
 
   ColumnFilters<String> get bounds => $composableBuilder(
     column: $table.bounds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get locationLat => $composableBuilder(
+    column: $table.locationLat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get locationLng => $composableBuilder(
+    column: $table.locationLng,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get altitudeM => $composableBuilder(
+    column: $table.altitudeM,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10898,6 +11087,21 @@ class $$GardensTableOrderingComposer
     column: $table.bounds,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get locationLat => $composableBuilder(
+    column: $table.locationLat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get locationLng => $composableBuilder(
+    column: $table.locationLng,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get altitudeM => $composableBuilder(
+    column: $table.altitudeM,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$GardensTableAnnotationComposer
@@ -10923,6 +11127,19 @@ class $$GardensTableAnnotationComposer
 
   GeneratedColumn<String> get bounds =>
       $composableBuilder(column: $table.bounds, builder: (column) => column);
+
+  GeneratedColumn<double> get locationLat => $composableBuilder(
+    column: $table.locationLat,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get locationLng => $composableBuilder(
+    column: $table.locationLng,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get altitudeM =>
+      $composableBuilder(column: $table.altitudeM, builder: (column) => column);
 
   Expression<T> zonesRefs<T extends Object>(
     Expression<T> Function($$ZonesTableAnnotationComposer a) f,
@@ -11247,6 +11464,9 @@ class $$GardensTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<String?> bounds = const Value.absent(),
+                Value<double?> locationLat = const Value.absent(),
+                Value<double?> locationLng = const Value.absent(),
+                Value<int?> altitudeM = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => GardensCompanion(
                 id: id,
@@ -11254,6 +11474,9 @@ class $$GardensTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 bounds: bounds,
+                locationLat: locationLat,
+                locationLng: locationLng,
+                altitudeM: altitudeM,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -11263,6 +11486,9 @@ class $$GardensTableTableManager
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<String?> bounds = const Value.absent(),
+                Value<double?> locationLat = const Value.absent(),
+                Value<double?> locationLng = const Value.absent(),
+                Value<int?> altitudeM = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => GardensCompanion.insert(
                 id: id,
@@ -11270,6 +11496,9 @@ class $$GardensTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 bounds: bounds,
+                locationLat: locationLat,
+                locationLng: locationLng,
+                altitudeM: altitudeM,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

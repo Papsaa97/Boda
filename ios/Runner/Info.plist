@@ -47,6 +47,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Bóďa potřebuje fotoaparát, abys mohl vyfotit práci na zahradě do deníku.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Bóďa použije přibližnou polohu zahrady (zaokrouhlenou na 1 km) pro počasí a kalendář prací. Polohu můžeš zadat i ručně.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Bóďa potřebuje přístup k fotkám, abys mohl přidat fotku k záznamu v deníku.</string>
 </dict>

@@ -105,6 +105,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Dnes zatím nic'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('včera'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('včera'), findsOneWidget);
   });
 

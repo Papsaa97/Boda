@@ -11,6 +11,8 @@ import '../../inventory/domain/shopping_item.dart';
 import '../../inventory/domain/stock_movement.dart';
 import '../../inventory/domain/units.dart';
 import '../../tasks/domain/task_entity.dart';
+import '../../weather/domain/garden_site.dart';
+import '../../weather/domain/weather.dart';
 import '../../zones/domain/zone_entity.dart';
 
 /// Verze formátu `data.json` v záloze (docs/FORMAT_EXPORTU.md).
@@ -73,6 +75,7 @@ class BackupData {
     this.shopping = const [],
     this.activityMaterials = const [],
     this.gardenOutline = const [],
+    this.site = const GardenSite(),
     this.incidents = const [],
     this.movements = const [],
   });
@@ -92,6 +95,9 @@ class BackupData {
   /// Od verze 3 formátu (MVP 1.1): obrys zahrady v metrech; prázdný,
   /// když plán není nakreslený.
   final List<Pt> gardenOutline;
+
+  /// Od verze 4 formátu (V2), nepovinné: poloha (~1 km) a výška zahrady.
+  final GardenSite site;
 
   /// Od verze 4 formátu (V2): incidenty a pohyby na skladě.
   final List<Incident> incidents;
@@ -149,6 +155,10 @@ Map<String, Object?> encodeBackup(BackupData data) {
       'outline': data.gardenOutline.isEmpty
           ? null
           : polygonToJson(data.gardenOutline),
+      'location': data.site.location == null
+          ? null
+          : {'lat': data.site.location!.lat, 'lng': data.site.location!.lng},
+      'altitudeM': data.site.altitudeM,
     },
     'activities': [
       for (final a in data.activities)
@@ -382,6 +392,7 @@ BackupData _decode(Map<String, Object?> json) {
           ((json['garden'] as Map?)?.cast<String, Object?>())?['outline'],
         ) ??
         const [],
+    site: _site(json['garden']),
     activities: [
       for (final a in list('activities'))
         ActivityEntity(
@@ -463,5 +474,19 @@ InventoryItem _inventoryItem(Map<String, Object?> i) {
     stockQty: (i['stockQty'] as num?)?.toDouble() ?? 0,
     lowStockThreshold: (i['lowStockThreshold'] as num?)?.toDouble(),
     details: ItemDetails.fromJson(category, i['details']),
+  );
+}
+
+GardenSite _site(Object? garden) {
+  if (garden is! Map) return const GardenSite();
+  final location = garden['location'];
+  final lat = location is Map ? location['lat'] : null;
+  final lng = location is Map ? location['lng'] : null;
+  final altitude = garden['altitudeM'];
+  return GardenSite(
+    location: lat is num && lng is num
+        ? GardenLocation(lat.toDouble(), lng.toDouble())
+        : null,
+    altitudeM: altitude is num ? altitude.round() : null,
   );
 }

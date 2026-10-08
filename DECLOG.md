@@ -382,3 +382,18 @@ Dopad: tabulka `incidents` v telefonu i na serveru (migrace `20261008000700`, RL
 **D84. Záloha formát 4: incidenty, pohyby na skladě a vazba úkolu na incident.**
 Proč: záloha má obnovit všechno, co uživatel zapsal (FR-E1).
 Dopad: nová pole jsou nepovinná, starší zálohy se načtou. Fotky incidentů jsou ve stejné složce `photos/` jako fotky záznamů.
+
+## 2026-10-08 – V2, část 2: počasí, zálivka, mráz a kalendář prací
+
+**D85. Počasí stahuje Edge Function `weather` s klíčem poskytovatele v secrets; je jen pro Premium, poloha se ukládá zaokrouhlená na ~1 km.**
+Proč: spec 5.6 a kap. 11 (počasí a zálivka jsou v Premium); klíč nesmí být v aplikaci (kap. 9). Open-Meteo je zdarma jen nekomerčně, placená aplikace potřebuje placený tarif nebo jiný zdroj s licencí, a to vybírá Papi.
+Dopad: funkce volá API ve tvaru Open-Meteo (`WEATHER_API_URL`, `WEATHER_API_KEY`), bez nich vrací `503`, bez Premium `402`. Poloha je ve sloupcích `gardens.location_lat/lng` (2 desetinná místa) a `altitude_m`, synchronizuje se (migrace `20261008000800`, pgTAP `09_garden_location`) a je v záloze. Počasí se ukládá v telefonu a stahuje znovu po 3 hodinách nebo tažením dolů; bez signálu se ukazuje poslední stažené. Poloha telefonu (`geolocator`, přibližná) se zjistí jen po klepnutí, jde ji zadat i ručně. Push upozornění (mráz) přijdou s FCM, které potřebuje účet Papiho; zatím je varování na dashboardu.
+
+**D86. Zálivka: srážky jsou zahrady, práh je podle druhu zóny, odložení je návrh na jedno klepnutí, automatika nejvýš jednou denně.**
+Proč: FR-W2 a FR-W3. Výchozí prahy (bylinky 12 mm, zelenina a ostatní 15 mm, ovoce a trávník 20 mm za 7 dní; předpověď ≥ 5 mm na dnešek nebo zítřek) jsou startovní hodnoty k ověření v praxi. Denní data nemají hodiny, proto „příštích 24 h“ = vyšší z dneška a zítřka.
+Dopad: krytá zóna a skleník déšť nezapočítávají, jezírko a stavba zálivku neřeší. Úkol zálivky se pozná podle názvu (úkoly nemají typ). Úkol bez zóny se odloží, jen když může počkat každá nekrytá zóna. Odložení posune úkol o den za den, kdy je na řadě; automatika se spustí po stažení počasí a jen jednou za den, aby úkol neujížděl. Varování před mrazem (≤ 0 °C v příštích 3 dnech, březen až červen a září až říjen) se týká nekrytých zón, kde se za posledních 8 týdnů selo nebo sázelo.
+
+**D87. Fenologický kalendář je zdarma a offline: startovní tabulka 16 prací pro ČR posunutá o 3 dny na 100 m výšky.**
+Proč: FR-W5; kap. 11 ho mezi placenými funkcemi nemá a nic nestojí. Hopkinsův zákon (zhruba 3 dny na 100 m) je dost dobrý start; skutečný průběh jara je přesnější, ale potřebuje data, která zatím nemáme.
+Dopad: okna jsou pro 250 m n. m.; výška se bere zadaná, jinak z počasí, jinak 300 m. Jarní práce se s výškou posouvají později, podzimní dřív. Ukazují se jen práce pro druhy zón, které zahrada má; „Teď je čas“ je i na dashboardu a každou práci jde přidat jako úkol.
+

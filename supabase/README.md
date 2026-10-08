@@ -57,6 +57,8 @@ Supabase sám. Ty nastavuješ jen tyto (hodnoty nikdy do gitu ani do chatu):
 | `LLM_PRICE_INPUT_USD_PER_MTOK`, `LLM_PRICE_OUTPUT_USD_PER_MTOK` | ne | ceník modelu v USD za milion tokenů; bez něj se náklad na dotaz nezapisuje |
 | `BODA_LIMIT_FREE`, `BODA_LIMIT_PREMIUM` | ne | změna měsíčních limitů dotazů (výchozí 10 a 300) |
 | `LLM_BASE_URL` | ne | jiná adresa API poskytovatele (proxy, regionální endpoint) |
+| `WEATHER_API_URL` | pro počasí | adresa denní předpovědi ve tvaru Open-Meteo (`…/v1/forecast`) u poskytovatele s licencí pro komerční aplikaci |
+| `WEATHER_API_KEY` | ne | klíč placeného tarifu poskytovatele počasí (posílá se jako `apikey`) |
 
 Nejbezpečněji přes soubor, ať klíče nezůstanou v historii příkazů:
 
@@ -67,11 +69,14 @@ supabase secrets list       # ukáže jen názvy, ne hodnoty
 ```
 
 Bez `LLM_API_KEY`/`LLM_MODEL` Bóďa odpovídá `503 not_configured`, zbytek funguje.
+Bez `WEATHER_API_URL` odpovídá `503` i funkce `weather`; aplikace pak počasí
+neukáže, kalendář prací funguje dál.
 
 ## 5. Nasazení funkcí
 
 ```bash
 supabase functions deploy boda-chat
+supabase functions deploy weather
 supabase functions deploy delete-account
 supabase functions deploy revenuecat-webhook --no-verify-jwt
 ```

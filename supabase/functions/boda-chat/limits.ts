@@ -1,24 +1,13 @@
 // Limity dotazů na Bóďu (spec 11.2): Free 10 za kalendářní měsíc,
 // Premium fair-use 300. Období se počítá v čase Europe/Prague.
 
-export type Plan = "free" | "premium";
+import { type EntitlementRow, type Plan, resolvePlan } from "../_shared/plan.ts";
+
+export { type EntitlementRow, type Plan, resolvePlan };
 
 export const DEFAULT_LIMITS: Record<Plan, number> = { free: 10, premium: 300 };
 
 export const PERIOD_TIME_ZONE = "Europe/Prague";
-
-export interface EntitlementRow {
-  plan?: string | null;
-  valid_until?: string | null;
-}
-
-/** Platný tarif podle řádku entitlements (premium s prošlou platností = free). */
-export function resolvePlan(row: EntitlementRow | null | undefined, now: Date): Plan {
-  if (row?.plan !== "premium") return "free";
-  if (!row.valid_until) return "premium";
-  const until = new Date(row.valid_until);
-  return !Number.isNaN(until.getTime()) && until.getTime() > now.getTime() ? "premium" : "free";
-}
 
 /** Limit pro tarif; lze přepsat proměnnými BODA_LIMIT_FREE / BODA_LIMIT_PREMIUM. */
 export function limitFor(plan: Plan, env: (name: string) => string | undefined = () => undefined): number {

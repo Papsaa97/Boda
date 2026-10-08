@@ -16,6 +16,9 @@ import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
 import 'package:zahradnik_boda/features/inventory/domain/units.dart';
 import 'package:zahradnik_boda/features/tasks/data/drift_task_repository.dart';
 import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
+import 'package:zahradnik_boda/features/weather/data/drift_garden_site_repository.dart';
+import 'package:zahradnik_boda/features/weather/domain/garden_site.dart';
+import 'package:zahradnik_boda/features/weather/domain/weather.dart';
 import 'package:zahradnik_boda/features/zones/data/drift_zone_repository.dart';
 import 'package:zahradnik_boda/features/zones/domain/zone_entity.dart';
 
@@ -61,6 +64,8 @@ class Device {
       DriftInventoryRepository(db, gardenId, clock);
 
   DriftPlanRepository get plan => DriftPlanRepository(db, gardenId, clock);
+  DriftGardenSiteRepository get site =>
+      DriftGardenSiteRepository(db, gardenId, clock);
   DriftIncidentRepository get incidents =>
       DriftIncidentRepository(db, gardenId, clock);
 
@@ -167,6 +172,9 @@ void main() {
       zone.copyWith(polygon: () => bed, layer: ZoneLayer.plan),
     );
     await a.plan.saveOutline(outline);
+    await a.site.saveSite(
+      GardenSite(location: GardenLocation(49.2, 16.61), altitudeM: 237),
+    );
     await a.engine(server).sync();
 
     final z = server.table('zones')['zone-1']!;
@@ -179,6 +187,8 @@ void main() {
     ]);
     final g = server.table('gardens')['garden-a']!;
     expect((g['bounds']! as Map)['outline'], hasLength(4));
+    expect(g['location_lat'], 49.2);
+    expect(g['altitude_m'], 237);
 
     final first = await b.engine(server).sync();
     final remoteId = (first.pairing as PairingConflict).remoteGardenId;
@@ -189,6 +199,10 @@ void main() {
     expect(got.polygon, bed);
     expect(got.layer, ZoneLayer.plan);
     expect(await b.plan.loadOutline(), outline);
+    expect(
+      await b.site.loadSite(),
+      GardenSite(location: GardenLocation(49.2, 16.61), altitudeM: 237),
+    );
   });
 
   test('incidents and stock movements travel to the second phone', () async {

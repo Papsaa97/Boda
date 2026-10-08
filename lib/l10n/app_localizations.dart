@@ -3861,6 +3861,384 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Smaže se karta „{label}“ i její fotky. Úkoly kontrol zůstanou.'**
   String incidentDeleteBody(String label);
+
+  /// No description provided for @weatherTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Počasí a kalendář prací'**
+  String get weatherTitle;
+
+  /// No description provided for @weatherCardSubtitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zálivka podle deště, mráz a co je teď na řadě'**
+  String get weatherCardSubtitle;
+
+  /// No description provided for @weatherSiteTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poloha zahrady'**
+  String get weatherSiteTitle;
+
+  /// No description provided for @weatherSiteNotSet.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poloha není zadaná. Bez ní nejde stáhnout počasí.'**
+  String get weatherSiteNotSet;
+
+  /// No description provided for @weatherSiteSummary.
+  ///
+  /// In cs, this message translates to:
+  /// **'{lat}, {lng} · {altitude}'**
+  String weatherSiteSummary(String lat, String lng, String altitude);
+
+  /// No description provided for @weatherAltitudeValue.
+  ///
+  /// In cs, this message translates to:
+  /// **'{meters} m n. m.'**
+  String weatherAltitudeValue(String meters);
+
+  /// No description provided for @weatherAltitudeFromWeather.
+  ///
+  /// In cs, this message translates to:
+  /// **'{meters} m n. m. (podle počasí)'**
+  String weatherAltitudeFromWeather(String meters);
+
+  /// No description provided for @weatherAltitudeUnknown.
+  ///
+  /// In cs, this message translates to:
+  /// **'výška nezadaná'**
+  String get weatherAltitudeUnknown;
+
+  /// No description provided for @weatherSiteEdit.
+  ///
+  /// In cs, this message translates to:
+  /// **'Upravit polohu'**
+  String get weatherSiteEdit;
+
+  /// No description provided for @weatherSiteSet.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadat polohu'**
+  String get weatherSiteSet;
+
+  /// No description provided for @weatherLocationIntro.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poloha slouží jen pro počasí a kalendář prací. Ukládá se zaokrouhlená na zhruba 1 km.'**
+  String get weatherLocationIntro;
+
+  /// No description provided for @weatherLatLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zeměpisná šířka'**
+  String get weatherLatLabel;
+
+  /// No description provided for @weatherLatHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'např. 49,19'**
+  String get weatherLatHint;
+
+  /// No description provided for @weatherLngLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zeměpisná délka'**
+  String get weatherLngLabel;
+
+  /// No description provided for @weatherLngHint.
+  ///
+  /// In cs, this message translates to:
+  /// **'např. 16,61'**
+  String get weatherLngHint;
+
+  /// No description provided for @weatherAltitudeLabel.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nadmořská výška (m)'**
+  String get weatherAltitudeLabel;
+
+  /// No description provided for @weatherAltitudeHelper.
+  ///
+  /// In cs, this message translates to:
+  /// **'Nepovinné. Když ji nezadáš, vezme se z počasí.'**
+  String get weatherAltitudeHelper;
+
+  /// No description provided for @weatherUseDeviceLocation.
+  ///
+  /// In cs, this message translates to:
+  /// **'Použít polohu telefonu'**
+  String get weatherUseDeviceLocation;
+
+  /// No description provided for @weatherClearLocation.
+  ///
+  /// In cs, this message translates to:
+  /// **'Smazat polohu'**
+  String get weatherClearLocation;
+
+  /// No description provided for @weatherInvalidCoordinate.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej číslo, například 49,19'**
+  String get weatherInvalidCoordinate;
+
+  /// No description provided for @weatherImplausibleLocation.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tahle poloha neleží v Česku. Nejsou šířka a délka prohozené?'**
+  String get weatherImplausibleLocation;
+
+  /// No description provided for @weatherAltitudeInvalid.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej výšku v metrech (0 až 2000)'**
+  String get weatherAltitudeInvalid;
+
+  /// No description provided for @weatherLocationIncomplete.
+  ///
+  /// In cs, this message translates to:
+  /// **'Vyplň šířku i délku, nebo obojí nech prázdné.'**
+  String get weatherLocationIncomplete;
+
+  /// No description provided for @weatherDeviceLocationDisabled.
+  ///
+  /// In cs, this message translates to:
+  /// **'Poloha v telefonu je vypnutá.'**
+  String get weatherDeviceLocationDisabled;
+
+  /// No description provided for @weatherDeviceLocationDenied.
+  ///
+  /// In cs, this message translates to:
+  /// **'Aplikace nemá povolení k poloze. Zadej ji ručně.'**
+  String get weatherDeviceLocationDenied;
+
+  /// No description provided for @weatherDeviceLocationFailed.
+  ///
+  /// In cs, this message translates to:
+  /// **'Polohu telefonu se nepodařilo zjistit.'**
+  String get weatherDeviceLocationFailed;
+
+  /// No description provided for @weatherDeviceLocationUnsupported.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tady polohu telefonu zjistit nejde. Zadej ji ručně.'**
+  String get weatherDeviceLocationUnsupported;
+
+  /// No description provided for @weatherSectionForecast.
+  ///
+  /// In cs, this message translates to:
+  /// **'Počasí'**
+  String get weatherSectionForecast;
+
+  /// No description provided for @weatherUnavailable.
+  ///
+  /// In cs, this message translates to:
+  /// **'Počasí potřebuje připojení k serveru, které tahle verze aplikace nemá.'**
+  String get weatherUnavailable;
+
+  /// No description provided for @weatherNotSignedIn.
+  ///
+  /// In cs, this message translates to:
+  /// **'Pro počasí se přihlas v Nastavení, v části Účet.'**
+  String get weatherNotSignedIn;
+
+  /// No description provided for @weatherNotPremium.
+  ///
+  /// In cs, this message translates to:
+  /// **'Počasí a zálivka podle deště jsou v Premium. Kalendář prací je zdarma.'**
+  String get weatherNotPremium;
+
+  /// No description provided for @weatherShowPremium.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zobrazit Premium'**
+  String get weatherShowPremium;
+
+  /// No description provided for @weatherNoLocation.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zadej polohu zahrady a počasí se stáhne.'**
+  String get weatherNoLocation;
+
+  /// No description provided for @weatherOffline.
+  ///
+  /// In cs, this message translates to:
+  /// **'Bez připojení. Zkusím to znovu později.'**
+  String get weatherOffline;
+
+  /// No description provided for @weatherProviderError.
+  ///
+  /// In cs, this message translates to:
+  /// **'Počasí se teď nepodařilo stáhnout.'**
+  String get weatherProviderError;
+
+  /// No description provided for @weatherRetry.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zkusit znovu'**
+  String get weatherRetry;
+
+  /// No description provided for @weatherFetchedAt.
+  ///
+  /// In cs, this message translates to:
+  /// **'Staženo {time}'**
+  String weatherFetchedAt(String time);
+
+  /// No description provided for @weatherRainLast7.
+  ///
+  /// In cs, this message translates to:
+  /// **'Za posledních 7 dní napršelo {mm} mm'**
+  String weatherRainLast7(String mm);
+
+  /// No description provided for @weatherDayRow.
+  ///
+  /// In cs, this message translates to:
+  /// **'{precip} mm · {tmin} až {tmax} °C'**
+  String weatherDayRow(String precip, String tmin, String tmax);
+
+  /// No description provided for @weatherDayRowNoTemp.
+  ///
+  /// In cs, this message translates to:
+  /// **'{precip} mm'**
+  String weatherDayRowNoTemp(String precip);
+
+  /// No description provided for @weatherSectionWatering.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zálivka'**
+  String get weatherSectionWatering;
+
+  /// No description provided for @weatherWateringEmpty.
+  ///
+  /// In cs, this message translates to:
+  /// **'Žádná zóna teď zálivku neřeší.'**
+  String get weatherWateringEmpty;
+
+  /// No description provided for @weatherAdviceRained.
+  ///
+  /// In cs, this message translates to:
+  /// **'Může počkat: napršelo {mm} mm (práh {threshold} mm)'**
+  String weatherAdviceRained(String mm, String threshold);
+
+  /// No description provided for @weatherAdviceRainExpected.
+  ///
+  /// In cs, this message translates to:
+  /// **'Může počkat: do zítřka má pršet'**
+  String get weatherAdviceRainExpected;
+
+  /// No description provided for @weatherAdviceWater.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zalij podle potřeby: napršelo {mm} z {threshold} mm'**
+  String weatherAdviceWater(String mm, String threshold);
+
+  /// No description provided for @weatherAdviceCovered.
+  ///
+  /// In cs, this message translates to:
+  /// **'Krytá zóna: déšť nedostane, zalij podle potřeby'**
+  String get weatherAdviceCovered;
+
+  /// No description provided for @weatherPostponeButton.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =1{Odložit 1 zálivku} few{Odložit {count} zálivky} other{Odložit {count} zálivek}}'**
+  String weatherPostponeButton(int count);
+
+  /// No description provided for @weatherPostponed.
+  ///
+  /// In cs, this message translates to:
+  /// **'{count, plural, =1{Zálivka odložena o den} few{{count} zálivky odloženy o den} other{{count} zálivek odloženo o den}}'**
+  String weatherPostponed(int count);
+
+  /// No description provided for @weatherAutoPostpone.
+  ///
+  /// In cs, this message translates to:
+  /// **'Odkládat zálivku automaticky'**
+  String get weatherAutoPostpone;
+
+  /// No description provided for @weatherAutoPostponeSubtitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Jednou denně po stažení počasí, když napršelo nebo má pršet'**
+  String get weatherAutoPostponeSubtitle;
+
+  /// No description provided for @weatherFrostTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'Mráz {temp} °C {day}'**
+  String weatherFrostTitle(String temp, String day);
+
+  /// No description provided for @weatherFrostZones.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zakryj nebo ochraň: {zones}'**
+  String weatherFrostZones(String zones);
+
+  /// No description provided for @weatherSectionPhenology.
+  ///
+  /// In cs, this message translates to:
+  /// **'Kalendář prací'**
+  String get weatherSectionPhenology;
+
+  /// No description provided for @weatherPhenologyAltitude.
+  ///
+  /// In cs, this message translates to:
+  /// **'Termíny jsou posunuté pro {altitude}. Řiď se i tím, jak jaro skutečně běží.'**
+  String weatherPhenologyAltitude(String altitude);
+
+  /// No description provided for @weatherPhenologyNow.
+  ///
+  /// In cs, this message translates to:
+  /// **'Teď je čas'**
+  String get weatherPhenologyNow;
+
+  /// No description provided for @weatherPhenologySoon.
+  ///
+  /// In cs, this message translates to:
+  /// **'Brzy přijde'**
+  String get weatherPhenologySoon;
+
+  /// No description provided for @weatherPhenologyEmpty.
+  ///
+  /// In cs, this message translates to:
+  /// **'Teď ani v příštích třech týdnech podle kalendáře nic. Kalendář se řídí druhy zón, které na zahradě máš.'**
+  String get weatherPhenologyEmpty;
+
+  /// No description provided for @weatherPhenologyRange.
+  ///
+  /// In cs, this message translates to:
+  /// **'{from} až {to}'**
+  String weatherPhenologyRange(String from, String to);
+
+  /// No description provided for @weatherPhenologyAddTask.
+  ///
+  /// In cs, this message translates to:
+  /// **'Přidat jako úkol'**
+  String get weatherPhenologyAddTask;
+
+  /// No description provided for @weatherPhenologyTaskAdded.
+  ///
+  /// In cs, this message translates to:
+  /// **'Úkol přidán'**
+  String get weatherPhenologyTaskAdded;
+
+  /// No description provided for @weatherCardNow.
+  ///
+  /// In cs, this message translates to:
+  /// **'Teď je čas: {items}'**
+  String weatherCardNow(String items);
+
+  /// No description provided for @weatherCardRained.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zálivka může počkat: napršelo {mm} mm'**
+  String weatherCardRained(String mm);
+
+  /// No description provided for @weatherCardRainExpected.
+  ///
+  /// In cs, this message translates to:
+  /// **'Zálivka může počkat: do zítřka má pršet'**
+  String get weatherCardRainExpected;
 }
 
 class _AppLocalizationsDelegate

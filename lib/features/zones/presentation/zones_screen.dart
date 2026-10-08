@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../weather/presentation/weather_screen.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../canvas/presentation/canvas_screen.dart';
@@ -185,6 +186,7 @@ class ZonesScreen extends ConsumerWidget {
               for (final zone in active) tile(zone),
               const _PlanCard(),
               const _IncidentsCard(),
+              const WeatherEntryCard(),
               if (planned.isNotEmpty) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
