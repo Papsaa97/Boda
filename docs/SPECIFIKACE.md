@@ -109,7 +109,7 @@ Offline deník → Spolehlivý deník → validace H1    → Chytrý parťák   
 #### MVP 0.1 – Offline deník ✅ (implementováno v PR #1)
 
 **Cíl:** mít použitelný deník pro vlastní zahradu autora.
-**Rozsah:** záznam aktivity (název, datum a čas, zóna ze seznamu, fotka, poznámka); rychlé volby pro častý zápis (Zálivka, Pletí, naposledy použité); deník seřazený od nejnovějšího s detailem, úpravou, smazáním a filtrem podle zóny; správa seznamu zón; úvodní obrazovka „Začít bez registrace“ a výběr zón velkými kartami (onboarding); dashboard „Co dnes?“ počítaný z deníku; statický sezónní tip od Bódi. Bez účtu, bez internetu, bez AI, bez 2D plátna.
+**Rozsah:** záznam aktivity (název, datum a čas, zóna ze seznamu, fotka, poznámka); rychlé volby pro častý zápis (Zálivka, Pletí, naposledy použité); deník seřazený od nejnovějšího s detailem, úpravou, smazáním a filtrem podle zóny; správa seznamu zón; onboarding „Co pěstuješ?“ s výběrem zón velkými kartami (jde přeskočit); dashboard „Co dnes?“ počítaný z deníku; statický sezónní tip od Bódi. Bez účtu, bez internetu, bez AI, bez 2D plátna.
 **Definice hotovo:**
 - [x] Všechny funkce výše fungují na Androidu bez připojení k internetu.
 - [x] Fotka přežije restart aplikace i promazání cache (kopíruje se do složky aplikace).
@@ -126,8 +126,8 @@ Offline deník → Spolehlivý deník → validace H1    → Chytrý parťák   
 4. **Filtrování deníku** podle typu činnosti a fulltext v názvu a poznámce (filtr podle zóny je hotový v 0.1).
 5. **Jednoduché úkoly s připomínkou** (název, termín, zóna, opakování týdně/měsíčně), lokální notifikace s tichými hodinami (kap. 5.3). Dokončení úkolu nabídne vytvořit záznam v deníku.
 6. **Statistika** pro testery: počet záznamů za týden, nejaktivnější zóny (podklad pro H1).
-7. **Světlý motiv** a přepínání podle systému (venku na slunci je tmavý motiv špatně čitelný, kap. 10).
-8. **Technický dluh:** přechod z `hive` na **Drift (SQLite)** s jednorázovou migrací dat z verze 0.1 (kap. 7.1, DECLOG D26), přejmenování `applicationId` z `com.example…` (Google Play ho nepřijme), schéma s verzí, časovými razítky a měkkým mazáním (kap. 8).
+7. **Světlý motiv** a přepínání podle systému (venku na slunci je tmavý motiv špatně čitelný, kap. 10). *(hotovo už v 0.1, DECLOG D36)*
+8. **Technický dluh:** přechod z `hive_ce` (od 0.1 místo `hive`, DECLOG D33) na **Drift (SQLite)** s jednorázovou migrací dat z verze 0.1 (kap. 7.1, DECLOG D26), schéma s verzí, časovými razítky a měkkým mazáním (kap. 8).
 9. **Distribuce:** Google Play interní testování (do 100 testerů).
 
 **Nice-to-have (jen pokud zbude čas):** sklizeň s množstvím (kg/ks), náklady (Kč) u záznamu, porovnání dvou fotek „před a po“, lokalita v onboardingu pro sezónní tipy.
@@ -322,7 +322,7 @@ On-device model (TF Lite / Core ML) je v NÁPADNÍKU: vyžaduje vlastní trénov
 | --- | --- | --- |
 | Aplikace | **Flutter** (Android, iOS, web) | Android první (většina českého trhu, testování bez Macu); iOS od 1.0; web jako doplněk (plánování na velké obrazovce od 1.1). Na webu se Flutter vykresluje přes CanvasKit/Skwasm; na mobilu přes Impeller. Plátno je `CustomPainter`. |
 | Architektura | **Feature-first clean architecture** | `lib/features/<feature>/{domain,data,presentation}`, sdílené věci v `lib/core`. Domain nezávisí na Flutteru ani na databázi. |
-| Stav | **Riverpod**, `AsyncNotifier`/`Notifier`, zápisy přes `AsyncValue.guard()` | `StateNotifier` se v novém kódu nepoužívá (v Riverpodu je legacy). Po odchodu z Hive zmizí kolize generátorů (DECLOG D2), takže Riverpod 3 a generátor `@riverpod` jsou možné; přechod je volitelný. |
+| Stav | **Riverpod**, `AsyncNotifier`/`Notifier`, zápisy přes `AsyncValue.guard()` | `StateNotifier` se v novém kódu nepoužívá (v Riverpodu je legacy). Riverpod 3 je v kódu od 0.1 (DECLOG D33); generátor `@riverpod` je po odchodu z Hive možný, ale volitelný. |
 | Navigace | `Navigator` v 0.x, **GoRouter** od 1.0 | Deep linky z notifikací, návrat z přihlášení (OAuth) a webové URL. |
 | Lokální data | **Drift (SQLite)** od 0.2 | Relační model 1 : 1 se serverovou databází (stejné tabulky a sloupce), transakce (sklad, outbox), fulltext přes FTS5, typované migrace s testy. Na webu přes WebAssembly. Nahrazuje `hive` 2.x, který se neudržuje (DECLOG D26). |
 | Backend (od 1.0) | **Supabase**: PostgreSQL s řádkovým zabezpečením (RLS), Auth, Storage, Edge Functions | Region EU (Frankfurt). Projekty `dev` a `prod`, lokální vývoj přes Supabase CLI. Schéma jako SQL migrace v gitu. Open source, data jdou kdykoli odnést (standardní PostgreSQL). DECLOG D24. |
@@ -511,7 +511,7 @@ Uložené hodnoty jsou anglické klíče, české popisky jsou v lokalizaci.
 1. **Zápis musí být rychlejší než zapomenutí.** Hlavní akce „+ Záznam“ je vždy na jedno klepnutí.
 2. **Venku na slunci, v rukavicích.** Velké dotykové plochy, vysoký kontrast, světlý motiv.
 3. **Klid, ne stres.** Žádné reklamy, žádné agresivní notifikace, upozornění jen když na něm záleží. Tón Bódi: přátelský, věcný, bez poučování.
-4. **Bez registrační zdi.** Aplikace jde používat hned; účet se nabídne až s funkcí, která ho potřebuje (záloha do cloudu, Bóďa). Úvodní obrazovka „Začít bez registrace“ (implementovaná v 0.1) slouží jako přivítání, ale nikdy nesmí účet vyžadovat; host je výchozí stav.
+4. **Bez registrační zdi.** Aplikace jde používat hned; účet se nabídne až s funkcí, která ho potřebuje (záloha do cloudu, Bóďa). Aplikace začíná rovnou onboardingem (10.4), bez úvodní obrazovky a bez volby účtu; host je výchozí stav.
 5. **Data patří uživateli.** Export je vždy zdarma a vždy dostupný.
 
 ### 10.2 Barvy a motivy
