@@ -1,19 +1,21 @@
 # 🪴 Zahradník Bóďa
 
-## Produktová a technická specifikace v2.1
+## Produktová a technická specifikace v2.2
 
 | | |
 | --- | --- |
-| **Verze** | 2.1 (revize v2.0 Master) |
+| **Verze** | 2.2 (v2.1 + Supabase místo Firebase a revize technologií) |
 | **Datum** | 8. 10. 2026 |
 | **Autor** | Michal Papoušek (produkt), revize Claude |
 | **Stav** | Živý dokument. Mění se přes pull request, každá podstatná změna má záznam v [`DECLOG.md`](../DECLOG.md). |
-| **Předchozí verze** | [`docs/archiv/SPECIFIKACE_v2.0.md`](archiv/SPECIFIKACE_v2.0.md) |
+| **Předchozí verze** | v2.1 v historii gitu; v2.0 v [`docs/archiv/SPECIFIKACE_v2.0.md`](archiv/SPECIFIKACE_v2.0.md) |
 
 **Tagline:** *„Tvůj AI parťák na každé semínko i šroubek.“*
 **Poslání:** *Vrátit do zahradničení radost a klid místo stresu a nejistoty.*
 
 > **Co se změnilo proti v2.0 (stručně):** přidány hypotézy a měřitelná kritéria úspěchu; roadmapa rozdělena na menší kroky s jasnou „definicí hotovo“; AI Bóďa přesunut před 2D plátno (hodnota je v radě na míru, ne v kreslení); výpočty dávek dělá kód, ne jazykový model; doplněny chybějící části (entita `Activity` v datovém modelu, záloha a export dat, GDPR, testovací strategie, rizika, sezónnost); zastaralý cíl 100 000 uživatelů do roku 2026 nahrazen cíli po fázích; cena přepracována na roční tarif; AR, IoT a 3D stínování přesunuty do [`NÁPADNÍK.md`](../NAPADNIK.md). Podrobně v kapitole 15 a v DECLOGu.
+>
+> **Co přinesla v2.2:** backend je **Supabase** (PostgreSQL s řádkovým zabezpečením, Auth, Storage, Edge Functions) místo Firebase; lokální databáze je od MVP 0.2 **Drift (SQLite)** místo Hive; doplněny konkrétní volby pro crash reporting, analytiku, platby a push. Technologie v této specifikaci jsou **výchozí volba, ne dogma**: pro každou část se vybírá nástroj, který se na ni hodí nejlépe, a změna se zapíše do DECLOGu (kap. 7.1, 15.2).
 
 ---
 
@@ -33,7 +35,7 @@
 12. [Kvalita a testování](#12-kvalita-a-testování)
 13. [Rizika](#13-rizika)
 14. [Způsob práce](#14-způsob-práce)
-15. [Změny proti v2.0](#15-změny-proti-v20)
+15. [Změny proti v2.0 a v2.1](#15-změny-proti-v20-a-v21)
 16. [Slovníček](#16-slovníček)
 
 ---
@@ -125,7 +127,7 @@ Offline deník → Spolehlivý deník → validace H1    → Chytrý parťák   
 5. **Jednoduché úkoly s připomínkou** (název, termín, zóna, opakování týdně/měsíčně), lokální notifikace s tichými hodinami (kap. 5.3). Dokončení úkolu nabídne vytvořit záznam v deníku.
 6. **Statistika** pro testery: počet záznamů za týden, nejaktivnější zóny (podklad pro H1).
 7. **Světlý motiv** a přepínání podle systému (venku na slunci je tmavý motiv špatně čitelný, kap. 10).
-8. **Technický dluh:** přechod `hive` → `hive_ce` (udržovaná náhrada), přejmenování `applicationId` z `com.example…` (Google Play ho nepřijme), schéma s `schemaVersion` a časovými razítky (kap. 8).
+8. **Technický dluh:** přechod z `hive` na **Drift (SQLite)** s jednorázovou migrací dat z verze 0.1 (kap. 7.1, DECLOG D26), přejmenování `applicationId` z `com.example…` (Google Play ho nepřijme), schéma s verzí, časovými razítky a měkkým mazáním (kap. 8).
 9. **Distribuce:** Google Play interní testování (do 100 testerů).
 
 **Nice-to-have (jen pokud zbude čas):** sklizeň s množstvím (kg/ks), náklady (Kč) u záznamu, porovnání dvou fotek „před a po“, lokalita v onboardingu pro sezónní tipy.
@@ -152,7 +154,7 @@ Vývoj se zpomalí, priorita je **pozorovat**. Opravují se jen chyby a tření 
 6. **Premium a platby** (kap. 11), spuštění na začátku sezóny 2028.
 7. **iOS** (App Store) a crash reporting.
 
-**Definice hotovo:** sada referenčních dotazů pro Bóďu (aspoň 30, včetně příkladů z kap. 5.2) prochází hodnocením kvality ≥ 80 %; žádná referenční odpověď neobsahuje dávku chemického přípravku, která není z etikety; synchronizace přežije souběžnou úpravu na dvou zařízeních bez ztráty dat; zabezpečení Firestore ověřené testy pravidel (emulátor); funguje smazání účtu z aplikace.
+**Definice hotovo:** sada referenčních dotazů pro Bóďu (aspoň 30, včetně příkladů z kap. 5.2) prochází hodnocením kvality ≥ 80 %; žádná referenční odpověď neobsahuje dávku chemického přípravku, která není z etikety; synchronizace přežije souběžnou úpravu na dvou zařízeních bez ztráty dat; řádkové zabezpečení databáze (RLS) ověřené automatickými testy (kap. 8.1, 12.1); funguje smazání účtu z aplikace.
 
 #### MVP 1.1 – 2D plátno
 
@@ -205,7 +207,7 @@ Každý požadavek má ID pro odkazování v PR a testech. Sloupec **Fáze** ř�
 | FR-P5 | Vrstvy **Realita** (aktuální stav) a **Návrh** (plán); prvek z Návrhu lze „zrealizovat“ (přesun do Reality se záznamem v deníku). |
 | FR-P6 | Undo/redo posledních 20 kroků. |
 
-**Výpočty:** souřadnice plátna jsou lokální v metrech (rovina), výměra polygonu se počítá shoelace vzorcem. Pro průniky a sjednocení polygonů použít existující Dart port Turf (balíček `turf`), ne vlastní port. Izoláty jen pokud měření ukáže, že výpočet blokuje UI (pro 300 uzlů to nehrozí).
+**Výpočty:** souřadnice plátna jsou lokální v metrech (rovina), výměra polygonu se počítá shoelace vzorcem ve vlastním kódu (pár řádků, plně pokryté testy). Pro rovinné predikáty (bod v polygonu, obsahuje, protíná) použít existující Dart port Turf (balíček `turf`), ne vlastní port; jeho **geodetické** funkce (plocha, délka) na lokální metrové souřadnice nepoužívat, počítají se zeměpisnými stupni. Pokud bude potřeba ořez a sjednocení polygonů, vybrat udržovanou knihovnu pro rovinný ořez až v 1.1 (DECLOG). Izoláty jen pokud měření ukáže, že výpočet blokuje UI (pro 300 uzlů to nehrozí).
 
 ### 5.2 Asistent Bóďa (MVP 1.0)
 
@@ -228,7 +230,7 @@ Každý požadavek má ID pro odkazování v PR a testech. Sloupec **Fáze** ř�
 2. *Mšice na fazolích:* nejdřív mechanicky/biologicky, chemie až na výslovný dotaz a jen s údaji z etikety, PHI a ochranou včel.
 3. *Dřevěný mostek přes jezírko bez podpěr ve vodě:* orientační rozpětí a průřezy, ochrana dřeva, rozpočet; upozornění na statika.
 
-**Technicky:** volání modelu jde **vždy přes backend** (Cloud Functions), API klíč nikdy není v aplikaci. Backend hlídá limity, loguje náklady na dotaz a odstraňuje z kontextu osobní údaje, které model nepotřebuje. Výběr modelu a poskytovatele je rozhodnutí na začátku 1.0 (zapsat do DECLOG): kritéria kvalita v češtině, cena za dotaz, zpracování dat v EU / smlouva o zpracování (DPA).
+**Technicky:** volání modelu jde **vždy přes backend** (Supabase Edge Function), API klíč nikdy není v aplikaci. Backend hlídá limity, loguje náklady na dotaz a odstraňuje z kontextu osobní údaje, které model nepotřebuje. Výběr modelu a poskytovatele je rozhodnutí na začátku 1.0 (zapsat do DECLOG): kritéria kvalita v češtině, cena za dotaz, zpracování dat v EU / smlouva o zpracování (DPA).
 
 ### 5.3 Úkoly, připomínky a denní přehled
 
@@ -314,19 +316,29 @@ On-device model (TF Lite / Core ML) je v NÁPADNÍKU: vyžaduje vlastní trénov
 
 ### 7.1 Technologie
 
+**Pravidlo výběru:** pro každou část se volí nástroj, který se na ni hodí nejlépe. Tabulka je výchozí volba, ne závazek. Kdo navrhne změnu, zapíše do DECLOGu, co se mění a proč; měnit kvůli změně samotné se nemá. Nová knihovna musí být udržovaná (vydání za posledních 12 měsíců) a mít vhodnou licenci (kap. 12, checklist).
+
 | Vrstva | Volba | Poznámka |
 | --- | --- | --- |
 | Aplikace | **Flutter** (Android, iOS, web) | Android první (většina českého trhu, testování bez Macu); iOS od 1.0; web jako doplněk (plánování na velké obrazovce od 1.1). Na webu se Flutter vykresluje přes CanvasKit/Skwasm; na mobilu přes Impeller. Plátno je `CustomPainter`. |
 | Architektura | **Feature-first clean architecture** | `lib/features/<feature>/{domain,data,presentation}`, sdílené věci v `lib/core`. Domain nezávisí na Flutteru ani na databázi. |
-| Stav | **Riverpod**, `AsyncNotifier`/`Notifier`, zápisy přes `AsyncValue.guard()` | `StateNotifier` se v novém kódu nepoužívá (v Riverpodu je legacy). Generátor `@riverpod` je volitelný (viz DECLOG D2); přejít na Riverpod 3 spolu s přechodem na `hive_ce`. |
-| Navigace | `Navigator` v 0.x, **GoRouter** od 1.0 | Deep linky z notifikací a webové URL. |
-| Lokální data | **Hive CE** (`hive_ce`) v 0.2; před 1.0 rozhodnout o **Drift (SQLite)** | Původní `hive` 2.x se už neudržuje. Pro sklad s transakcemi, dotazy přes víc entit a synchronizaci je SQLite (Drift) vhodnější; rozhodnutí zapsat do DECLOG na začátku 1.0. Repozitáře v domain vrstvě výměnu odstíní. |
-| Backend (od 1.0) | **Firebase**: Auth, Firestore, Storage, Cloud Functions | Region EU (`eur3` / `europe-west3`). Samostatné projekty `dev` a `prod`. |
-| AI (od 1.0) | LLM přes Cloud Functions | Kap. 5.2. Klíče jen na backendu. |
-| Geometrie (1.1) | Vlastní výpočet ploch + balíček `turf` pro průniky | Kap. 5.1. |
-| Notifikace (0.2) | `flutter_local_notifications` + plánovač respektující tiché hodiny | Push (FCM) až pokud bude potřeba ze serveru (V2 počasí). |
-| Monitoring (1.0) | Crashlytics nebo Sentry | Bez osobních údajů v logu. |
-| CI | GitHub Actions: `flutter analyze`, `flutter test` na každý PR | Od 0.2 i build APK jako artefakt. |
+| Stav | **Riverpod**, `AsyncNotifier`/`Notifier`, zápisy přes `AsyncValue.guard()` | `StateNotifier` se v novém kódu nepoužívá (v Riverpodu je legacy). Po odchodu z Hive zmizí kolize generátorů (DECLOG D2), takže Riverpod 3 a generátor `@riverpod` jsou možné; přechod je volitelný. |
+| Navigace | `Navigator` v 0.x, **GoRouter** od 1.0 | Deep linky z notifikací, návrat z přihlášení (OAuth) a webové URL. |
+| Lokální data | **Drift (SQLite)** od 0.2 | Relační model 1 : 1 se serverovou databází (stejné tabulky a sloupce), transakce (sklad, outbox), fulltext přes FTS5, typované migrace s testy. Na webu přes WebAssembly. Nahrazuje `hive` 2.x, který se neudržuje (DECLOG D26). |
+| Backend (od 1.0) | **Supabase**: PostgreSQL s řádkovým zabezpečením (RLS), Auth, Storage, Edge Functions | Region EU (Frankfurt). Projekty `dev` a `prod`, lokální vývoj přes Supabase CLI. Schéma jako SQL migrace v gitu. Open source, data jdou kdykoli odnést (standardní PostgreSQL). DECLOG D24. |
+| Synchronizace (1.0) | **Vlastní outbox** nad Drift → Supabase | Kap. 7.4. Záložní varianta, pokud vlastní synchronizace nebude stačit (sdílení ve V2): PowerSync. |
+| Přihlášení (1.0) | **Supabase Auth**: Google (nativní přihlášení + `signInWithIdToken`), Apple, e-mail s jednorázovým kódem | Bez hesel. Host (bez účtu) je výchozí stav (kap. 10.1). |
+| Fotky v cloudu (1.0) | **Supabase Storage**, soukromý bucket | Náhled (~400 px) se dělá v telefonu, nahrávají se oba soubory. Přístup přes pravidla RLS podle členství v zahradě. |
+| Serverová logika (1.0) | **Supabase Edge Functions** (TypeScript) | Bóďa (volání LLM, limity, náklady), webhook plateb, smazání účtu. Tajné klíče jen v secrets Edge Functions. |
+| AI (od 1.0) | LLM přes Edge Function | Kap. 5.2. Poskytovatel se vybere na začátku 1.0 podle kvality češtiny, ceny za dotaz a zpracování v EU (DPA). |
+| Diagnostika z fotek (V2) | Multimodální LLM přes Edge Function | Specializované API na choroby rostlin jako alternativa, porovnat na stejné sadě fotek. Kap. 5.5b. |
+| Geometrie (1.1) | Vlastní výpočet ploch + `turf` pro rovinné predikáty | Kap. 5.1. |
+| Notifikace (0.2) | `flutter_local_notifications` + plánovač respektující tiché hodiny | Push ze serveru až ve V2 (počasí, sdílení): FCM jen jako doručovací kanál, odesílá Edge Function. |
+| Crash reporting (1.0) | **Sentry** (datové centrum v EU) | Bez osobních údajů v logu. Firebase Crashlytics odpadá spolu s Firebase. |
+| Analytika (1.0) | **PostHog** (EU cloud) | Jen se souhlasem (kap. 9). Měření H1–H4 včetně kohort a meziroční retence. |
+| Platby (1.0) | **RevenueCat** nad Google Play Billing a App Store | Předplatné digitální služby musí jít přes obchody. RevenueCat řeší obě platformy, obnovy a zkušební verzi; webhook do Edge Function zapíše nárok na Premium. |
+| Lokalizace (0.2) | `flutter_localizations` + ARB soubory (`gen-l10n`) | NFR-7. |
+| CI | GitHub Actions: `flutter analyze`, `flutter test` na každý PR | Od 0.2 i build APK jako artefakt; od 1.0 i testy databáze (`supabase test db`). iOS build přes macOS runner nebo Codemagic. |
 
 ### 7.2 Struktura kódu (cílová)
 
@@ -344,7 +356,7 @@ lib/
     assistant/   # Bóďa (1.0)
     account/     # účet, sync (1.0)
     canvas/      # 2D plátno (1.1)
-functions/       # Cloud Functions (1.0), TypeScript
+supabase/        # (1.0) migrations/ (SQL), functions/ (Edge Functions, TypeScript), tests/ (testy RLS)
 docs/            # specifikace, formát exportu, ADR
 ```
 
@@ -360,79 +372,101 @@ docs/            # specifikace, formát exportu, ADR
 
 **Lokální databáze je vždy zdroj pravdy**, cloud je záloha a most mezi zařízeními. Díky tomu režim bez registrace funguje stejně jako s účtem a aplikace nikdy nečeká na síť.
 
-- Každý dokument má `updatedAt` a `deletedAt` (měkké mazání, aby se smazání propsalo na ostatní zařízení).
-- Změny se zapisují do lokální fronty (outbox) a odesílají na pozadí; konflikt řeší **poslední zápis vyhrává** na úrovni dokumentu (pro deník jednoho uživatele dostačuje; u sdílených zahrad ve V2 přehodnotit).
-- Fotky se nahrávají zvlášť, ve výchozím stavu jen přes Wi-Fi; v cloudu se ukládá i náhled (~400 px).
+- Každý řádek má `updated_at` (čas změny na zařízení) a `deleted_at` (měkké mazání, aby se smazání propsalo na ostatní zařízení). Server navíc při každém zápisu nastaví `server_updated_at`; podle něj se stahují změny, aby nevadily rozdílně nastavené hodiny telefonů.
+- Změny se ve stejné transakci zapíší do lokální fronty (`sync_outbox`) a odesílají na pozadí jako `upsert` podle `id`. Konflikt řeší **poslední zápis vyhrává** podle `updated_at` na úrovni řádku; databázový trigger odmítne zápis starší, než je uložená verze. Pro deník jednoho uživatele to stačí; u sdílených zahrad ve V2 přehodnotit.
+- Stahování: řádky zahrad, kde je uživatel členem, se `server_updated_at` větším než poslední stažený. Realtime odběr změn jen pokud bude potřeba (sdílení ve V2).
+- Fotky se nahrávají zvlášť, ve výchozím stavu jen přes Wi-Fi; v cloudu se ukládá i náhled (~400 px) vytvořený v telefonu.
 - První přihlášení: nahrát lokální data do nové zahrady v cloudu; přihlášení na druhém zařízení s lokálními daty nabídne sloučit nebo nahradit.
-- Alternativa „Firestore jako lokální úložiště (offline cache SDK)“ byla zvážena: je jednodušší, ale režim bez účtu by potřeboval anonymní přihlášení (první spuštění online) a cache není zaručená trvalá úložiště. Konečné rozhodnutí ADR na začátku 1.0.
+- Supabase nemá offline SDK jako Firestore; vlastní outbox je proto nutnost, ne volba navíc. Hotová alternativa je **PowerSync** (synchronizační služba nad Supabase se SQLite v telefonu); zvážit, pokud se vlastní synchronizace ukáže jako křehká, hlavně se sdílením ve V2. Drift obě cesty nechává otevřené.
 
 ---
 
 ## 8. Datový model
 
-Jeden logický model pro lokální databázi i Firestore. Názvy polí v **camelCase** (konvence Dartu; v2.0 míchala snake_case). Firestore struktura je navržená **od začátku pro sdílení** (V2), aby se nemusela později migrovat: zahrady jsou kolekce nejvyšší úrovně s mapou členů, ne podkolekce uživatele.
+Jeden logický model pro lokální databázi (Drift), serverovou databázi (PostgreSQL v Supabase) i export. Pojmenování:
 
-### 8.1 Firestore (od 1.0)
+- **V databázích snake_case** (`occurred_at`, `zone_id`): konvence PostgreSQL a výchozí chování Driftu, takže lokální a serverové tabulky mají stejné názvy sloupců.
+- **V Dartu a v JSON exportu camelCase** (`occurredAt`, `zoneId`); převod dělá datová vrstva.
+- Uložené hodnoty číselníků jsou anglické klíče (kap. 8.3), české popisky jsou v lokalizaci.
+
+Schéma je navržené **od začátku pro sdílení** (V2), aby se nemuselo později migrovat: data patří zahradě, ne uživateli, a členství je samostatná tabulka.
+
+### 8.1 PostgreSQL v Supabase (od 1.0)
+
+Společné pro všechny tabulky se synchronizovanými daty: `id uuid` (primární klíč generovaný v zařízení), `created_at`, `updated_at`, `deleted_at?` (měkké mazání), `server_updated_at` (nastavuje server, kap. 7.4). Číselníky jsou `text` s kontrolou `check (… in (…))`, ne typ `enum` (snáz se rozšiřují). Čas je `timestamptz` v UTC.
 
 ```
-users/{uid}
-  displayName, createdAt
-  settings: { quietHoursStart: "21:00", quietHoursEnd: "08:00", theme: "system", digest: "daily" }
-  consents: { analytics: {granted, at}, photoUpload: {granted, at}, aiProcessing: {granted, at}, policyVersion }
-  plan: "free" | "premium", planValidUntil            # zapisuje jen backend
+profiles                       # 1 řádek na uživatele, id = auth.users.id
+  id, display_name?, created_at, updated_at
+  settings jsonb      { quietHoursStart: "21:00", quietHoursEnd: "08:00", theme: "system", digest: "daily" }
+  consents jsonb      { analytics: {granted, at}, photoUpload: {granted, at}, aiProcessing: {granted, at}, policyVersion }
 
-gardens/{gardenId}
-  name, ownerId, members: { <uid>: "owner" | "editor" | "viewer" }
-  location: { lat, lng }        # zaokrouhleno na 2 desetinná místa (~1 km), volitelné
-  altitudeM?, createdAt, updatedAt, deletedAt?, schemaVersion
-  bounds?: [ {x, y} ], scaleMetersPerUnit?             # 2D plátno, 1.1
+entitlements                   # nárok na Premium; zapisuje JEN backend (webhook plateb), uživatel jen čte
+  user_id (PK → auth.users), plan: 'free' | 'premium', valid_until?, source: 'play' | 'appstore' | 'promo', updated_at
 
-  zones/{zoneId}
-    name, type, areaM2?, soilTexture?, ph?, phMeasuredAt?, sunExposure?, irrigation?, covered: bool
-    polygon?: [ {x, y} ], layer?: "reality" | "plan"   # 1.1
-    archived: bool, createdAt, updatedAt, deletedAt?
+gardens
+  id, name, owner_id → auth.users
+  location_lat?, location_lng?   # numeric zaokrouhlené na 2 desetinná místa (~1 km), volitelné
+  altitude_m?, bounds jsonb?, scale_meters_per_unit?    # bounds a měřítko: 2D plátno, 1.1
 
-  activities/{activityId}
-    type, title, occurredAt, occurredTz, zoneId, notes?
-    photoIds: [ ], harvest?: { qty, unit }, costCzk?
-    taskId?, materialsUsed?: [ { itemId, qty, unit } ]
-    createdAt, updatedAt, deletedAt?
+garden_members                 # PK (garden_id, user_id)
+  garden_id → gardens, user_id → auth.users, role: 'owner' | 'editor' | 'viewer', created_at
 
-  photos/{photoId}
-    activityId?, incidentId?, storagePath, thumbPath, width, height, takenAt
-    createdAt, deletedAt?                              # lokální cesta se do cloudu neukládá
+zones
+  garden_id → gardens, name, type, area_m2?, soil_texture?, ph?, ph_measured_at?, sun_exposure?, irrigation?
+  covered bool, archived bool
+  polygon jsonb?, layer?: 'reality' | 'plan'           # 1.1
 
-  tasks/{taskId}
-    title, zoneId?, due, rrule?, snoozedUntil?, status: "open" | "done" | "skipped"
-    durationEstMin?, tools?: [ ], materials?: [ { itemId, qty, unit } ]
-    completedAt?, completedActivityId?, source: "user" | "boda" | "weather"
-    createdAt, updatedAt, deletedAt?
+activities
+  garden_id, zone_id → zones, type, title, occurred_at, occurred_tz, notes?
+  harvest_qty?, harvest_unit?, cost_czk?, task_id? → tasks
 
-  inventory/{itemId}
-    category: "seed" | "fertilizer" | "plantProtection" | "tool" | "other"
-    name, unit, stockQty, lowStockThreshold?
-    seed?: { species, variety, lot, bestBefore }
-    fertilizer?: { n, p, k, form }
-    plantProtection?: { activeSubstance, authorizationNo, phiDays, nonProfessional: bool }
-    tool?: { condition, serviceIntervalDays, lastServiceAt }
-    createdAt, updatedAt, deletedAt?
-    movements/{movementId}                              # V2: odpis
-      qtyDelta, reason: "purchase" | "task" | "manual" | "reversal", taskId?, at
+activity_materials             # 1.0, spotřebovaný materiál; PK (activity_id, item_id)
+  activity_id → activities, item_id → inventory_items, qty, unit
 
-  incidents/{incidentId}                                # V2
-    zoneId, label, source: "user" | "model", candidates?: [ {label, note} ]
-    planBio?, planChem?, followUps: [ { taskId } ], photoIds: [ ], status: "open" | "resolved"
-    createdAt, updatedAt, deletedAt?
+photos
+  garden_id, activity_id?, incident_id?, storage_path, thumb_path, width, height, taken_at
+                                                       # lokální cesta k souboru se na server neukládá
 
-  assistantThreads/{threadId}/messages/{messageId}      # 1.0, volitelně jen lokálně
-    role, text, contextSummary?, feedback?: "up" | "down", createdAt
+tasks
+  garden_id, title, zone_id?, due, rrule?, snoozed_until?, status: 'open' | 'done' | 'skipped'
+  duration_est_min?, tools text[]?, completed_at?, completed_activity_id?, incident_id?
+  source: 'user' | 'boda' | 'weather'
+
+task_materials                 # 1.0; PK (task_id, item_id)
+  task_id → tasks, item_id → inventory_items, qty, unit
+
+inventory_items
+  garden_id, category: 'seed' | 'fertilizer' | 'plantProtection' | 'tool' | 'other'
+  name, unit, stock_qty, low_stock_threshold?
+  details jsonb       # podle kategorie:
+                      #   seed            { species, variety, lot, bestBefore }
+                      #   fertilizer      { n, p, k, form }
+                      #   plantProtection { activeSubstance, authorizationNo, phiDays, nonProfessional }  (povinné, check)
+                      #   tool            { condition, serviceIntervalDays, lastServiceAt }
+
+inventory_movements            # V2: odpis; jen přibývají, nemění se
+  item_id → inventory_items, qty_delta, reason: 'purchase' | 'task' | 'manual' | 'reversal', task_id?, at
+
+incidents                      # V2; kontroly D+3 a D+7 jsou úkoly s incident_id
+  garden_id, zone_id, label, source: 'user' | 'model', candidates jsonb?, plan_bio?, plan_chem?
+  status: 'open' | 'resolved'
+
+assistant_threads, assistant_messages                  # 1.0, ve výchozím stavu jen lokálně
+  role, text, context_summary?, feedback?: 'up' | 'down', created_at
 ```
 
-**Bezpečnostní pravidla (princip):** zahradu čte jen člen (`request.auth.uid in resource.data.members`), zapisuje vlastník a editor; `plan` a `planValidUntil` zapisuje jen backend; každé pravidlo má test v emulátoru.
+**Zabezpečení (RLS, princip):**
+- RLS je zapnuté na **každé** tabulce; tabulka bez pravidel je nedostupná.
+- Pomocná funkce `is_garden_member(garden_id, roles)` (v neveřejném schématu, `security definer`) rozhoduje o přístupu ke všem datům zahrady: číst smí každý člen, zapisovat `owner` a `editor`, členy spravuje jen `owner`.
+- `profiles`: každý jen svůj řádek. `entitlements`: uživatel jen čte svůj řádek, zapisuje výhradně Edge Function se servisní rolí.
+- Storage: soukromý bucket `photos`, cesta `<gardenId>/<photoId>.jpg` a `<gardenId>/<photoId>_thumb.jpg`; pravidla nad `storage.objects` ověřují členství podle první složky cesty.
+- Každé pravidlo má automatický test (pgTAP, `supabase test db`): cizí uživatel nic nepřečte, `viewer` nezapíše, nikdo kromě backendu nezmění `entitlements`. Testy běží v CI.
+- Servisní klíč (service role) je jen v Edge Functions; v aplikaci je jen veřejný (publishable) klíč, který bez RLS k ničemu nepustí.
 
-### 8.2 Lokální úložiště (0.x)
+### 8.2 Lokální úložiště (0.x, Drift)
 
-Stejné entity a názvy polí jako výše, bez `gardens` (v 0.x je jedna implicitní zahrada). Fotky jako soubory ve složce aplikace, v záznamu jen relativní cesta. Každý box/tabulka má `schemaVersion` kvůli migracím.
+Stejné tabulky a sloupce jako v 8.1, bez `profiles`, `entitlements` a `garden_members`. V 0.x je jedna implicitní zahrada s UUID vygenerovaným při prvním spuštění; při prvním přihlášení v 1.0 se nahraje jako nová zahrada. Od 1.0 přibude tabulka `sync_outbox` (kap. 7.4). Fotky jsou soubory ve složce aplikace, v databázi jen relativní cesta. Verze schématu je Drift `schemaVersion`; každá změna má migraci a test (Drift umí uložit snímek schématu každé verze a ověřit migraci z libovolné starší). Data z Hive (MVP 0.1) se při prvním spuštění 0.2 jednorázově převedou.
 
 ### 8.3 Číselníky
 
@@ -460,12 +494,12 @@ Uložené hodnoty jsou anglické klíče, české popisky jsou v lokalizaci.
 
 | Oblast | Požadavek |
 | --- | --- |
-| Zásady ochrany soukromí | Veřejná stránka (CZ), odkaz v aplikaci i v obchodech. Kdo je správce, jaká data, proč, jak dlouho, kteří zpracovatelé (Google Firebase, poskytovatel LLM, platby). |
+| Zásady ochrany soukromí | Veřejná stránka (CZ), odkaz v aplikaci i v obchodech. Kdo je správce, jaká data, proč, jak dlouho, kteří zpracovatelé (Supabase, poskytovatel LLM, Sentry, PostHog, RevenueCat, Google Play a App Store). |
 | Souhlasy | Odděleně a odvolatelně: odesílání fotek k diagnostice, zpracování dotazů AI, analytika. Bez souhlasu s analytikou se nic analytického neodesílá. Záznam verze a času souhlasu. |
-| Práva subjektu | Export dat (čl. 20) a **smazání účtu přímo v aplikaci i přes web** (vyžaduje i Google Play a App Store). Smazání odstraní data z Firestore i Storage do 30 dní. |
+| Práva subjektu | Export dat (čl. 20) a **smazání účtu přímo v aplikaci i přes web** (vyžaduje i Google Play a App Store). Smazání (Edge Function) odstraní účet, data v databázi i fotky ve Storage do 30 dní; zahrady sdílené s jinými členy předá dalšímu vlastníkovi nebo smaže. |
 | Minimalizace | Poloha zahrady zaokrouhlená (~1 km); z fotek se před nahráním odstraňují EXIF data včetně GPS; do LLM jde jen kontext potřebný k odpovědi, bez jména a e-mailu. |
-| Umístění dat | Firebase v EU; u poskytovatele LLM smlouva o zpracování (DPA) a ideálně zpracování v EU, bez použití dat k trénování. |
-| Bezpečnost | Firestore pravidla s testy; žádné klíče v aplikaci (kontrola v CI přes secret scanning); App Check proti zneužití backendu; limity na Cloud Functions proti nákladovým útokům. |
+| Umístění dat | Supabase, Sentry i PostHog v EU (Frankfurt); u poskytovatele LLM smlouva o zpracování (DPA) a ideálně zpracování v EU, bez použití dat k trénování. |
+| Bezpečnost | RLS na každé tabulce a v úložišti fotek, s testy (kap. 8.1); v aplikaci jen veřejný klíč, servisní a API klíče jen v Edge Functions (kontrola v CI přes secret scanning); Edge Functions vyžadují přihlášení a hlídají limity na uživatele proti nákladovým útokům; zapnutý strop útrat v Supabase a limit útraty u poskytovatele LLM; CAPTCHA u registrace e-mailem. |
 | Děti | Aplikace není určena dětem do 15 let (nesbírá se věk, uvedeno v zásadách). |
 
 ---
@@ -565,7 +599,7 @@ Na trhu existují zahradnické deníky (např. Gardenize), plánovače záhonů 
 | **Widget** | Klíčové obrazovky: zápis záznamu, deník, zóny, úkoly; stavy načítání/chyby/prázdno. | Každá nová obrazovka. |
 | **Integrační** | Šťastná cesta „první spuštění → záznam s fotkou → zobrazení v deníku → export → import“. | Od 0.2, v CI na emulátoru. |
 | **Migrace** | Data uložená předchozí verzí se po aktualizaci načtou. | Každá změna schématu. |
-| **Pravidla Firestore** | Testy v emulátoru: cizí uživatel nic nepřečte, člen bez práv nezapíše. | Od 1.0. |
+| **Zabezpečení databáze** | Testy RLS (pgTAP, `supabase test db`) proti lokální Supabase: cizí uživatel nic nepřečte, člen bez práv nezapíše, `entitlements` mění jen backend. | Od 1.0, v CI. |
 | **Kvalita Bódi** | Sada ≥ 30 referenčních dotazů s očekávanými vlastnostmi odpovědi (obsahuje dávku z kalkulátoru, nevymýšlí chemii, zmíní PHI…); hodnotí se automaticky (kontroly) + ručně před vydáním. | Od 1.0, při každé změně promptu nebo modelu. |
 | **Ruční** | Krátký checklist před vydáním: režim letadlo, venku na slunci, velké písmo, starý telefon. | Každé vydání. |
 
@@ -593,7 +627,9 @@ Viz [`CODE_REVIEW_CHECKLIST.md`](../CODE_REVIEW_CHECKLIST.md). Minimum: CI zelen
 | **Náklady na AI převýší příjmy** | střední | střední | Měření nákladu na dotaz, limity ve Free, fair-use v Premium, levnější model pro jednoduché dotazy. |
 | **Sezónnost** zabije retenci | vysoká | střední | Zimní funkce, roční tarif, měření H4. |
 | **Licence dat** (počasí, mapy, registr přípravků) | střední | střední | Před V2 ověřit licenci pro komerční použití; mapové dlaždice nestahovat. |
-| **Opuštěné knihovny** (`hive` 2.x) | už nastalo | nízký | Přechod na `hive_ce` v 0.2, repozitáře odstiňují úložiště. |
+| **Opuštěné knihovny** (`hive` 2.x) | už nastalo | nízký | Přechod na Drift v 0.2, repozitáře odstiňují úložiště. |
+| **Závislost na poskytovateli backendu** | nízká | střední | Supabase je open source nad standardním PostgreSQL: schéma je v gitu jako SQL migrace, data jdou vyexportovat a projekt jde provozovat i u jiného poskytovatele. Žádná logika jen v klikacím rozhraní. |
+| **Náklady a uspání projektu** | střední | nízký | Bezplatný tarif Supabase uspí neaktivní projekt; `prod` proto od spuštění na placeném tarifu (Pro), `dev` může zůstat zdarma. Strop útrat zapnutý. |
 | **Závislost na jednom vývojáři / AI nástrojích** | vysoká | střední | Repo jako jediný zdroj pravdy (spec, DECLOG, README), CI, čitelný kód s testy. |
 
 ---
@@ -611,7 +647,9 @@ Povinné soubory repozitáře: `README.md`, `DECLOG.md`, `ENVIRONMENT.md`, `NAPA
 
 ---
 
-## 15. Změny proti v2.0
+## 15. Změny proti v2.0 a v2.1
+
+### 15.1 Změny proti v2.0 (v2.1)
 
 | # | Kapitola v2.0 | Změna | Důvod |
 | --- | --- | --- | --- |
@@ -634,6 +672,19 @@ Povinné soubory repozitáře: `README.md`, `DECLOG.md`, `ENVIRONMENT.md`, `NAPA
 | 17 | 9 Metodika | Repo jako jediný zdroj pravdy, práce přes vlákna a draft PR | Projekt se přesunul sem; „neomylná“ externí paměť se nedá ověřit ani verzovat. |
 | 18 | – | Nové kapitoly Testování (12) a Rizika (13) | Chyběly úplně. |
 | 19 | celé | Opraveny překlepy a směs jazyků („Chemia“, „lhutu“, „bridges/mostků“, „full slunce“) | Čitelnost. |
+
+### 15.2 Změny ve v2.2 (8. 10. 2026)
+
+Papi rozhodl: backend bude Supabase a technologie ve specifikaci jsou předloha, ne závazek; pro každou část se má vybrat to správné. Podrobnosti a důvody v DECLOGu (D24–D32).
+
+| # | Kapitola | Změna | Důvod |
+| --- | --- | --- | --- |
+| 1 | 7.1, 8, 9, 12 | Firebase → **Supabase** (PostgreSQL + RLS, Auth, Storage, Edge Functions); schéma Firestore převedeno na tabulky PostgreSQL; pravidla Firestore → RLS s testy pgTAP | Data deníku, zón a skladu jsou relační; SQL, transakce a joiny; předvídatelná cena místo platby za každé čtení a zápis; open source a přenositelná data. |
+| 2 | 4.2, 7.1, 8.2 | Lokální databáze: `hive_ce` → **Drift (SQLite)** už od 0.2 | Model 1 : 1 se serverem, FTS5 pro fulltext, transakce pro sklad a outbox; jedna migrace dat před příchodem testerů místo dvou. |
+| 3 | 7.4 | Synchronizace: vlastní outbox s `server_updated_at` a triggerem „poslední zápis vyhrává“; PowerSync jako záložní varianta | Supabase nemá offline SDK; čas serveru řeší rozdílné hodiny telefonů. |
+| 4 | 7.1 | Doplněny konkrétní volby: Sentry, PostHog (EU), RevenueCat, FCM jen jako doručovací kanál push | Crashlytics a Firebase Analytics odpadly s Firebase; platby a analytika ve spec neměly technologii. |
+| 5 | 5.1 | `turf` jen pro rovinné predikáty, ne geodetickou plochu | Plátno má lokální souřadnice v metrech, geodetické funkce počítají ve stupních. |
+| 6 | 8 | Pojmenování: snake_case v databázích, camelCase v Dartu a exportu | Konvence PostgreSQL a Driftu; v Dartu zůstává camelCase. |
 
 ---
 

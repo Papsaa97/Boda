@@ -34,9 +34,10 @@ GitHub Actions (`.github/workflows/ci.yml`) na každý push a PR spustí `flutte
 
 ## Prostředí backendu (od MVP 1.0)
 
-Zatím žádný backend není. Až přijde Firebase:
+Zatím žádný backend není. Backend bude **Supabase** (DECLOG D24):
 
-* Dva projekty: `zahradnik-boda-dev` a `zahradnik-boda-prod`, region EU (`eur3` / `europe-west3`).
-* Přepínání přes Flutter flavors (`dev`, `prod`) a `flutterfire configure` pro každý projekt.
-* Konfigurační soubory Firebase (`google-services.json`, `GoogleService-Info.plist`, `firebase_options.dart`) nejsou tajné, ale API klíče LLM a platebních bran ano: ty patří **jen** do Cloud Functions (Secret Manager), nikdy do aplikace ani do gitu.
-* Lokální vývoj backendu přes Firebase Emulator Suite; testy bezpečnostních pravidel běží proti emulátoru.
+* Dva projekty v regionu EU (Frankfurt, `eu-central-1`): `zahradnik-boda-dev` (bezplatný tarif stačí, při neaktivitě se uspí) a `zahradnik-boda-prod` (placený tarif Pro, aby se neuspal; zapnutý strop útrat). Aktuální ceník ověřit při zakládání.
+* Lokální vývoj přes [Supabase CLI](https://supabase.com/docs/guides/local-development) (`supabase start`, potřebuje Docker). Schéma jako SQL migrace v `supabase/migrations/`, Edge Functions v `supabase/functions/`, testy RLS v `supabase/tests/` (`supabase test db`, běží i v CI).
+* Přepínání prostředí přes Flutter flavors (`dev`, `prod`); URL projektu a veřejný (publishable) klíč se předávají přes `--dart-define-from-file` a nejsou tajné, protože přístup hlídá RLS.
+* **Tajné** jsou servisní klíč Supabase (service role), API klíče LLM, RevenueCat a FCM: patří **jen** do secrets Edge Functions (`supabase secrets set`), nikdy do aplikace ani do gitu.
+* Další účty, které 1.0 potřebuje (zakládá Papi): Sentry (EU), PostHog (EU), RevenueCat, Google Cloud OAuth klient pro přihlášení Googlem, Apple Developer Program, poskytovatel LLM.
