@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/widgets/discard_guard.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/formatting/dates.dart';
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../activity/domain/activity_entity.dart';
 import '../../activity/presentation/widgets/activity_photo.dart';
 import '../../tasks/domain/task_entity.dart';
 import '../../tasks/presentation/task_ui.dart';
 import '../../tasks/presentation/tasks_controller.dart';
+import '../../zones/domain/zone_entity.dart';
 import '../../zones/presentation/zones_controller.dart';
 import '../domain/diagnosis.dart';
 import '../domain/incident.dart';
@@ -43,7 +46,7 @@ class IncidentsScreen extends ConsumerWidget {
       body: async.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(l.commonErrorWithDetail('$e'))),
+        error: (e, stack) => LoadErrorView(error: e, stack: stack),
         data: (incidents) {
           if (incidents.isEmpty) {
             return Center(
@@ -141,6 +144,24 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
   late List<IncidentCandidate> _candidates =
       widget.initial?.candidates ?? const [];
   bool _saving = false;
+  late final String _initialState;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialState = _snapshot();
+  }
+
+  String _snapshot() => [
+    _label.text,
+    _bio.text,
+    _chem.text,
+    _zoneId,
+    _photos.length,
+    _photos.map((p) => p.saved?.id ?? p.picked?.path).join(','),
+    _source,
+    _candidates.length,
+  ].join('|');
 
   @override
   void dispose() {
@@ -171,15 +192,24 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
         ),
       ),
     );
-    if (source == null) return;
-    final picked = await ImagePicker().pickImage(
-      source: source,
-      maxWidth: 1920,
-      maxHeight: 1920,
-      imageQuality: 80,
-    );
+    if (source == null || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    XFile? picked;
+    try {
+      picked = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 80,
+      );
+    } on Exception catch (e) {
+      debugPrint('Výběr fotky selhal: $e');
+      messenger.showSnackBar(SnackBar(content: Text(l.photoPickFailed)));
+      return;
+    }
     if (picked == null || !mounted) return;
-    setState(() => _photos = [..._photos, _PhotoItem.picked(picked)]);
+    final file = picked;
+    setState(() => _photos = [..._photos, _PhotoItem.picked(file)]);
   }
 
   Future<Uint8List?> _photoBytes(_PhotoItem item) async {
@@ -274,53 +304,71 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
     final storage = ref.read(photoStorageProvider);
     final newId = ref.read(newIdProvider);
     final photos = <PhotoRef>[];
-    for (final item in _photos) {
-      final picked = item.picked;
-      if (picked == null) {
-        photos.add(item.saved!);
-        continue;
-      }
-      final id = newId();
-      photos.add(
-        PhotoRef(
-          id: id,
-          path: await storage.persist(picked, baseName: id),
-        ),
-      );
-    }
+    final added = <PhotoRef>[];
     final controller = ref.read(incidentsControllerProvider.notifier);
     final label = _label.text.trim();
     final initial = widget.initial;
-    if (initial == null) {
-      await controller.create(
-        zoneId: zoneId,
-        label: label,
-        planBio: _bio.text,
-        planChem: _chem.text,
-        photos: photos,
-        source: _source,
-        candidates: _candidates,
-        checkTitle: (day) => l.incidentCheckTask(day, label),
-      );
-    } else {
-      await controller.save(
-        initial.copyWith(
+    var failed = false;
+    try {
+      for (final item in _photos) {
+        final picked = item.picked;
+        if (picked == null) {
+          photos.add(item.saved!);
+          continue;
+        }
+        final id = newId();
+        final ref = PhotoRef(
+          id: id,
+          path: await storage.persist(picked, baseName: id),
+        );
+        photos.add(ref);
+        added.add(ref);
+      }
+      if (initial == null) {
+        await controller.create(
           zoneId: zoneId,
           label: label,
+          planBio: _bio.text,
+          planChem: _chem.text,
+          photos: photos,
           source: _source,
           candidates: _candidates,
-          planBio: () => _bio.text,
-          planChem: () => _chem.text,
-          photos: photos,
-        ),
-      );
+          checkTitle: (day) => l.incidentCheckTask(day, label),
+        );
+      } else {
+        await controller.save(
+          initial.copyWith(
+            zoneId: zoneId,
+            label: label,
+            source: _source,
+            candidates: _candidates,
+            planBio: () => _bio.text,
+            planChem: () => _chem.text,
+            photos: photos,
+          ),
+        );
+      }
+      failed = ref.read(incidentsControllerProvider).hasError;
+    } on Exception catch (e) {
+      debugPrint('Uložení problému selhalo: $e');
+      failed = true;
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
-    if (!mounted) return;
-    setState(() => _saving = false);
-    if (ref.read(incidentsControllerProvider).hasError) {
+    if (failed) {
+      // Nově zkopírované fotky by zůstaly bez záznamu.
+      for (final p in added) {
+        await storage.delete(p.path);
+      }
       messenger.showSnackBar(SnackBar(content: Text(l.incidentSaveFailed)));
       return;
     }
+    // Fotky odebrané při úpravě už nic nepotřebuje.
+    final kept = {for (final p in photos) p.path};
+    for (final p in initial?.photos ?? const <PhotoRef>[]) {
+      if (!kept.contains(p.path)) await storage.delete(p.path);
+    }
+    if (!mounted) return;
     if (initial == null) {
       messenger.showSnackBar(SnackBar(content: Text(l.incidentCreated)));
     }
@@ -332,155 +380,173 @@ class _IncidentFormState extends ConsumerState<IncidentFormScreen> {
     final l = AppLocalizations.of(context);
     final zones = ref.watch(activeZonesProvider);
     final zoneIds = {for (final z in zones) z.id};
+    final current = zoneIds.contains(_zoneId)
+        ? null
+        : (ref.watch(zonesControllerProvider).value ?? const <ZoneEntity>[])
+              .where((z) => z.id == _zoneId)
+              .firstOrNull;
     final diagnosisAvailable = ref.watch(diagnosisBackendProvider).available;
     final diagnosing = ref.watch(diagnosisControllerProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.initial == null ? l.incidentNew : l.incidentEditTitle,
-        ),
-        actions: [
-          TextButton(
-            onPressed: _saving ? null : _submit,
-            child: Text(l.commonSave),
+    return DiscardGuard(
+      hasChanges: () => _snapshot() != _initialState,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.initial == null ? l.incidentNew : l.incidentEditTitle,
           ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            TextFormField(
-              controller: _label,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: l.incidentLabel,
-                hintText: l.incidentLabelHint,
-              ),
-              validator: (v) => v == null || v.trim().isEmpty
-                  ? l.incidentLabelRequired
-                  : null,
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              initialValue: zoneIds.contains(_zoneId) ? _zoneId : null,
-              isExpanded: true,
-              decoration: InputDecoration(labelText: l.activityZoneLabel),
-              items: [
-                for (final z in zones)
-                  DropdownMenuItem(value: z.id, child: Text(z.name)),
-              ],
-              validator: (v) => v == null ? l.incidentZoneRequired : null,
-              onChanged: (v) => setState(() => _zoneId = v),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l.incidentPhotos,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final (i, item) in _photos.indexed)
-                  Stack(
-                    children: [
-                      item.picked != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                File(item.picked!.path),
-                                width: 80,
-                                height: 80,
-                                cacheWidth: 240,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : ActivityPhoto(
-                              path: item.saved!.path,
-                              width: 80,
-                              height: 80,
-                              borderRadius: 8,
-                            ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: IconButton(
-                          tooltip: l.photoRemove,
-                          icon: const Icon(Icons.close, size: 18),
-                          onPressed: () => setState(
-                            () => _photos = [..._photos]..removeAt(i),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                if (!kIsWeb && _photos.length < maxIncidentPhotos)
-                  OutlinedButton.icon(
-                    onPressed: () => _addPhoto(l),
-                    icon: const Icon(Icons.add_a_photo_outlined),
-                    label: Text(l.photoAdd(_photos.length, maxIncidentPhotos)),
-                  ),
-              ],
-            ),
-            if (!kIsWeb && diagnosisAvailable && _photos.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: diagnosing ? null : () => _diagnose(l),
-                icon: diagnosing
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.auto_awesome_outlined),
-                label: Text(
-                  diagnosing ? l.diagnosisRunning : l.diagnosisButton,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l.diagnosisButtonHelper,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _bio,
-              minLines: 2,
-              maxLines: 6,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: l.incidentPlanBio,
-                helperText: l.incidentPlanBioHelper,
-                helperMaxLines: 3,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _chem,
-              minLines: 2,
-              maxLines: 6,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: l.incidentPlanChem,
-                helperText: l.incidentPlanChemHelper,
-                helperMaxLines: 4,
-              ),
-            ),
-            if (widget.initial == null) ...[
-              const SizedBox(height: 16),
-              Text(l.incidentChecksNote),
-            ],
-            const SizedBox(height: 24),
-            FilledButton.icon(
+          actions: [
+            TextButton(
               onPressed: _saving ? null : _submit,
-              icon: const Icon(Icons.check),
-              label: Text(l.commonSave),
+              child: Text(l.commonSave),
             ),
           ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              TextFormField(
+                controller: _label,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: l.incidentLabel,
+                  hintText: l.incidentLabelHint,
+                ),
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? l.incidentLabelRequired
+                    : null,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                initialValue: zoneIds.contains(_zoneId) || current != null
+                    ? _zoneId
+                    : null,
+                isExpanded: true,
+                decoration: InputDecoration(labelText: l.activityZoneLabel),
+                items: [
+                  for (final z in zones)
+                    DropdownMenuItem(value: z.id, child: Text(z.name)),
+                  // Archivovaná zóna upravovaného problému zůstane v nabídce.
+                  if (current != null)
+                    DropdownMenuItem(
+                      value: current.id,
+                      child: Text(current.name),
+                    ),
+                ],
+                validator: (v) => v == null ? l.incidentZoneRequired : null,
+                onChanged: (v) => setState(() => _zoneId = v),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l.incidentPhotos,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final (i, item) in _photos.indexed)
+                    Stack(
+                      children: [
+                        item.picked != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  File(item.picked!.path),
+                                  width: 80,
+                                  height: 80,
+                                  cacheWidth: 240,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : ActivityPhoto(
+                                path: item.saved!.path,
+                                width: 80,
+                                height: 80,
+                                borderRadius: 8,
+                              ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: IconButton(
+                            tooltip: l.photoRemove,
+                            icon: const Icon(Icons.close, size: 18),
+                            onPressed: () => setState(
+                              () => _photos = [..._photos]..removeAt(i),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (!kIsWeb && _photos.length < maxIncidentPhotos)
+                    OutlinedButton.icon(
+                      onPressed: () => _addPhoto(l),
+                      icon: const Icon(Icons.add_a_photo_outlined),
+                      label: Text(
+                        l.photoAdd(_photos.length, maxIncidentPhotos),
+                      ),
+                    ),
+                ],
+              ),
+              if (!kIsWeb && diagnosisAvailable && _photos.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: diagnosing ? null : () => _diagnose(l),
+                  icon: diagnosing
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.auto_awesome_outlined),
+                  label: Text(
+                    diagnosing ? l.diagnosisRunning : l.diagnosisButton,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l.diagnosisButtonHelper,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _bio,
+                minLines: 2,
+                maxLines: 6,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: l.incidentPlanBio,
+                  helperText: l.incidentPlanBioHelper,
+                  helperMaxLines: 3,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _chem,
+                minLines: 2,
+                maxLines: 6,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: l.incidentPlanChem,
+                  helperText: l.incidentPlanChemHelper,
+                  helperMaxLines: 4,
+                ),
+              ),
+              if (widget.initial == null) ...[
+                const SizedBox(height: 16),
+                Text(l.incidentChecksNote),
+              ],
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: _saving ? null : _submit,
+                icon: const Icon(Icons.check),
+                label: Text(l.commonSave),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -590,8 +656,13 @@ class IncidentDetailScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (ok != true) return;
+    if (ok != true || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
     await ref.read(incidentsControllerProvider.notifier).delete(incident.id);
+    if (ref.read(incidentsControllerProvider).hasError) {
+      messenger.showSnackBar(SnackBar(content: Text(l.incidentSaveFailed)));
+      return;
+    }
     navigator.pop();
   }
 
@@ -600,7 +671,11 @@ class IncidentDetailScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final incident = ref.watch(incidentByIdProvider(incidentId));
     if (incident == null) {
-      return Scaffold(appBar: AppBar());
+      // Smazaný tady nebo z jiného telefonu.
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(child: Text(l.incidentGone)),
+      );
     }
     final zone = ref.watch(zoneNameProvider(incident.zoneId)) ?? '';
     final checks = ref.watch(incidentChecksProvider(incidentId));

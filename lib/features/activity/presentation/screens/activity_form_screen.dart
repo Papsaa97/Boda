@@ -274,22 +274,31 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     // FR-D8: delší strana nejvýš 1 920 px, JPEG ~80 %.
     final picker = ImagePicker();
     final remaining = maxPhotosPerActivity - _photos.length;
-    final List<XFile> picked;
-    if (source == ImageSource.gallery && remaining > 1) {
-      picked = await picker.pickMultiImage(
-        maxWidth: 1920,
-        maxHeight: 1920,
-        imageQuality: 80,
-        limit: remaining,
-      );
-    } else {
-      final one = await picker.pickImage(
-        source: source,
-        maxWidth: 1920,
-        maxHeight: 1920,
-        imageQuality: 80,
-      );
-      picked = one == null ? const [] : [one];
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    List<XFile> picked;
+    try {
+      if (source == ImageSource.gallery && remaining > 1) {
+        picked = await picker.pickMultiImage(
+          maxWidth: 1920,
+          maxHeight: 1920,
+          imageQuality: 80,
+          limit: remaining,
+        );
+      } else {
+        final one = await picker.pickImage(
+          source: source,
+          maxWidth: 1920,
+          maxHeight: 1920,
+          imageQuality: 80,
+        );
+        picked = one == null ? const [] : [one];
+      }
+    } on Exception catch (e) {
+      // Odepřené oprávnění nebo chyba fotoaparátu; formulář zůstane.
+      debugPrint('Výběr fotky selhal: $e');
+      messenger.showSnackBar(SnackBar(content: Text(l.photoPickFailed)));
+      return;
     }
     if (picked.isEmpty || !mounted) return;
     setState(() {

@@ -298,8 +298,9 @@ class AssistantController extends AsyncNotifier<AssistantConversation> {
     });
   }
 
-  /// Uloží úkol z odpovědi (FR-B5); bez termínu dnes.
-  Future<void> createTask(TaskAction action) async {
+  /// Uloží úkol z odpovědi (FR-B5); bez termínu dnes. Vrací false, když
+  /// se zápis nepovedl.
+  Future<bool> createTask(TaskAction action) async {
     final today = dayOnly(ref.read(todayProvider));
     final zones = await ref.read(zonesControllerProvider.future);
     final zoneId = zones.any((z) => z.id == action.zoneId)
@@ -316,11 +317,13 @@ class AssistantController extends AsyncNotifier<AssistantConversation> {
             source: TaskSource.boda,
           ),
         );
+    return !ref.read(tasksControllerProvider).hasError;
   }
 
   /// Přidá položku na nákupní seznam (FR-B5); položku skladu se stejným
-  /// názvem propojí, aby nákup šel doplnit do skladu.
-  Future<void> addToShopping(ShoppingAction action) async {
+  /// názvem propojí, aby nákup šel doplnit do skladu. Vrací false, když
+  /// se zápis nepovedl.
+  Future<bool> addToShopping(ShoppingAction action) async {
     final inventory = await ref.read(inventoryControllerProvider.future);
     final name = normalizeForSearch(action.name.trim());
     final item = inventory
@@ -335,8 +338,22 @@ class AssistantController extends AsyncNotifier<AssistantConversation> {
           itemId: item?.id,
           source: ShoppingSource.boda,
         );
+    return !ref.read(shoppingControllerProvider).hasError;
   }
 }
+
+/// Akce z odpovědí, které už uživatel uložil (klíč: id zprávy a pořadí
+/// akce). Drží se mimo bublinu, aby po odscrollování nešly uložit podruhé.
+class AppliedActions extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => const {};
+
+  void add(String key) => state = {...state, key};
+}
+
+final appliedActionsProvider = NotifierProvider<AppliedActions, Set<String>>(
+  AppliedActions.new,
+);
 
 final assistantControllerProvider =
     AsyncNotifierProvider<AssistantController, AssistantConversation>(

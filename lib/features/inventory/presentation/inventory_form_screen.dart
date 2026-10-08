@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/widgets/discard_guard.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/text/numbers.dart';
@@ -35,6 +36,7 @@ class _InventoryFormScreenState extends ConsumerState<InventoryFormScreen> {
   ToolCondition? _condition;
   bool _nonProfessional = false;
   bool _saving = false;
+  late final String _initialState;
 
   TextEditingController _ctl(String key) =>
       _c.putIfAbsent(key, TextEditingController.new);
@@ -79,7 +81,23 @@ class _InventoryFormScreenState extends ConsumerState<InventoryFormScreen> {
       case null:
         break;
     }
+    _initialState = _snapshot();
   }
+
+  String _snapshot() => [
+    ([
+      for (final e in _c.entries)
+        if (e.value.text.isNotEmpty) '${e.key}=${e.value.text}',
+    ]..sort()).join(','),
+    _category,
+    _unit,
+    _doseUnit,
+    _bestBefore,
+    _lastService,
+    _form,
+    _condition,
+    _nonProfessional,
+  ].join('|');
 
   @override
   void dispose() {
@@ -378,101 +396,104 @@ class _InventoryFormScreenState extends ConsumerState<InventoryFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEdit ? l.inventoryEditTitle : l.inventoryNewTitle),
-        actions: [
-          if (_isEdit)
-            IconButton(
-              tooltip: l.commonDelete,
-              icon: const Icon(Icons.delete_outline),
-              onPressed: _delete,
-            ),
-          TextButton(
-            onPressed: _saving ? null : _submit,
-            child: Text(l.commonSave),
-          ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: DropdownButtonFormField<InventoryCategory>(
-                initialValue: _category,
-                isExpanded: true,
-                decoration: InputDecoration(
-                  labelText: l.inventoryCategoryLabel,
-                ),
-                items: [
-                  for (final c in InventoryCategory.values)
-                    DropdownMenuItem(
-                      value: c,
-                      child: Row(
-                        children: [
-                          Icon(inventoryCategoryIcon(c), size: 20),
-                          const SizedBox(width: 12),
-                          Flexible(child: Text(inventoryCategoryLabel(l, c))),
-                        ],
-                      ),
-                    ),
-                ],
-                onChanged: (c) => setState(() => _category = c ?? _category),
+    return DiscardGuard(
+      hasChanges: () => _snapshot() != _initialState,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEdit ? l.inventoryEditTitle : l.inventoryNewTitle),
+          actions: [
+            if (_isEdit)
+              IconButton(
+                tooltip: l.commonDelete,
+                icon: const Icon(Icons.delete_outline),
+                onPressed: _delete,
               ),
-            ),
-            _field(
-              'name',
-              l.inventoryNameLabel,
-              validator: (v) => v == null || v.trim().isEmpty
-                  ? l.inventoryNameRequired
-                  : null,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: _field('stock', l.inventoryStockLabel, number: true),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: DropdownButtonFormField<InventoryUnit>(
-                    initialValue: _unit,
-                    isExpanded: true,
-                    decoration: InputDecoration(
-                      labelText: l.inventoryUnitLabel,
-                    ),
-                    items: [
-                      for (final u in InventoryUnit.values)
-                        DropdownMenuItem(
-                          value: u,
-                          child: Text(unitLabel(l, u)),
-                        ),
-                    ],
-                    onChanged: (u) => setState(() => _unit = u ?? _unit),
-                  ),
-                ),
-              ],
-            ),
-            _field(
-              'threshold',
-              l.inventoryThresholdLabel,
-              number: true,
-              helper: l.inventoryThresholdHelper,
-            ),
-            ..._categoryFields(l),
-            const SizedBox(height: 16),
-            FilledButton.icon(
+            TextButton(
               onPressed: _saving ? null : _submit,
-              icon: const Icon(Icons.check),
-              label: Text(l.commonSave),
+              child: Text(l.commonSave),
             ),
-            if (widget.initial case final item?) _History(item: item),
           ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: DropdownButtonFormField<InventoryCategory>(
+                  initialValue: _category,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: l.inventoryCategoryLabel,
+                  ),
+                  items: [
+                    for (final c in InventoryCategory.values)
+                      DropdownMenuItem(
+                        value: c,
+                        child: Row(
+                          children: [
+                            Icon(inventoryCategoryIcon(c), size: 20),
+                            const SizedBox(width: 12),
+                            Flexible(child: Text(inventoryCategoryLabel(l, c))),
+                          ],
+                        ),
+                      ),
+                  ],
+                  onChanged: (c) => setState(() => _category = c ?? _category),
+                ),
+              ),
+              _field(
+                'name',
+                l.inventoryNameLabel,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? l.inventoryNameRequired
+                    : null,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: _field('stock', l.inventoryStockLabel, number: true),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: DropdownButtonFormField<InventoryUnit>(
+                      initialValue: _unit,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        labelText: l.inventoryUnitLabel,
+                      ),
+                      items: [
+                        for (final u in InventoryUnit.values)
+                          DropdownMenuItem(
+                            value: u,
+                            child: Text(unitLabel(l, u)),
+                          ),
+                      ],
+                      onChanged: (u) => setState(() => _unit = u ?? _unit),
+                    ),
+                  ),
+                ],
+              ),
+              _field(
+                'threshold',
+                l.inventoryThresholdLabel,
+                number: true,
+                helper: l.inventoryThresholdHelper,
+              ),
+              ..._categoryFields(l),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: _saving ? null : _submit,
+                icon: const Icon(Icons.check),
+                label: Text(l.commonSave),
+              ),
+              if (widget.initial case final item?) _History(item: item),
+            ],
+          ),
         ),
       ),
     );

@@ -8,8 +8,12 @@
   "commonEdit": "Upravit",
   "commonClose": "Zavřít",
   "commonContinue": "Pokračovat",
+  "commonDiscardTitle": "Zahodit změny?",
+  "commonDiscardBody": "Změny nejsou uložené.",
   "commonUnknownZone": "Neznámá zóna",
   "commonErrorWithDetail": "Chyba: {error}",
+  "commonSaveFailed": "Uložení se nepovedlo. Zkus to znovu.",
+  "commonLoadFailed": "Data se nepodařilo načíst. Zkus aplikaci zavřít a otevřít znovu.",
   "zonesLoadError": "Chyba při načítání zón: {error}",
   "navToday": "Dnes",
   "navDiary": "Deník",
@@ -50,7 +54,7 @@
   "activityNewTitle": "Nový záznam",
   "activityEditTitle": "Upravit záznam",
   "activityDetailTitle": "Záznam",
-  "activityTypeLabel": "Co jsi dělal?",
+  "activityTypeLabel": "Co jsi dělal(a)?",
   "activityTitleLabel": "Název aktivity",
   "activityTitleHint": "např. Zálivka rajčat",
   "activityTitleRequired": "Zadej název aktivity",
@@ -67,6 +71,7 @@
   "activityGone": "Záznam už neexistuje.",
   "photoTake": "Vyfotit",
   "photoFromGallery": "Vybrat z galerie",
+  "photoPickFailed": "Fotku se nepodařilo načíst. Zkontroluj, jestli má aplikace přístup k fotoaparátu a fotkám.",
   "photoRemove": "Odebrat fotku",
   "photoSaveFailed": "Fotku se nepodařilo uložit.",
   "photoAdd": "Přidat fotku ({count}/{max})",
@@ -138,20 +143,26 @@
   "zoneNameHint": "např. Záhon u plotu",
   "zoneSaveFailed": "Změnu zón se nepodařilo uložit.",
   "zoneCannotDeleteTitle": "Zónu nejde smazat",
-  "zoneCannotDeleteBody": "{name} má v deníku {count, plural, =1{1 záznam} few{{count} záznamy} other{{count} záznamů}}. Můžeš ji archivovat: nebude se nabízet pro nové záznamy, ale záznamy zůstanou.",
+  "zoneCannotDeleteBody": "K zóně {name} patří záznamy v deníku, úkoly, problémy nebo stavby. Můžeš ji archivovat: nebude se nabízet pro nové záznamy, ale všechno v ní zůstane.",
   "@zoneCannotDeleteBody": {
     "placeholders": {
       "name": {
         "type": "String"
-      },
-      "count": {
-        "type": "int"
       }
     }
   },
   "zoneArchive": "Archivovat",
   "zoneUnarchive": "Vrátit z archivu",
   "zoneDelete": "Smazat zónu",
+  "zoneDeleteConfirmTitle": "Smazat zónu {name}?",
+  "@zoneDeleteConfirmTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneDeleteConfirmBody": "Smaže se i její obrys v plánu zahrady. Tohle nejde vrátit.",
   "zoneKeepOne": "Aspoň jedna zóna musí zůstat.",
   "zoneArchivedSection": "Archivované",
   "zoneActivityCount": "{count, plural, =0{Zatím bez záznamů} =1{1 záznam} few{{count} záznamy} other{{count} záznamů}}",
@@ -279,7 +290,7 @@
   "backupErrorCorrupted": "Záloha je poškozená a nejde načíst.",
   "backupErrorTooNew": "Záloha je z novější verze aplikace. Nejdřív si aplikaci aktualizuj.",
   "backupReminderTitle": "Zálohuj si deník",
-  "backupReminderBody": "Data jsou jen v tomhle telefonu. Záloha zabere chvilku a uložíš ji třeba na Disk nebo do e-mailu.",
+  "backupReminderBody": "Bez účtu jsou data jen v tomhle telefonu. Záloha zabere chvilku a uložíš ji třeba na Disk nebo do e-mailu.",
   "backupReminderAction": "Zálohovat",
   "backupExport": "Exportovat zálohu",
   "backupExportSubtitleNever": "Zatím žádná záloha",
@@ -293,6 +304,10 @@
   },
   "backupImport": "Obnovit ze zálohy",
   "backupImportSubtitle": "Nahradí všechna data obsahem ZIP souboru",
+  "diaryCsvExport": "Exportovat deník do tabulky",
+  "diaryCsvExportSubtitle": "CSV pro Excel nebo Google Tabulky",
+  "diaryCsvShareSubject": "Deník Zahradníka Bódi (CSV)",
+  "diaryCsvFailed": "Tabulku se nepodařilo vytvořit.",
   "backupUnavailableWeb": "Záloha je dostupná v aplikaci pro Android a iOS.",
   "settingsTitle": "Nastavení",
   "settingsTooltip": "Nastavení",
@@ -315,7 +330,7 @@
   "digestOffHelp": "Jen připomínky u jednotlivých úkolů",
   "settingsData": "Data",
   "settingsAbout": "O aplikaci",
-  "settingsPrivacy": "Všechna data zůstávají jen v tomhle zařízení. Aplikace nic neodesílá.",
+  "settingsPrivacy": "Deník je v telefonu a funguje bez účtu. Na server jdou jen data, se kterými jsi souhlasil(a): synchronizace, dotazy pro Bóďu, poloha pro počasí a fotky k diagnostice.",
   "settingsVersion": "Verze {version}",
   "@settingsVersion": {
     "placeholders": {
@@ -328,9 +343,12 @@
   "statsSubtitle": "Záznamy po týdnech a nejaktivnější zóny",
   "statsTotal": "záznamů celkem",
   "statsThisWeek": "tento týden",
-  "statsActiveWeeks": "týdnů z {weeks} s aspoň 2 záznamy",
+  "statsActiveWeeks": "{active, plural, one{týden} few{týdny} other{týdnů}} z {weeks} s aspoň 2 záznamy",
   "@statsActiveWeeks": {
     "placeholders": {
+      "active": {
+        "type": "int"
+      },
       "weeks": {
         "type": "int"
       }
@@ -454,7 +472,7 @@
       }
     }
   },
-  "notificationDigestMore": "a {count} další",
+  "notificationDigestMore": "a {count, plural, one{1 další} few{{count} další} other{{count} dalších}}",
   "@notificationDigestMore": {
     "placeholders": {
       "count": {
@@ -679,6 +697,15 @@
   "shoppingNameLabel": "Co koupit",
   "shoppingQtyLabel": "Množství (nepovinné)",
   "shoppingClearDone": "Smazat koupené",
+  "shoppingAlreadyListed": "{name} už na seznamu je.",
+  "@shoppingAlreadyListed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shoppingSaveFailed": "Nákupní seznam se nepodařilo uložit.",
   "shoppingRestocked": "Do skladu přidáno: {name} +{qty}",
   "@shoppingRestocked": {
     "placeholders": {
@@ -783,6 +810,7 @@
       }
     }
   },
+  "taskMaterialQtyInvalid": "Zadej množství větší než 0.",
   "taskMaterialMissing": "Neznámá položka",
   "weekendTitle": "Víkend na chalupě",
   "weekendTooltip": "Víkend na chalupě",
@@ -1015,6 +1043,7 @@
   "accountIntro": "S účtem se zahrada zálohuje do cloudu a jde otevřít i na dalším zařízení. Bóďa s umělou inteligencí účet potřebuje. Bez účtu vše funguje dál jen v tomto telefonu.",
   "accountEmailLabel": "E-mail",
   "accountSendCode": "Poslat kód",
+  "accountSignIn": "Přihlásit se",
   "accountCodeSent": "Kód jsme poslali na {email}. Platí jen chvíli.",
   "@accountCodeSent": {
     "placeholders": {
@@ -1386,7 +1415,8 @@
   "incidentCheckDone": "Zkontrolováno",
   "incidentCheckSkipped": "Vynecháno",
   "incidentDeleteTitle": "Smazat problém?",
-  "incidentDeleteBody": "Smaže se karta „{label}“ i její fotky. Úkoly kontrol zůstanou.",
+  "incidentGone": "Tenhle problém už neexistuje.",
+  "incidentDeleteBody": "Smaže se karta „{label}“ i její fotky. Otevřené kontroly k ní se přeskočí.",
   "@incidentDeleteBody": {
     "placeholders": {
       "label": {
@@ -1583,6 +1613,7 @@
   },
   "weatherPhenologyAddTask": "Přidat jako úkol",
   "weatherPhenologyTaskAdded": "Úkol přidán",
+  "weatherPhenologyTaskExists": "Takový úkol už v seznamu máš.",
   "weatherCardNow": "Teď je čas: {items}",
   "@weatherCardNow": {
     "placeholders": {
@@ -1725,6 +1756,7 @@
   "buildsChooseTemplate": "Co chceš postavit?",
   "buildsName": "Název",
   "buildsNameRequired": "Zadej název",
+  "buildsFixParams": "Nejdřív oprav parametry s chybou.",
   "buildsZone": "Zóna",
   "buildsNoZone": "Bez zóny",
   "buildsParams": "Parametry",
@@ -1769,6 +1801,14 @@
         "type": "String"
       },
       "price": {
+        "type": "String"
+      }
+    }
+  },
+  "buildsLineAmount": "{amount} Kč",
+  "@buildsLineAmount": {
+    "placeholders": {
+      "amount": {
         "type": "String"
       }
     }
@@ -2054,11 +2094,11 @@
   },
   "buildFindingBridgeNeedsRailing": "Mostek je víc než 0,5 m nad hladinou nebo terénem. Přidej zábradlí, hlavně kvůli dětem.",
   "buildFindingBridgeNarrow": "Mostek užší než 0,6 m se špatně přechází. Doporučená šířka je aspoň 0,8 m.",
-  "buildFindingBridgeDeckSpan": "Podlahová prkna by mezi nosníky měla moc velké pole. Zvol {beams} nosníky nebo silnější prkna.",
+  "buildFindingBridgeDeckSpan": "Podlahová prkna by mezi nosníky měla moc velké pole. Zvol {beams, plural, one{1 nosník} few{{beams} nosníky} other{{beams} nosníků}} nebo silnější prkna.",
   "@buildFindingBridgeDeckSpan": {
     "placeholders": {
       "beams": {
-        "type": "String"
+        "type": "int"
       }
     }
   },

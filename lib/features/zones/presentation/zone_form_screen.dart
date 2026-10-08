@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/widgets/discard_guard.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/text/numbers.dart';
@@ -35,6 +36,7 @@ class _ZoneFormScreenState extends ConsumerState<ZoneFormScreen> {
   late bool _covered;
   ZoneNameError? _nameError;
   bool _saving = false;
+  late final String _initialState;
 
   @override
   void initState() {
@@ -53,7 +55,20 @@ class _ZoneFormScreenState extends ConsumerState<ZoneFormScreen> {
     _irrigation = z.irrigation;
     _phMeasuredAt = z.phMeasuredAt;
     _covered = z.covered;
+    _initialState = _snapshot();
   }
+
+  String _snapshot() => [
+    _name.text,
+    _area.text,
+    _ph.text,
+    _type,
+    _soil,
+    _sun,
+    _irrigation,
+    _phMeasuredAt,
+    _covered,
+  ].join('|');
 
   @override
   void dispose() {
@@ -144,140 +159,143 @@ class _ZoneFormScreenState extends ConsumerState<ZoneFormScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     const gap = SizedBox(height: 16);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l.zoneEditTitle),
-        actions: [
-          TextButton(
-            onPressed: _saving ? null : _submit,
-            child: Text(l.commonSave),
-          ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            TextFormField(
-              controller: _name,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: l.zoneNameLabel,
-                errorText: switch (_nameError) {
-                  ZoneNameError.empty => l.zoneNameEmpty,
-                  ZoneNameError.duplicate => l.zoneNameDuplicate,
-                  null => null,
-                },
-              ),
-              onChanged: (_) {
-                if (_nameError != null) setState(() => _nameError = null);
-              },
-            ),
-            gap,
-            DropdownButtonFormField<ZoneType>(
-              initialValue: _type,
-              isExpanded: true,
-              decoration: InputDecoration(labelText: l.zoneTypeLabel),
-              items: [
-                for (final type in ZoneType.values)
-                  DropdownMenuItem(
-                    value: type,
-                    child: Row(
-                      children: [
-                        Icon(zoneIcon(type), size: 20),
-                        const SizedBox(width: 12),
-                        Flexible(child: Text(zoneTypeLabel(l, type))),
-                      ],
-                    ),
-                  ),
-              ],
-              onChanged: (type) => setState(() => _type = type ?? _type),
-            ),
-            gap,
-            TextFormField(
-              controller: _area,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: InputDecoration(
-                labelText: l.zoneAreaLabel,
-                hintText: l.zoneAreaHint,
-                helperText: l.zoneAreaHelper,
-              ),
-              validator: (v) => _numberError(
-                l,
-                validateZoneArea(v ?? '', parseDecimal(v)),
-                l.zoneAreaOutOfRange,
-              ),
-            ),
-            gap,
-            _dropdown<SoilTexture>(
-              label: l.zoneSoilLabel,
-              value: _soil,
-              values: SoilTexture.values,
-              labelOf: (v) => soilTextureLabel(l, v),
-              onChanged: (v) => setState(() => _soil = v),
-            ),
-            gap,
-            TextFormField(
-              controller: _ph,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: InputDecoration(
-                labelText: l.zonePhLabel,
-                hintText: l.zonePhHint,
-              ),
-              validator: (v) => _numberError(
-                l,
-                validateZonePh(v ?? '', parseDecimal(v)),
-                l.zonePhOutOfRange,
-              ),
-              onChanged: (_) => setState(() {}),
-            ),
-            if (_ph.text.trim().isNotEmpty)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.event),
-                title: Text(l.zonePhMeasuredLabel),
-                subtitle: Text(
-                  _phMeasuredAt == null
-                      ? l.zonePhMeasuredNone
-                      : formatDate(_phMeasuredAt!),
-                ),
-                onTap: _pickPhDate,
-              ),
-            gap,
-            _dropdown<SunExposure>(
-              label: l.zoneSunLabel,
-              value: _sun,
-              values: SunExposure.values,
-              labelOf: (v) => sunExposureLabel(l, v),
-              onChanged: (v) => setState(() => _sun = v),
-            ),
-            gap,
-            _dropdown<Irrigation>(
-              label: l.zoneIrrigationLabel,
-              value: _irrigation,
-              values: Irrigation.values,
-              labelOf: (v) => irrigationLabel(l, v),
-              onChanged: (v) => setState(() => _irrigation = v),
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l.zoneCoveredLabel),
-              subtitle: Text(l.zoneCoveredHelp),
-              value: _covered,
-              onChanged: (v) => setState(() => _covered = v),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
+    return DiscardGuard(
+      hasChanges: () => _snapshot() != _initialState,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l.zoneEditTitle),
+          actions: [
+            TextButton(
               onPressed: _saving ? null : _submit,
-              icon: const Icon(Icons.check),
-              label: Text(l.commonSave),
+              child: Text(l.commonSave),
             ),
           ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              TextFormField(
+                controller: _name,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: l.zoneNameLabel,
+                  errorText: switch (_nameError) {
+                    ZoneNameError.empty => l.zoneNameEmpty,
+                    ZoneNameError.duplicate => l.zoneNameDuplicate,
+                    null => null,
+                  },
+                ),
+                onChanged: (_) {
+                  if (_nameError != null) setState(() => _nameError = null);
+                },
+              ),
+              gap,
+              DropdownButtonFormField<ZoneType>(
+                initialValue: _type,
+                isExpanded: true,
+                decoration: InputDecoration(labelText: l.zoneTypeLabel),
+                items: [
+                  for (final type in ZoneType.values)
+                    DropdownMenuItem(
+                      value: type,
+                      child: Row(
+                        children: [
+                          Icon(zoneIcon(type), size: 20),
+                          const SizedBox(width: 12),
+                          Flexible(child: Text(zoneTypeLabel(l, type))),
+                        ],
+                      ),
+                    ),
+                ],
+                onChanged: (type) => setState(() => _type = type ?? _type),
+              ),
+              gap,
+              TextFormField(
+                controller: _area,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(
+                  labelText: l.zoneAreaLabel,
+                  hintText: l.zoneAreaHint,
+                  helperText: l.zoneAreaHelper,
+                ),
+                validator: (v) => _numberError(
+                  l,
+                  validateZoneArea(v ?? '', parseDecimal(v)),
+                  l.zoneAreaOutOfRange,
+                ),
+              ),
+              gap,
+              _dropdown<SoilTexture>(
+                label: l.zoneSoilLabel,
+                value: _soil,
+                values: SoilTexture.values,
+                labelOf: (v) => soilTextureLabel(l, v),
+                onChanged: (v) => setState(() => _soil = v),
+              ),
+              gap,
+              TextFormField(
+                controller: _ph,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(
+                  labelText: l.zonePhLabel,
+                  hintText: l.zonePhHint,
+                ),
+                validator: (v) => _numberError(
+                  l,
+                  validateZonePh(v ?? '', parseDecimal(v)),
+                  l.zonePhOutOfRange,
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+              if (_ph.text.trim().isNotEmpty)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.event),
+                  title: Text(l.zonePhMeasuredLabel),
+                  subtitle: Text(
+                    _phMeasuredAt == null
+                        ? l.zonePhMeasuredNone
+                        : formatDate(_phMeasuredAt!),
+                  ),
+                  onTap: _pickPhDate,
+                ),
+              gap,
+              _dropdown<SunExposure>(
+                label: l.zoneSunLabel,
+                value: _sun,
+                values: SunExposure.values,
+                labelOf: (v) => sunExposureLabel(l, v),
+                onChanged: (v) => setState(() => _sun = v),
+              ),
+              gap,
+              _dropdown<Irrigation>(
+                label: l.zoneIrrigationLabel,
+                value: _irrigation,
+                values: Irrigation.values,
+                labelOf: (v) => irrigationLabel(l, v),
+                onChanged: (v) => setState(() => _irrigation = v),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l.zoneCoveredLabel),
+                subtitle: Text(l.zoneCoveredHelp),
+                value: _covered,
+                onChanged: (v) => setState(() => _covered = v),
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: _saving ? null : _submit,
+                icon: const Icon(Icons.check),
+                label: Text(l.commonSave),
+              ),
+            ],
+          ),
         ),
       ),
     );

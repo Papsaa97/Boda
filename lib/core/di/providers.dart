@@ -194,6 +194,21 @@ final syncRemoteProvider = Provider<SyncRemote?>((ref) {
   return client == null ? null : SupabaseSyncRemote(client);
 });
 
+/// Záložky spodní navigace v pořadí, v jakém jsou na obrazovce.
+enum HomeTab { today, diary, assistant, tasks, garden }
+
+/// Vybraná záložka; obrazovky ji přepínají (třeba „Všechny úkoly“ z Dnes).
+class HomeTabController extends Notifier<HomeTab> {
+  @override
+  HomeTab build() => HomeTab.today;
+
+  void select(HomeTab tab) => state = tab;
+}
+
+final homeTabProvider = NotifierProvider<HomeTabController, HomeTab>(
+  HomeTabController.new,
+);
+
 /// Znovu načte aplikaci (po převzetí zahrady z účtu se mění id zahrady).
 /// Nastavuje main.dart.
 final restartAppProvider = Provider<void Function()>((ref) => () {});

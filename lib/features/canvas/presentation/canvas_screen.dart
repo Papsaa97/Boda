@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 
 import '../../../core/di/providers.dart';
 import '../../../core/text/numbers.dart';
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../zones/domain/zone_entity.dart';
 import '../../zones/domain/zone_rules.dart';
@@ -238,8 +239,7 @@ class _CanvasScreenState extends ConsumerState<CanvasScreen> {
       body: async.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text(l.commonErrorWithDetail('$error'))),
+        error: (error, stack) => LoadErrorView(error: error, stack: stack),
         data: (s) {
           final hint = _hint(l, s);
           return Column(
@@ -526,8 +526,13 @@ class _BottomBar extends ConsumerWidget {
                   selected,
                   activityTitle: l.canvasRealizedActivity(zone.name),
                 );
+                final failed = ref.read(canvasControllerProvider).hasError;
                 messenger.showSnackBar(
-                  SnackBar(content: Text(l.canvasRealized(zone.name))),
+                  SnackBar(
+                    content: Text(
+                      failed ? l.commonSaveFailed : l.canvasRealized(zone.name),
+                    ),
+                  ),
                 );
               },
               child: Text(l.canvasRealize),

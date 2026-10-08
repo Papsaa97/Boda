@@ -170,8 +170,8 @@ class ShoppingController extends AsyncNotifier<List<ShoppingItem>> {
       _sorted(await ref.watch(shoppingRepositoryProvider).getAll());
 
   /// Přidá položku. Pro položku skladu, která už na seznamu nekoupená je,
-  /// nepřidá nic (hlídač ani Bóďa nevytvoří duplicitu).
-  Future<void> add({
+  /// nepřidá nic (hlídač ani Bóďa nevytvoří duplicitu) a vrátí false.
+  Future<bool> add({
     required String name,
     double? qty,
     InventoryUnit? unit,
@@ -180,7 +180,7 @@ class ShoppingController extends AsyncNotifier<List<ShoppingItem>> {
   }) async {
     final current = state.value ?? const <ShoppingItem>[];
     final trimmed = name.trim();
-    if (trimmed.isEmpty) return;
+    if (trimmed.isEmpty) return false;
     final duplicate = current.any(
       (s) =>
           !s.done &&
@@ -188,7 +188,7 @@ class ShoppingController extends AsyncNotifier<List<ShoppingItem>> {
               ? s.itemId == itemId
               : s.name.toLowerCase() == trimmed.toLowerCase()),
     );
-    if (duplicate) return;
+    if (duplicate) return false;
     final item = ShoppingItem(
       id: ref.read(newIdProvider)(),
       name: trimmed,
@@ -201,6 +201,7 @@ class ShoppingController extends AsyncNotifier<List<ShoppingItem>> {
       await ref.read(shoppingRepositoryProvider).save(item);
       return [...list, item];
     });
+    return true;
   }
 
   /// Odškrtne položku. S [restock] přidá koupené množství do skladu

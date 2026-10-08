@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../weather/presentation/weather_screen.dart';
+import '../../../core/di/providers.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/time/calendar.dart';
 import '../../../core/time/today.dart';
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../activity/presentation/controllers/activity_controller.dart';
 import '../../activity/presentation/screens/activity_form_screen.dart';
@@ -19,7 +21,6 @@ import '../../settings/presentation/settings_screen.dart';
 import '../../stats/domain/season_summary.dart';
 import '../../stats/presentation/season_screen.dart';
 import '../../tasks/domain/task_entity.dart';
-import '../../tasks/presentation/screens/tasks_screen.dart';
 import '../../tasks/presentation/tasks_controller.dart';
 import '../../tasks/presentation/widgets/task_tile.dart';
 import '../../zones/domain/zone_entity.dart';
@@ -83,8 +84,7 @@ class DashboardScreen extends ConsumerWidget {
       ),
       body: summaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text(l.commonErrorWithDetail('$error'))),
+        error: (error, stack) => LoadErrorView(error: error, stack: stack),
         data: (summary) => ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
           children: [
@@ -100,6 +100,8 @@ class DashboardScreen extends ConsumerWidget {
             ],
             const WeatherCard(),
             if (!kIsWeb &&
+                // FR-E3: připomínka jen bez cloudové synchronizace.
+                ref.watch(currentUserProvider).value == null &&
                 backupReminderDue(
                   lastExportAt: settings.lastExportAt,
                   activityCount: summary.totalCount,
@@ -184,13 +186,13 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 /// Úkoly na dnešek (a po termínu).
-class _TasksCard extends StatelessWidget {
+class _TasksCard extends ConsumerWidget {
   const _TasksCard({required this.tasks});
 
   final List<TaskEntity> tasks;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Card(
@@ -211,9 +213,8 @@ class _TasksCard extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const TasksScreen()),
-                  ),
+                  onPressed: () =>
+                      ref.read(homeTabProvider.notifier).select(HomeTab.tasks),
                   child: Text(l.dashboardAllTasks),
                 ),
               ),

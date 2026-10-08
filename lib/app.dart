@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/di/providers.dart';
 import 'core/theme/app_theme.dart';
 import 'core/time/today.dart';
 import 'features/account/presentation/consent_sync.dart';
@@ -81,8 +82,6 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell>
     with WidgetsBindingObserver {
-  int _index = 0;
-
   @override
   void initState() {
     super.initState();
@@ -107,7 +106,8 @@ class _HomeShellState extends ConsumerState<HomeShell>
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final fab = switch (_index) {
+    final index = ref.watch(homeTabProvider).index;
+    final fab = switch (index) {
       3 => FloatingActionButton(
         heroTag: 'add-task',
         tooltip: l.newTaskTooltip,
@@ -129,7 +129,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
 
     return Scaffold(
       body: IndexedStack(
-        index: _index,
+        index: index,
         children: const [
           DashboardScreen(),
           TimelineScreen(),
@@ -140,8 +140,9 @@ class _HomeShellState extends ConsumerState<HomeShell>
       ),
       floatingActionButton: fab,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        selectedIndex: index,
+        onDestinationSelected: (i) =>
+            ref.read(homeTabProvider.notifier).select(HomeTab.values[i]),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.wb_sunny_outlined),

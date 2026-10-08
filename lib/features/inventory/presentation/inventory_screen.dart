@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/inventory_alerts.dart';
 import '../domain/inventory_item.dart';
@@ -51,7 +52,7 @@ class InventoryScreen extends ConsumerWidget {
       body: itemsAsync.when(
         skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(l.commonErrorWithDetail('$e'))),
+        error: (e, stack) => LoadErrorView(error: e, stack: stack),
         data: (items) {
           if (items.isEmpty) {
             return _Empty(

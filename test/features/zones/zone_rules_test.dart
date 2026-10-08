@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zahradnik_boda/features/tasks/domain/task_entity.dart';
 import 'package:zahradnik_boda/features/zones/domain/zone_entity.dart';
 import 'package:zahradnik_boda/features/zones/domain/zone_rules.dart';
 import 'package:zahradnik_boda/features/zones/presentation/zones_controller.dart';
@@ -25,16 +26,16 @@ void main() {
         zoneId: 'Z1',
         activeZoneCount: 2,
         isArchived: false,
-        activityCount: 3,
+        linkedCount: 3,
       ),
-      ZoneDeleteBlocker.hasActivities,
+      ZoneDeleteBlocker.inUse,
     );
     expect(
       zoneDeleteBlocker(
         zoneId: 'Z1',
         activeZoneCount: 1,
         isArchived: false,
-        activityCount: 0,
+        linkedCount: 0,
       ),
       ZoneDeleteBlocker.lastZone,
     );
@@ -44,7 +45,7 @@ void main() {
         zoneId: 'Z2',
         activeZoneCount: 1,
         isArchived: true,
-        activityCount: 0,
+        linkedCount: 0,
       ),
       isNull,
     );
@@ -65,11 +66,32 @@ void main() {
     expect(await controller.addZone('SKLENÍK'), ZoneNameError.duplicate);
     expect(zoneRepo.items, hasLength(2));
 
-    expect(await controller.deleteZone('Z1'), ZoneDeleteBlocker.hasActivities);
+    expect(await controller.deleteZone('Z1'), ZoneDeleteBlocker.inUse);
     expect(zoneRepo.items.containsKey('Z1'), isTrue);
 
     expect(await controller.deleteZone('Z2'), isNull);
     expect(zoneRepo.items.containsKey('Z2'), isFalse);
+  });
+
+  test('a zone with an open task cannot be deleted either', () async {
+    final zoneRepo = InMemoryZoneRepository(zones);
+    final container = makeContainer(
+      zones: zoneRepo,
+      tasks: InMemoryTaskRepository([
+        TaskEntity(
+          id: 'T1',
+          title: 'Zalít',
+          due: DateTime(2026, 10, 9),
+          zoneId: 'Z2',
+        ),
+      ]),
+    );
+    addTearDown(container.dispose);
+    final controller = container.read(zonesControllerProvider.notifier);
+    await container.read(zonesControllerProvider.future);
+
+    expect(await controller.deleteZone('Z2'), ZoneDeleteBlocker.inUse);
+    expect(zoneRepo.items.containsKey('Z2'), isTrue);
   });
 
   test('zone with activities can be archived, but not the last one', () async {

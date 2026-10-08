@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/widgets/discard_guard.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/text/numbers.dart';
 import '../../../core/time/calendar.dart';
 import '../../../core/time/today.dart';
+import '../../../core/widgets/load_error_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../premium/presentation/paywall_screen.dart';
 import '../../tasks/domain/task_entity.dart';
@@ -28,7 +30,7 @@ String _altitudeText(AppLocalizations l, WeatherState s) {
   return l.weatherAltitudeUnknown;
 }
 
-String _weekday(DateTime d) => DateFormat('EEEE d. M.', appLocale).format(d);
+String _weekday(DateTime d) => formatWeekdayIn(d);
 
 /// Karta na dashboardu: mráz, zálivka po dešti a co je teď na řadě.
 /// Když není co říct, nezobrazí se (klid místo stresu).
@@ -47,7 +49,7 @@ class WeatherCard extends ConsumerWidget {
     final lines = <Widget>[
       if (frost != null)
         Text(
-          '${l.weatherFrostTitle(formatDecimal(frost.tMinC, maxFractionDigits: 1), _weekday(frost.date))}. '
+          '${l.weatherFrostTitle(formatDecimal(frost.tMinC, maxFractionDigits: 1), _weekday(frost.date))} '
           '${l.weatherFrostZones(frost.zones.map((z) => z.name).join(', '))}',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.error,
@@ -176,7 +178,7 @@ class WeatherScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l.weatherTitle)),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(l.commonErrorWithDetail('$e'))),
+        error: (e, stack) => LoadErrorView(error: e, stack: stack),
         data: (s) => RefreshIndicator(
           onRefresh: () =>
               ref.read(weatherControllerProvider.notifier).refresh(force: true),
@@ -539,6 +541,13 @@ class _PhenologyTile extends ConsumerWidget {
         onPressed: () async {
           final messenger = ScaffoldMessenger.of(context);
           final today = dayOnly(ref.read(clockProvider)());
+          final existing = ref.read(tasksControllerProvider).value ?? const [];
+          if (existing.any((t) => t.isOpen && t.title == e.title)) {
+            messenger.showSnackBar(
+              SnackBar(content: Text(l.weatherPhenologyTaskExists)),
+            );
+            return;
+          }
           await ref
               .read(tasksControllerProvider.notifier)
               .create(
@@ -549,8 +558,13 @@ class _PhenologyTile extends ConsumerWidget {
                   notes: e.note,
                 ),
               );
+          final failed = ref.read(tasksControllerProvider).hasError;
           messenger.showSnackBar(
-            SnackBar(content: Text(l.weatherPhenologyTaskAdded)),
+            SnackBar(
+              content: Text(
+                failed ? l.commonSaveFailed : l.weatherPhenologyTaskAdded,
+              ),
+            ),
           );
         },
       ),
@@ -575,6 +589,7 @@ class _GardenLocationScreenState extends ConsumerState<GardenLocationScreen> {
   late final TextEditingController _lng;
   late final TextEditingController _altitude;
   bool _locating = false;
+  late final String _initialState;
 
   @override
   void initState() {
@@ -587,7 +602,10 @@ class _GardenLocationScreenState extends ConsumerState<GardenLocationScreen> {
       text: site.location == null ? '' : formatDecimal(site.location!.lng),
     );
     _altitude = TextEditingController(text: site.altitudeM?.toString() ?? '');
+    _initialState = _snapshot();
   }
+
+  String _snapshot() => [_lat.text, _lng.text, _altitude.text].join('|');
 
   @override
   void dispose() {
@@ -655,11 +673,10 @@ class _GardenLocationScreenState extends ConsumerState<GardenLocationScreen> {
               altitudeM: parseDecimal(_altitude.text)?.round(),
             ),
           );
-    } on Exception catch (e) {
+    } on Exception catch (e, stack) {
       // Formulář zůstane vyplněný, uživatel to může zkusit znovu.
-      messenger.showSnackBar(
-        SnackBar(content: Text(l.commonErrorWithDetail('$e'))),
-      );
+      ref.read(crashReporterProvider).recordError(e, stack);
+      messenger.showSnackBar(SnackBar(content: Text(l.commonSaveFailed)));
       return;
     }
     navigator.pop();
@@ -672,91 +689,94 @@ class _GardenLocationScreenState extends ConsumerState<GardenLocationScreen> {
     final lng = parseDecimal(_lng.text);
     final implausible =
         lat != null && lng != null && !GardenLocation(lat, lng).isPlausible;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l.weatherSiteTitle),
-        actions: [TextButton(onPressed: _save, child: Text(l.commonSave))],
-      ),
-      body: Form(
-        key: _form,
-        onChanged: () => setState(() {}),
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text(l.weatherLocationIntro),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: _locating ? null : _useDevice,
-              icon: _locating
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.my_location),
-              label: Text(l.weatherUseDeviceLocation),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _lat,
-              decoration: InputDecoration(
-                labelText: l.weatherLatLabel,
-                hintText: l.weatherLatHint,
+    return DiscardGuard(
+      hasChanges: () => _snapshot() != _initialState,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l.weatherSiteTitle),
+          actions: [TextButton(onPressed: _save, child: Text(l.commonSave))],
+        ),
+        body: Form(
+          key: _form,
+          onChanged: () => setState(() {}),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(l.weatherLocationIntro),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: _locating ? null : _useDevice,
+                icon: _locating
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.my_location),
+                label: Text(l.weatherUseDeviceLocation),
               ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-                signed: true,
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _lat,
+                decoration: InputDecoration(
+                  labelText: l.weatherLatLabel,
+                  hintText: l.weatherLatHint,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                  signed: true,
+                ),
+                validator: (v) => _coordinate(v, -90, 90),
               ),
-              validator: (v) => _coordinate(v, -90, 90),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _lng,
-              decoration: InputDecoration(
-                labelText: l.weatherLngLabel,
-                hintText: l.weatherLngHint,
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _lng,
+                decoration: InputDecoration(
+                  labelText: l.weatherLngLabel,
+                  hintText: l.weatherLngHint,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                  signed: true,
+                ),
+                validator: (v) => _coordinate(v, -180, 180),
               ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-                signed: true,
-              ),
-              validator: (v) => _coordinate(v, -180, 180),
-            ),
-            if (implausible) ...[
-              const SizedBox(height: 8),
-              Text(
-                l.weatherImplausibleLocation,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ],
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _altitude,
-              decoration: InputDecoration(
-                labelText: l.weatherAltitudeLabel,
-                helperText: l.weatherAltitudeHelper,
-              ),
-              keyboardType: TextInputType.number,
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return null;
-                final a = parseDecimal(v);
-                return a == null || a < 0 || a > 2000
-                    ? l.weatherAltitudeInvalid
-                    : null;
-              },
-            ),
-            const SizedBox(height: 16),
-            if (widget.initial.site.location != null)
-              TextButton.icon(
-                onPressed: () {
-                  _lat.clear();
-                  _lng.clear();
-                  setState(() {});
+              if (implausible) ...[
+                const SizedBox(height: 8),
+                Text(
+                  l.weatherImplausibleLocation,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _altitude,
+                decoration: InputDecoration(
+                  labelText: l.weatherAltitudeLabel,
+                  helperText: l.weatherAltitudeHelper,
+                ),
+                keyboardType: TextInputType.number,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return null;
+                  final a = parseDecimal(v);
+                  return a == null || a < 0 || a > 2000
+                      ? l.weatherAltitudeInvalid
+                      : null;
                 },
-                icon: const Icon(Icons.location_off_outlined),
-                label: Text(l.weatherClearLocation),
               ),
-          ],
+              const SizedBox(height: 16),
+              if (widget.initial.site.location != null)
+                TextButton.icon(
+                  onPressed: () {
+                    _lat.clear();
+                    _lng.clear();
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.location_off_outlined),
+                  label: Text(l.weatherClearLocation),
+                ),
+            ],
+          ),
         ),
       ),
     );
