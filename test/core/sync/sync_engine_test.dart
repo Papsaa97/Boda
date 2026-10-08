@@ -6,6 +6,8 @@ import 'package:zahradnik_boda/core/photos/photo_storage.dart';
 import 'package:zahradnik_boda/core/sync/sync_engine.dart';
 import 'package:zahradnik_boda/features/activity/data/drift_activity_repository.dart';
 import 'package:zahradnik_boda/features/activity/domain/activity_entity.dart';
+import 'package:zahradnik_boda/features/canvas/data/drift_plan_repository.dart';
+import 'package:zahradnik_boda/features/canvas/domain/geometry.dart';
 import 'package:zahradnik_boda/features/inventory/data/drift_inventory_repository.dart';
 import 'package:zahradnik_boda/features/inventory/domain/inventory_item.dart';
 import 'package:zahradnik_boda/features/inventory/domain/units.dart';
@@ -54,6 +56,8 @@ class Device {
       DriftActivityRepository(db, gardenId, clock);
   DriftInventoryRepository get inventory =>
       DriftInventoryRepository(db, gardenId, clock);
+
+  DriftPlanRepository get plan => DriftPlanRepository(db, gardenId, clock);
 
   Future<int> outbox() async => (await db.select(db.syncOutbox).get()).length;
 }
@@ -149,6 +153,37 @@ void main() {
     await a.engine(server).sync();
     expect(await a.outbox(), 0);
     expect(server.pushes, hasLength(1));
+  });
+
+  test('the garden plan travels to the second phone', () async {
+    const outline = [Pt(0, 0), Pt(20, 0), Pt(20, 12.5), Pt(0, 12.5)];
+    const bed = [Pt(1, 1), Pt(6, 1), Pt(6, 3), Pt(1, 3)];
+    await a.zones.saveZone(
+      zone.copyWith(polygon: () => bed, layer: ZoneLayer.plan),
+    );
+    await a.plan.saveOutline(outline);
+    await a.engine(server).sync();
+
+    final z = server.table('zones')['zone-1']!;
+    expect(z['layer'], 'plan');
+    expect(z['polygon'], [
+      [1, 1],
+      [6, 1],
+      [6, 3],
+      [1, 3],
+    ]);
+    final g = server.table('gardens')['garden-a']!;
+    expect((g['bounds']! as Map)['outline'], hasLength(4));
+
+    final first = await b.engine(server).sync();
+    final remoteId = (first.pairing as PairingConflict).remoteGardenId;
+    await b.engine(server).adoptRemoteGarden(remoteId);
+    b.gardenId = remoteId;
+    await b.engine(server).sync();
+    final got = (await b.zones.getAllZones()).single;
+    expect(got.polygon, bed);
+    expect(got.layer, ZoneLayer.plan);
+    expect(await b.plan.loadOutline(), outline);
   });
 
   test('a second phone adopts the account garden and gets the data', () async {

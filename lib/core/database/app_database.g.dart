@@ -522,8 +522,23 @@ class $GardensTable extends Gardens with TableInfo<$GardensTable, GardenRow> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _boundsMeta = const VerificationMeta('bounds');
   @override
-  List<GeneratedColumn> get $columns => [id, name, createdAt, updatedAt];
+  late final GeneratedColumn<String> bounds = GeneratedColumn<String>(
+    'bounds',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    createdAt,
+    updatedAt,
+    bounds,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -565,6 +580,12 @@ class $GardensTable extends Gardens with TableInfo<$GardensTable, GardenRow> {
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
+    if (data.containsKey('bounds')) {
+      context.handle(
+        _boundsMeta,
+        bounds.isAcceptableOrUnknown(data['bounds']!, _boundsMeta),
+      );
+    }
     return context;
   }
 
@@ -590,6 +611,10 @@ class $GardensTable extends Gardens with TableInfo<$GardensTable, GardenRow> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      bounds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bounds'],
+      ),
     );
   }
 
@@ -604,11 +629,16 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
   final String name;
   final DateTime createdAt;
   final DateTime updatedAt;
+
+  /// Plán zahrady (1.1, schéma 5): JSON `{"outline": [[x, y], ...]}`
+  /// v metrech; serverový sloupec `bounds`.
+  final String? bounds;
   const GardenRow({
     required this.id,
     required this.name,
     required this.createdAt,
     required this.updatedAt,
+    this.bounds,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -617,6 +647,9 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
     map['name'] = Variable<String>(name);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || bounds != null) {
+      map['bounds'] = Variable<String>(bounds);
+    }
     return map;
   }
 
@@ -626,6 +659,9 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
       name: Value(name),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      bounds: bounds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bounds),
     );
   }
 
@@ -639,6 +675,7 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
       name: serializer.fromJson<String>(json['name']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      bounds: serializer.fromJson<String?>(json['bounds']),
     );
   }
   @override
@@ -649,6 +686,7 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
       'name': serializer.toJson<String>(name),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'bounds': serializer.toJson<String?>(bounds),
     };
   }
 
@@ -657,11 +695,13 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
     String? name,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Value<String?> bounds = const Value.absent(),
   }) => GardenRow(
     id: id ?? this.id,
     name: name ?? this.name,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    bounds: bounds.present ? bounds.value : this.bounds,
   );
   GardenRow copyWithCompanion(GardensCompanion data) {
     return GardenRow(
@@ -669,6 +709,7 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
       name: data.name.present ? data.name.value : this.name,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      bounds: data.bounds.present ? data.bounds.value : this.bounds,
     );
   }
 
@@ -678,13 +719,14 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('bounds: $bounds')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, createdAt, updatedAt);
+  int get hashCode => Object.hash(id, name, createdAt, updatedAt, bounds);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -692,7 +734,8 @@ class GardenRow extends DataClass implements Insertable<GardenRow> {
           other.id == this.id &&
           other.name == this.name &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.bounds == this.bounds);
 }
 
 class GardensCompanion extends UpdateCompanion<GardenRow> {
@@ -700,12 +743,14 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
   final Value<String> name;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<String?> bounds;
   final Value<int> rowid;
   const GardensCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.bounds = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   GardensCompanion.insert({
@@ -713,6 +758,7 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     required String name,
     required DateTime createdAt,
     required DateTime updatedAt,
+    this.bounds = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
@@ -723,6 +769,7 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     Expression<String>? name,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<String>? bounds,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -730,6 +777,7 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
       if (name != null) 'name': name,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (bounds != null) 'bounds': bounds,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -739,6 +787,7 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     Value<String>? name,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<String?>? bounds,
     Value<int>? rowid,
   }) {
     return GardensCompanion(
@@ -746,6 +795,7 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      bounds: bounds ?? this.bounds,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -765,6 +815,9 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (bounds.present) {
+      map['bounds'] = Variable<String>(bounds.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -778,6 +831,7 @@ class GardensCompanion extends UpdateCompanion<GardenRow> {
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('bounds: $bounds, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -934,6 +988,26 @@ class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _polygonMeta = const VerificationMeta(
+    'polygon',
+  );
+  @override
+  late final GeneratedColumn<String> polygon = GeneratedColumn<String>(
+    'polygon',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _layerMeta = const VerificationMeta('layer');
+  @override
+  late final GeneratedColumn<String> layer = GeneratedColumn<String>(
+    'layer',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -982,6 +1056,8 @@ class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
     sunExposure,
     irrigation,
     covered,
+    polygon,
+    layer,
     createdAt,
     updatedAt,
     deletedAt,
@@ -1085,6 +1161,18 @@ class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
         covered.isAcceptableOrUnknown(data['covered']!, _coveredMeta),
       );
     }
+    if (data.containsKey('polygon')) {
+      context.handle(
+        _polygonMeta,
+        polygon.isAcceptableOrUnknown(data['polygon']!, _polygonMeta),
+      );
+    }
+    if (data.containsKey('layer')) {
+      context.handle(
+        _layerMeta,
+        layer.isAcceptableOrUnknown(data['layer']!, _layerMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -1168,6 +1256,14 @@ class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
         DriftSqlType.bool,
         data['${effectivePrefix}covered'],
       )!,
+      polygon: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}polygon'],
+      ),
+      layer: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}layer'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -1209,6 +1305,12 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
   final String? sunExposure;
   final String? irrigation;
   final bool covered;
+
+  /// Tvar na plánu zahrady (1.1, schéma 5): JSON `[[x, y], ...]` v metrech.
+  final String? polygon;
+
+  /// Vrstva plánu `reality` | `plan`; null = realita.
+  final String? layer;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
@@ -1226,6 +1328,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     this.sunExposure,
     this.irrigation,
     required this.covered,
+    this.polygon,
+    this.layer,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -1260,6 +1364,12 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
       map['irrigation'] = Variable<String>(irrigation);
     }
     map['covered'] = Variable<bool>(covered);
+    if (!nullToAbsent || polygon != null) {
+      map['polygon'] = Variable<String>(polygon);
+    }
+    if (!nullToAbsent || layer != null) {
+      map['layer'] = Variable<String>(layer);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || deletedAt != null) {
@@ -1295,6 +1405,12 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
           ? const Value.absent()
           : Value(irrigation),
       covered: Value(covered),
+      polygon: polygon == null && nullToAbsent
+          ? const Value.absent()
+          : Value(polygon),
+      layer: layer == null && nullToAbsent
+          ? const Value.absent()
+          : Value(layer),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -1322,6 +1438,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
       sunExposure: serializer.fromJson<String?>(json['sunExposure']),
       irrigation: serializer.fromJson<String?>(json['irrigation']),
       covered: serializer.fromJson<bool>(json['covered']),
+      polygon: serializer.fromJson<String?>(json['polygon']),
+      layer: serializer.fromJson<String?>(json['layer']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -1344,6 +1462,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
       'sunExposure': serializer.toJson<String?>(sunExposure),
       'irrigation': serializer.toJson<String?>(irrigation),
       'covered': serializer.toJson<bool>(covered),
+      'polygon': serializer.toJson<String?>(polygon),
+      'layer': serializer.toJson<String?>(layer),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
@@ -1364,6 +1484,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     Value<String?> sunExposure = const Value.absent(),
     Value<String?> irrigation = const Value.absent(),
     bool? covered,
+    Value<String?> polygon = const Value.absent(),
+    Value<String?> layer = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
@@ -1381,6 +1503,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     sunExposure: sunExposure.present ? sunExposure.value : this.sunExposure,
     irrigation: irrigation.present ? irrigation.value : this.irrigation,
     covered: covered ?? this.covered,
+    polygon: polygon.present ? polygon.value : this.polygon,
+    layer: layer.present ? layer.value : this.layer,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
@@ -1408,6 +1532,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
           ? data.irrigation.value
           : this.irrigation,
       covered: data.covered.present ? data.covered.value : this.covered,
+      polygon: data.polygon.present ? data.polygon.value : this.polygon,
+      layer: data.layer.present ? data.layer.value : this.layer,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -1430,6 +1556,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
           ..write('sunExposure: $sunExposure, ')
           ..write('irrigation: $irrigation, ')
           ..write('covered: $covered, ')
+          ..write('polygon: $polygon, ')
+          ..write('layer: $layer, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
@@ -1452,6 +1580,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     sunExposure,
     irrigation,
     covered,
+    polygon,
+    layer,
     createdAt,
     updatedAt,
     deletedAt,
@@ -1473,6 +1603,8 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
           other.sunExposure == this.sunExposure &&
           other.irrigation == this.irrigation &&
           other.covered == this.covered &&
+          other.polygon == this.polygon &&
+          other.layer == this.layer &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt);
@@ -1492,6 +1624,8 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
   final Value<String?> sunExposure;
   final Value<String?> irrigation;
   final Value<bool> covered;
+  final Value<String?> polygon;
+  final Value<String?> layer;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
@@ -1510,6 +1644,8 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     this.sunExposure = const Value.absent(),
     this.irrigation = const Value.absent(),
     this.covered = const Value.absent(),
+    this.polygon = const Value.absent(),
+    this.layer = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -1529,6 +1665,8 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     this.sunExposure = const Value.absent(),
     this.irrigation = const Value.absent(),
     this.covered = const Value.absent(),
+    this.polygon = const Value.absent(),
+    this.layer = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
@@ -1552,6 +1690,8 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     Expression<String>? sunExposure,
     Expression<String>? irrigation,
     Expression<bool>? covered,
+    Expression<String>? polygon,
+    Expression<String>? layer,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -1571,6 +1711,8 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
       if (sunExposure != null) 'sun_exposure': sunExposure,
       if (irrigation != null) 'irrigation': irrigation,
       if (covered != null) 'covered': covered,
+      if (polygon != null) 'polygon': polygon,
+      if (layer != null) 'layer': layer,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -1592,6 +1734,8 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     Value<String?>? sunExposure,
     Value<String?>? irrigation,
     Value<bool>? covered,
+    Value<String?>? polygon,
+    Value<String?>? layer,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
@@ -1611,6 +1755,8 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
       sunExposure: sunExposure ?? this.sunExposure,
       irrigation: irrigation ?? this.irrigation,
       covered: covered ?? this.covered,
+      polygon: polygon ?? this.polygon,
+      layer: layer ?? this.layer,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -1660,6 +1806,12 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     if (covered.present) {
       map['covered'] = Variable<bool>(covered.value);
     }
+    if (polygon.present) {
+      map['polygon'] = Variable<String>(polygon.value);
+    }
+    if (layer.present) {
+      map['layer'] = Variable<String>(layer.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1691,6 +1843,8 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
           ..write('sunExposure: $sunExposure, ')
           ..write('irrigation: $irrigation, ')
           ..write('covered: $covered, ')
+          ..write('polygon: $polygon, ')
+          ..write('layer: $layer, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -8638,6 +8792,7 @@ typedef $$GardensTableCreateCompanionBuilder =
       required String name,
       required DateTime createdAt,
       required DateTime updatedAt,
+      Value<String?> bounds,
       Value<int> rowid,
     });
 typedef $$GardensTableUpdateCompanionBuilder =
@@ -8646,6 +8801,7 @@ typedef $$GardensTableUpdateCompanionBuilder =
       Value<String> name,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<String?> bounds,
       Value<int> rowid,
     });
 
@@ -8850,6 +9006,11 @@ class $$GardensTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bounds => $composableBuilder(
+    column: $table.bounds,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -9107,6 +9268,11 @@ class $$GardensTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get bounds => $composableBuilder(
+    column: $table.bounds,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$GardensTableAnnotationComposer
@@ -9129,6 +9295,9 @@ class $$GardensTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get bounds =>
+      $composableBuilder(column: $table.bounds, builder: (column) => column);
 
   Expression<T> zonesRefs<T extends Object>(
     Expression<T> Function($$ZonesTableAnnotationComposer a) f,
@@ -9399,12 +9568,14 @@ class $$GardensTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<String?> bounds = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => GardensCompanion(
                 id: id,
                 name: name,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                bounds: bounds,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -9413,12 +9584,14 @@ class $$GardensTableTableManager
                 required String name,
                 required DateTime createdAt,
                 required DateTime updatedAt,
+                Value<String?> bounds = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => GardensCompanion.insert(
                 id: id,
                 name: name,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                bounds: bounds,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -9685,6 +9858,8 @@ typedef $$ZonesTableCreateCompanionBuilder =
       Value<String?> sunExposure,
       Value<String?> irrigation,
       Value<bool> covered,
+      Value<String?> polygon,
+      Value<String?> layer,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<DateTime?> deletedAt,
@@ -9705,6 +9880,8 @@ typedef $$ZonesTableUpdateCompanionBuilder =
       Value<String?> sunExposure,
       Value<String?> irrigation,
       Value<bool> covered,
+      Value<String?> polygon,
+      Value<String?> layer,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
@@ -9835,6 +10012,16 @@ class $$ZonesTableFilterComposer extends Composer<_$AppDatabase, $ZonesTable> {
 
   ColumnFilters<bool> get covered => $composableBuilder(
     column: $table.covered,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get polygon => $composableBuilder(
+    column: $table.polygon,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get layer => $composableBuilder(
+    column: $table.layer,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -9996,6 +10183,16 @@ class $$ZonesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get polygon => $composableBuilder(
+    column: $table.polygon,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get layer => $composableBuilder(
+    column: $table.layer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -10087,6 +10284,12 @@ class $$ZonesTableAnnotationComposer
 
   GeneratedColumn<bool> get covered =>
       $composableBuilder(column: $table.covered, builder: (column) => column);
+
+  GeneratedColumn<String> get polygon =>
+      $composableBuilder(column: $table.polygon, builder: (column) => column);
+
+  GeneratedColumn<String> get layer =>
+      $composableBuilder(column: $table.layer, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -10216,6 +10419,8 @@ class $$ZonesTableTableManager
                 Value<String?> sunExposure = const Value.absent(),
                 Value<String?> irrigation = const Value.absent(),
                 Value<bool> covered = const Value.absent(),
+                Value<String?> polygon = const Value.absent(),
+                Value<String?> layer = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -10234,6 +10439,8 @@ class $$ZonesTableTableManager
                 sunExposure: sunExposure,
                 irrigation: irrigation,
                 covered: covered,
+                polygon: polygon,
+                layer: layer,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -10254,6 +10461,8 @@ class $$ZonesTableTableManager
                 Value<String?> sunExposure = const Value.absent(),
                 Value<String?> irrigation = const Value.absent(),
                 Value<bool> covered = const Value.absent(),
+                Value<String?> polygon = const Value.absent(),
+                Value<String?> layer = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -10272,6 +10481,8 @@ class $$ZonesTableTableManager
                 sunExposure: sunExposure,
                 irrigation: irrigation,
                 covered: covered,
+                polygon: polygon,
+                layer: layer,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,

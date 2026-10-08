@@ -10,6 +10,8 @@ import '../../features/account/domain/consents.dart';
 import '../../features/account/domain/auth_service.dart';
 import '../../features/activity/data/drift_activity_repository.dart';
 import '../../features/assistant/data/demo_assistant_backend.dart';
+import '../../features/canvas/data/drift_plan_repository.dart';
+import '../../features/canvas/domain/plan_repository.dart';
 import '../../features/assistant/data/drift_assistant_repository.dart';
 import '../../features/assistant/data/supabase_assistant_backend.dart';
 import '../../features/assistant/domain/assistant_backend.dart';
@@ -78,6 +80,15 @@ final activityRepositoryProvider = Provider<ActivityRepository>(
 
 final zoneRepositoryProvider = Provider<ZoneRepository>(
   (ref) => DriftZoneRepository(
+    ref.watch(databaseProvider),
+    ref.watch(gardenIdProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+/// Obrys zahrady a podklad plánu (1.1).
+final planRepositoryProvider = Provider<PlanRepository>(
+  (ref) => DriftPlanRepository(
     ref.watch(databaseProvider),
     ref.watch(gardenIdProvider),
     ref.watch(clockProvider),

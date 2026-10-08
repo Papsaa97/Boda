@@ -107,7 +107,7 @@ List<Calculation> calculationsFor({
 }) {
   final measured = [
     for (final z in zones)
-      if (!z.archived && (z.areaM2 ?? 0) > 0) z,
+      if (z.isActive && (z.areaM2 ?? 0) > 0) z,
   ];
   final dosed = [
     for (final i in inventory)

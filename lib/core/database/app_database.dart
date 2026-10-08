@@ -21,6 +21,10 @@ class Gardens extends Table {
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 
+  /// Plán zahrady (1.1, schéma 5): JSON `{"outline": [[x, y], ...]}`
+  /// v metrech; serverový sloupec `bounds`.
+  TextColumn get bounds => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -48,6 +52,12 @@ class Zones extends Table {
   TextColumn get sunExposure => text().nullable()();
   TextColumn get irrigation => text().nullable()();
   BoolColumn get covered => boolean().withDefault(const Constant(false))();
+
+  /// Tvar na plánu zahrady (1.1, schéma 5): JSON `[[x, y], ...]` v metrech.
+  TextColumn get polygon => text().nullable()();
+
+  /// Vrstva plánu `reality` | `plan`; null = realita.
+  TextColumn get layer => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -298,7 +308,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -371,6 +381,12 @@ class AppDatabase extends _$AppDatabase {
         ]) {
           await m.create(trigger);
         }
+      },
+      // 1.1: plán zahrady – obrys zahrady, tvary a vrstvy zón.
+      from4To5: (m, schema) async {
+        await m.addColumn(schema.gardens, schema.gardens.bounds);
+        await m.addColumn(schema.zones, schema.zones.polygon);
+        await m.addColumn(schema.zones, schema.zones.layer);
       },
     ),
     beforeOpen: (details) async {

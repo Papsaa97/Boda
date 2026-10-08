@@ -91,13 +91,18 @@ const _times = {
 
 /// Tabulky v pořadí cizích klíčů (rodiče dřív).
 const syncTables = <SyncTable>[
-  SyncTable('gardens', gardenColumn: 'id', kinds: _times),
+  SyncTable(
+    'gardens',
+    gardenColumn: 'id',
+    kinds: {..._times, 'bounds': SyncKind.json},
+  ),
   SyncTable(
     'zones',
     kinds: {
       ..._times,
       'archived': SyncKind.boolean,
       'covered': SyncKind.boolean,
+      'polygon': SyncKind.json,
     },
   ),
   SyncTable(

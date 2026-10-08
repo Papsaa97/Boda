@@ -1980,4 +1980,203 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get assistantLimitPremium => 'Víc dotazů s Premium';
+
+  @override
+  String get canvasTitle => 'Plán zahrady';
+
+  @override
+  String get canvasCardSubtitle => 'Obrys, zóny na mapě a jejich výměry';
+
+  @override
+  String get zonePlannedSection => 'V návrhu (plán zahrady)';
+
+  @override
+  String get canvasToolSelect => 'Vybrat';
+
+  @override
+  String get canvasToolOutline => 'Obrys';
+
+  @override
+  String get canvasToolZone => 'Zóna';
+
+  @override
+  String get canvasToolCalibrate => 'Kalibrovat';
+
+  @override
+  String get canvasToolMeasure => 'Kontrola';
+
+  @override
+  String get canvasUndo => 'Zpět';
+
+  @override
+  String get canvasRedo => 'Znovu';
+
+  @override
+  String get canvasLayerReality => 'Realita';
+
+  @override
+  String get canvasLayerPlan => 'Návrh';
+
+  @override
+  String get canvasLayerBoth => 'Obojí';
+
+  @override
+  String get canvasSnap => 'Přitahovat k mřížce (0,5 m)';
+
+  @override
+  String get canvasEmptyHint =>
+      'Začni obrysem zahrady: vyber Obrys a klepáním přidávej rohy. Mřížka má čtverce 1 m.';
+
+  @override
+  String get canvasHintOutline =>
+      'Klepáním přidávej rohy obrysu. Uzavřeš ho klepnutím na první bod nebo tlačítkem Hotovo.';
+
+  @override
+  String get canvasHintZone =>
+      'Klepáním přidávej rohy zóny. Uzavřeš ji klepnutím na první bod nebo tlačítkem Hotovo.';
+
+  @override
+  String get canvasHintEdit =>
+      'Táhni uzlem. Klepnutím na malý bod uprostřed hrany přidáš uzel.';
+
+  @override
+  String get canvasHintCalibrate =>
+      'Klepni na začátek a konec úsečky, jejíž délku znáš (třeba plot nebo stěna domu).';
+
+  @override
+  String get canvasHintMeasure =>
+      'Pro kontrolu klepni na začátek a konec jiné známé vzdálenosti.';
+
+  @override
+  String get canvasDone => 'Hotovo';
+
+  @override
+  String get canvasDiscard => 'Zahodit';
+
+  @override
+  String get canvasEditNodes => 'Upravit uzly';
+
+  @override
+  String get canvasEditDone => 'Hotovo s úpravou';
+
+  @override
+  String get canvasDeleteVertex => 'Smazat uzel';
+
+  @override
+  String get canvasRemoveShape => 'Odebrat z plánu';
+
+  @override
+  String get canvasRemoveOutline => 'Smazat obrys';
+
+  @override
+  String get canvasRealize => 'Zrealizovat';
+
+  @override
+  String canvasRealizedActivity(String name) {
+    return 'Zrealizováno podle plánu: $name';
+  }
+
+  @override
+  String canvasRealized(String name) {
+    return '$name je teď v Realitě a v deníku přibyl záznam.';
+  }
+
+  @override
+  String canvasSelectedOutline(String area) {
+    return 'Obrys zahrady · $area m²';
+  }
+
+  @override
+  String canvasSelectedZone(String name, String area) {
+    return '$name · $area m²';
+  }
+
+  @override
+  String canvasSelectedPlanned(String name, String area) {
+    return '$name · $area m² · v návrhu';
+  }
+
+  @override
+  String get canvasAssignTitle => 'Ke které zóně tvar patří?';
+
+  @override
+  String get canvasAssignNew => 'Nová zóna';
+
+  @override
+  String get canvasAssignNewName => 'Název nové zóny';
+
+  @override
+  String get canvasAssignCreate => 'Vytvořit zónu';
+
+  @override
+  String get canvasAssignPlanned => 'Nová zóna půjde do vrstvy Návrh.';
+
+  @override
+  String get canvasOutsideOutline =>
+      'Zóna přesahuje obrys zahrady. Zkontroluj uzly.';
+
+  @override
+  String canvasAreaSuggest(String name, String plan, String current) {
+    return 'Podle plánu má $name $plan m², zadáno je $current m².';
+  }
+
+  @override
+  String get canvasAreaUse => 'Použít';
+
+  @override
+  String get canvasLengthTitle => 'Skutečná délka';
+
+  @override
+  String get canvasLengthLabel => 'Délka v metrech';
+
+  @override
+  String get canvasLengthInvalid => 'Zadej kladné číslo.';
+
+  @override
+  String canvasLengthDrawn(String length) {
+    return 'Na plánu teď $length m.';
+  }
+
+  @override
+  String get canvasCalibrated =>
+      'Plán je přepočtený na metry. Pro kontrolu změř ještě jednu známou vzdálenost.';
+
+  @override
+  String canvasDeviationOk(String value) {
+    return 'Odchylka $value %, měřítko sedí.';
+  }
+
+  @override
+  String canvasDeviationBad(String value) {
+    return 'Odchylka $value % je víc než 5 %. Podklad je asi zkreslený (šikmá fotka, nepřesný plánek).';
+  }
+
+  @override
+  String get canvasBackgroundPick => 'Vložit podklad';
+
+  @override
+  String get canvasBackgroundRemove => 'Odebrat podklad';
+
+  @override
+  String get canvasBackgroundHelp =>
+      'Fotka plánku nebo snímek mapy, který máš u sebe. Pak plán zkalibruj podle známé délky.';
+
+  @override
+  String get canvasBackgroundFailed => 'Obrázek se nepodařilo načíst.';
+
+  @override
+  String get canvasMore => 'Další volby';
+
+  @override
+  String canvasSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count zón',
+      few: '$count zóny',
+      one: '1 zóna',
+      zero: 'žádná zóna',
+    );
+    return 'Plán zahrady, $_temp0';
+  }
 }

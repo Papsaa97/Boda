@@ -1174,5 +1174,141 @@
   "premiumRestored": "Nákupy obnovené.",
   "premiumFailed": "Nákup se nepovedl. Zkus to prosím znovu.",
   "premiumOffline": "Bez připojení. Zkus to, až budeš online.",
-  "assistantLimitPremium": "Víc dotazů s Premium"
+  "assistantLimitPremium": "Víc dotazů s Premium",
+  "canvasTitle": "Plán zahrady",
+  "canvasCardSubtitle": "Obrys, zóny na mapě a jejich výměry",
+  "zonePlannedSection": "V návrhu (plán zahrady)",
+  "canvasToolSelect": "Vybrat",
+  "canvasToolOutline": "Obrys",
+  "canvasToolZone": "Zóna",
+  "canvasToolCalibrate": "Kalibrovat",
+  "canvasToolMeasure": "Kontrola",
+  "canvasUndo": "Zpět",
+  "canvasRedo": "Znovu",
+  "canvasLayerReality": "Realita",
+  "canvasLayerPlan": "Návrh",
+  "canvasLayerBoth": "Obojí",
+  "canvasSnap": "Přitahovat k mřížce (0,5 m)",
+  "canvasEmptyHint": "Začni obrysem zahrady: vyber Obrys a klepáním přidávej rohy. Mřížka má čtverce 1 m.",
+  "canvasHintOutline": "Klepáním přidávej rohy obrysu. Uzavřeš ho klepnutím na první bod nebo tlačítkem Hotovo.",
+  "canvasHintZone": "Klepáním přidávej rohy zóny. Uzavřeš ji klepnutím na první bod nebo tlačítkem Hotovo.",
+  "canvasHintEdit": "Táhni uzlem. Klepnutím na malý bod uprostřed hrany přidáš uzel.",
+  "canvasHintCalibrate": "Klepni na začátek a konec úsečky, jejíž délku znáš (třeba plot nebo stěna domu).",
+  "canvasHintMeasure": "Pro kontrolu klepni na začátek a konec jiné známé vzdálenosti.",
+  "canvasDone": "Hotovo",
+  "canvasDiscard": "Zahodit",
+  "canvasEditNodes": "Upravit uzly",
+  "canvasEditDone": "Hotovo s úpravou",
+  "canvasDeleteVertex": "Smazat uzel",
+  "canvasRemoveShape": "Odebrat z plánu",
+  "canvasRemoveOutline": "Smazat obrys",
+  "canvasRealize": "Zrealizovat",
+  "canvasRealizedActivity": "Zrealizováno podle plánu: {name}",
+  "@canvasRealizedActivity": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasRealized": "{name} je teď v Realitě a v deníku přibyl záznam.",
+  "@canvasRealized": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasSelectedOutline": "Obrys zahrady · {area} m²",
+  "@canvasSelectedOutline": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasSelectedZone": "{name} · {area} m²",
+  "@canvasSelectedZone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasSelectedPlanned": "{name} · {area} m² · v návrhu",
+  "@canvasSelectedPlanned": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasAssignTitle": "Ke které zóně tvar patří?",
+  "canvasAssignNew": "Nová zóna",
+  "canvasAssignNewName": "Název nové zóny",
+  "canvasAssignCreate": "Vytvořit zónu",
+  "canvasAssignPlanned": "Nová zóna půjde do vrstvy Návrh.",
+  "canvasOutsideOutline": "Zóna přesahuje obrys zahrady. Zkontroluj uzly.",
+  "canvasAreaSuggest": "Podle plánu má {name} {plan} m², zadáno je {current} m².",
+  "@canvasAreaSuggest": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "plan": {
+        "type": "String"
+      },
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasAreaUse": "Použít",
+  "canvasLengthTitle": "Skutečná délka",
+  "canvasLengthLabel": "Délka v metrech",
+  "canvasLengthInvalid": "Zadej kladné číslo.",
+  "canvasLengthDrawn": "Na plánu teď {length} m.",
+  "@canvasLengthDrawn": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasCalibrated": "Plán je přepočtený na metry. Pro kontrolu změř ještě jednu známou vzdálenost.",
+  "canvasDeviationOk": "Odchylka {value} %, měřítko sedí.",
+  "@canvasDeviationOk": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasDeviationBad": "Odchylka {value} % je víc než 5 %. Podklad je asi zkreslený (šikmá fotka, nepřesný plánek).",
+  "@canvasDeviationBad": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "canvasBackgroundPick": "Vložit podklad",
+  "canvasBackgroundRemove": "Odebrat podklad",
+  "canvasBackgroundHelp": "Fotka plánku nebo snímek mapy, který máš u sebe. Pak plán zkalibruj podle známé délky.",
+  "canvasBackgroundFailed": "Obrázek se nepodařilo načíst.",
+  "canvasMore": "Další volby",
+  "canvasSemantics": "Plán zahrady, {count, plural, =0{žádná zóna} =1{1 zóna} few{{count} zóny} other{{count} zón}}",
+  "@canvasSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -16,7 +16,7 @@ class ZonesController extends AsyncNotifier<List<ZoneEntity>> {
 
   List<ZoneEntity> get _current => state.value ?? const <ZoneEntity>[];
 
-  int get _activeCount => _current.where((z) => !z.archived).length;
+  int get _activeCount => _current.where((z) => z.isActive).length;
 
   /// Přidá zónu. Vrací důvod, když název neprojde kontrolou.
   Future<ZoneNameError?> addZone(
@@ -124,7 +124,7 @@ final activeZonesProvider = Provider<List<ZoneEntity>>((ref) {
   final zones = ref.watch(zonesControllerProvider).value ?? const [];
   return [
     for (final z in zones)
-      if (!z.archived) z,
+      if (z.isActive) z,
   ];
 });
 
