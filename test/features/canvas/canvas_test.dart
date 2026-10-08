@@ -11,6 +11,7 @@ import 'package:zahradnik_boda/features/canvas/domain/plan_repository.dart';
 import 'package:zahradnik_boda/features/canvas/domain/edit_history.dart';
 import 'package:zahradnik_boda/features/canvas/presentation/canvas_controller.dart';
 import 'package:zahradnik_boda/features/canvas/presentation/canvas_screen.dart';
+import 'package:zahradnik_boda/features/canvas/presentation/plan_painter.dart';
 import 'package:zahradnik_boda/features/zones/data/drift_zone_repository.dart';
 import 'package:zahradnik_boda/features/zones/domain/zone_entity.dart';
 import 'package:zahradnik_boda/features/zones/presentation/zones_controller.dart';
@@ -97,6 +98,37 @@ void main() {
         lessThan(maxCalibrationDeviationPercent),
       );
       expect(() => calibrationFactor(drawn: 0, real: 1), throwsArgumentError);
+    });
+  });
+
+  group('fitPlanToView', () {
+    // Zahrada 24 × 16 m na plátně 60 × 40 m s okrajem 10 m.
+    const garden = [Pt(0, 0), Pt(24, 0), Pt(24, 16), Pt(0, 16)];
+    const viewport = Size(390, 600);
+
+    Offset apply(Matrix4 m, Offset o) => MatrixUtils.transformPoint(m, o);
+
+    test('centres the drawn plan and fits it into the viewport', () {
+      const frame = PlanFrame(Pt(-10, -10), 60, 40);
+      final m = fitPlanToView(frame, garden, viewport)!;
+      final topLeft = apply(m, frame.toPx(garden[0]));
+      final bottomRight = apply(m, frame.toPx(garden[2]));
+      expect(topLeft.dx, closeTo(16, 0.01));
+      expect(bottomRight.dx, closeTo(374, 0.01));
+      expect(topLeft.dy, greaterThanOrEqualTo(16));
+      expect(bottomRight.dy, lessThanOrEqualTo(584));
+      expect((topLeft.dy + bottomRight.dy) / 2, closeTo(300, 0.01));
+    });
+
+    test('does not blow up a tiny plan', () {
+      const frame = PlanFrame(Pt(-10, -10), 60, 40);
+      final m = fitPlanToView(frame, const [Pt(1, 1)], viewport)!;
+      expect(m.getMaxScaleOnAxis(), 3);
+    });
+
+    test('leaves an empty canvas alone', () {
+      const frame = PlanFrame(Pt(0, 0), 60, 40);
+      expect(fitPlanToView(frame, const [], viewport), isNull);
     });
   });
 
@@ -441,5 +473,47 @@ void main() {
     await tester.tap(find.text('Návrh'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('canvas screen opens with the whole garden in view', (
+    tester,
+  ) async {
+    final plan = InMemoryPlanRepository()
+      ..outline = const [Pt(0, 0), Pt(24, 0), Pt(24, 16), Pt(0, 16)];
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...testOverrides(zones: InMemoryZoneRepository([])),
+          planRepositoryProvider.overrideWithValue(plan),
+        ],
+        child: MaterialApp(
+          locale: const Locale('cs'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: const CanvasScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final viewer = find.byType(InteractiveViewer);
+    final size = tester.getSize(viewer);
+    final m = tester
+        .widget<InteractiveViewer>(viewer)
+        .transformationController!
+        .value;
+    // Obrys začíná 10 m od rohu plátna (PlanFrame), po otevření je celý vidět.
+    const corner = 10 * pixelsPerMeter;
+    final topLeft = MatrixUtils.transformPoint(m, const Offset(corner, corner));
+    final bottomRight = MatrixUtils.transformPoint(
+      m,
+      const Offset(corner + 24 * pixelsPerMeter, corner + 16 * pixelsPerMeter),
+    );
+    expect(topLeft.dx, greaterThanOrEqualTo(0));
+    expect(topLeft.dy, greaterThanOrEqualTo(0));
+    expect(bottomRight.dx, lessThanOrEqualTo(size.width));
+    expect(bottomRight.dy, lessThanOrEqualTo(size.height));
   });
 }

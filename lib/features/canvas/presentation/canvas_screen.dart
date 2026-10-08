@@ -332,7 +332,7 @@ class _CanvasScreenState extends ConsumerState<CanvasScreen> {
 }
 
 /// Posuvné a zvětšitelné plátno s podkladem a kresbou.
-class _PlanView extends ConsumerWidget {
+class _PlanView extends ConsumerStatefulWidget {
   const _PlanView({
     required this.state,
     required this.onTap,
@@ -344,7 +344,42 @@ class _PlanView extends ConsumerWidget {
   final VoidCallback onDragEnd;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_PlanView> createState() => _PlanViewState();
+}
+
+class _PlanViewState extends ConsumerState<_PlanView> {
+  final _transform = TransformationController();
+
+  /// Plán se přizpůsobí oknu jen při otevření, ne při každé změně kresby.
+  bool _fitted = false;
+
+  @override
+  void dispose() {
+    _transform.dispose();
+    super.dispose();
+  }
+
+  /// Na telefonu by plán začínal v rohu plátna a zahrada by ležela
+  /// napůl mimo obrazovku; proto se po otevření vycentruje a zmenší.
+  void _fitOnce(PlanFrame frame, Size viewport) {
+    if (_fitted || viewport.isEmpty) return;
+    _fitted = true;
+    final s = widget.state;
+    final fit = fitPlanToView(frame, [
+      ...s.doc.allPoints,
+      if (s.background case final b?) ...[
+        b.origin,
+        b.origin + Pt(b.widthM, b.heightM),
+      ],
+    ], viewport);
+    if (fit != null) _transform.value = fit;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = widget.state;
+    final onTap = widget.onTap;
+    final onDragEnd = widget.onDragEnd;
     final l = AppLocalizations.of(context);
     final controller = ref.read(canvasControllerProvider.notifier);
     final zones = <String, ZoneEntity>{
@@ -361,58 +396,65 @@ class _PlanView extends ConsumerWidget {
     final editing = state.tool == CanvasTool.edit;
     return Semantics(
       label: l.canvasSemantics(state.doc.shapes.length),
-      child: InteractiveViewer(
-        constrained: false,
-        minScale: 0.2,
-        maxScale: 8,
-        panEnabled: !editing,
-        boundaryMargin: const EdgeInsets.all(200),
-        child: GestureDetector(
-          onTapUp: (d) => onTap(frame.toMeters(d.localPosition)),
-          onPanStart: editing
-              ? (d) => controller.dragStart(frame.toMeters(d.localPosition))
-              : null,
-          onPanUpdate: editing
-              ? (d) => controller.dragUpdate(frame.toMeters(d.localPosition))
-              : null,
-          onPanEnd: editing ? (_) => onDragEnd() : null,
-          child: SizedBox.fromSize(
-            size: frame.size,
-            child: Stack(
-              children: [
-                if (background != null && backgroundFile != null)
-                  Positioned(
-                    left: frame.toPx(background.origin).dx,
-                    top: frame.toPx(background.origin).dy,
-                    width: background.widthM * pixelsPerMeter,
-                    height: background.heightM * pixelsPerMeter,
-                    child: Opacity(
-                      opacity: 0.55,
-                      child: Image.file(
-                        File(backgroundFile),
-                        fit: BoxFit.fill,
-                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          _fitOnce(frame, constraints.biggest);
+          return InteractiveViewer(
+            transformationController: _transform,
+            constrained: false,
+            minScale: 0.2,
+            maxScale: 8,
+            panEnabled: !editing,
+            boundaryMargin: const EdgeInsets.all(200),
+            child: GestureDetector(
+              onTapUp: (d) => onTap(frame.toMeters(d.localPosition)),
+              onPanStart: editing
+                  ? (d) => controller.dragStart(frame.toMeters(d.localPosition))
+                  : null,
+              onPanUpdate: editing
+                  ? (d) =>
+                        controller.dragUpdate(frame.toMeters(d.localPosition))
+                  : null,
+              onPanEnd: editing ? (_) => onDragEnd() : null,
+              child: SizedBox.fromSize(
+                size: frame.size,
+                child: Stack(
+                  children: [
+                    if (background != null && backgroundFile != null)
+                      Positioned(
+                        left: frame.toPx(background.origin).dx,
+                        top: frame.toPx(background.origin).dy,
+                        width: background.widthM * pixelsPerMeter,
+                        height: background.heightM * pixelsPerMeter,
+                        child: Opacity(
+                          opacity: 0.55,
+                          child: Image.file(
+                            File(backgroundFile),
+                            fit: BoxFit.fill,
+                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                          ),
+                        ),
+                      ),
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: PlanPainter(
+                          state: state,
+                          frame: frame,
+                          zones: zones,
+                          scheme: theme.colorScheme,
+                          textStyle: theme.textTheme.labelMedium!.copyWith(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: PlanPainter(
-                      state: state,
-                      frame: frame,
-                      zones: zones,
-                      scheme: theme.colorScheme,
-                      textStyle: theme.textTheme.labelMedium!.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
